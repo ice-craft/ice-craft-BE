@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 
 const app = express();
 const httpServer = createServer(app);
+const port = 4000;
 const io = new Server(httpServer);
 
 io.on("connection", (socket) => {
@@ -11,4 +12,6 @@ io.on("connection", (socket) => {
   socket.emit("소켓과 연결되었습니다.");
 });
 
-httpServer.listen(4000);
+app.listen(port, () => {
+  console.log(`port(${port})으로 실행 중`);
+});
