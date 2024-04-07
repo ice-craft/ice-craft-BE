@@ -18,11 +18,11 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("클라이언트와 연결되었습니다.");
+  socket.emit("server", `${socket.id}님이 들어 오셨습니다.`);
 });
 
 io.on("disconnection", (socket) => {
-  console.log("클라이언트와 연결이 끊겼습니다.");
+  socket.emit("server", `${socket.id}님이 나가셨습니다.`);
 });
 
 httpServer.listen(port, () => {
