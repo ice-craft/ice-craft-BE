@@ -21,6 +21,10 @@ io.on("connection", (socket) => {
   socket.data.name = `user${count++}`;
   socket.emit("server", "채팅방에 들어오신 것을 환영합니다.");
   socket.broadcast.emit("server", `${socket.data.name}님이 들어 오셨습니다.`);
+
+  socket.on("toAll", (userName, message) => {
+    io.emit("server", `[${userName}] ${message}`);
+  });
 });
 
 io.on("disconnection", () => {
