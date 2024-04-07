@@ -11,16 +11,18 @@ const io = new Server(httpServer, {
   },
 });
 
+let count = 0;
+
 app.get("/", (req, res) => {
-  res.send("connected");
+  res.send("express 서버와 연결되어 있습니다.");
 });
 
 io.on("connection", (socket) => {
-  console.log("connected");
+  console.log("클라이언트와 연결되었습니다.");
 });
 
 io.on("disconnection", (socket) => {
-  console.log("disconnect");
+  console.log("클라이언트와 연결이 끊겼습니다.");
 });
 
 httpServer.listen(port, () => {
