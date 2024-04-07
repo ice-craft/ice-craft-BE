@@ -18,11 +18,13 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  socket.emit("server", `${socket.id}님이 들어 오셨습니다.`);
+  socket.data.name = `user${count++}`;
+  socket.emit("server", "채팅방에 들어오신 것을 환영합니다.");
+  socket.broadcast.emit("server", `${socket.data.name}님이 들어 오셨습니다.`);
 });
 
-io.on("disconnection", (socket) => {
-  socket.emit("server", `${socket.id}님이 나가셨습니다.`);
+io.on("disconnection", () => {
+  console.log("클라이언트와의 연결이 끊겼습니다.");
 });
 
 httpServer.listen(port, () => {
