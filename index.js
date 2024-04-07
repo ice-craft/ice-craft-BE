@@ -1,11 +1,14 @@
 import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+
 const app = express();
-const port = 4000;
+const httpServer = createServer(app);
+const io = new Server(httpServer);
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+io.on("connection", (socket) => {
+  console.log("연결됨");
+  socket.emit("소켓과 연결되었습니다.");
 });
 
-app.listen(port, () => {
-  console.log(`port : ${port}`);
-});
+httpServer.listen(4000);
