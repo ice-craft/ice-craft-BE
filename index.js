@@ -16,11 +16,11 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("A user connected");
+  console.log("connected");
 });
 
 io.on("disconnection", (socket) => {
-  console.log("A user connected");
+  console.log("disconnect");
 });
 
 httpServer.listen(port, () => {
