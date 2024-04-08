@@ -12,14 +12,15 @@ const io = new Server(httpServer, {
     origin: "http://localhost:3000",
   },
 });
+const mafiaIo = io.of("/mafia");
 
 app.get("/", (req, res) => {
   res.send("express 서버와 연결되어 있습니다.");
 });
 
-io.on("connection", (socket) => {
+mafiaIo.on("connection", (socket) => {
   socket.on("toAll", (userName, message) => {
-    io.emit("server", `[${userName}] ${message}`);
+    mafiaIo.emit("server", `[${userName}] ${message}`);
   });
 
   socket.on("enter", (nickname) => {
