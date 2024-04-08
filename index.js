@@ -21,7 +21,10 @@ app.get("/", (req, res) => {
 
 mafiaIo.on("connection", (socket) => {
   socket.on("toAll", (nickname, message) => {
-    socket.to(userInRoom[nickname]).emit("server", `[${nickname}] ${message}`);
+    socket.broadcast
+      .to(userInRoom[nickname])
+      .emit("server", `[${nickname}] ${message}`);
+    socket.emit("server", `[나] ${message}`);
   });
 
   socket.on("enterMafia", (nickname) => {
