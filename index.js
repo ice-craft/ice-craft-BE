@@ -1,3 +1,5 @@
+//NOTE - 네임스페이스, 룸 구현
+
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -11,19 +13,22 @@ const io = new Server(httpServer, {
   },
 });
 
-let count = 0;
-
 app.get("/", (req, res) => {
   res.send("express 서버와 연결되어 있습니다.");
 });
 
 io.on("connection", (socket) => {
-  socket.data.name = `user${count++}`;
-  socket.emit("server", "채팅방에 들어오신 것을 환영합니다.");
-  socket.broadcast.emit("server", `${socket.data.name}님이 들어 오셨습니다.`);
-
   socket.on("toAll", (userName, message) => {
     io.emit("server", `[${userName}] ${message}`);
+  });
+
+  socket.on("enter", (nickname) => {
+    socket.emit("server", "채팅방에 들어오신 것을 환영합니다.");
+    socket.broadcast.emit("server", `${nickname}님이 들어오셨습니다.`);
+  });
+
+  socket.on("exit", (nickname) => {
+    socket.broadcast.emit("server", `${nickname}님이 나가셨습니다.`);
   });
 });
 
