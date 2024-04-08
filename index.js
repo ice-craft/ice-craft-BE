@@ -13,19 +13,32 @@ const io = new Server(httpServer, {
   },
 });
 const mafiaIo = io.of("/mafia");
+const userInRoom = {};
 
 app.get("/", (req, res) => {
   res.send("express 서버와 연결되어 있습니다.");
 });
 
 mafiaIo.on("connection", (socket) => {
-  socket.on("toAll", (userName, message) => {
-    mafiaIo.emit("server", `[${userName}] ${message}`);
+  socket.on("toAll", (nickname, message) => {
+    socket.to(userInRoom[nickname]).emit("server", `[${nickname}] ${message}`);
   });
 
-  socket.on("enter", (nickname) => {
-    socket.emit("server", "채팅방에 들어오신 것을 환영합니다.");
-    socket.broadcast.emit("server", `${nickname}님이 들어오셨습니다.`);
+  socket.on("enterMafia", (nickname) => {
+    socket.emit("server", "마피아 게임에 들어오신 것을 환영합니다.");
+    socket.broadcast.emit(
+      "server",
+      `${nickname}님이 마피아 게임에들어오셨습니다.`
+    );
+  });
+
+  socket.on("enterRoom", (nickname, roomId) => {
+    socket.join(roomId);
+    userInRoom[nickname] = roomId;
+    socket.broadcast
+      .to(roomId)
+      .emit("server", `${nickname}님이 방${roomId}에 들어오셨습니다.`);
+    socket.emit("server", `방${roomId}에 들어오신 것을 환영합니다.`);
   });
 
   socket.on("exit", (nickname) => {
