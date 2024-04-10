@@ -10,8 +10,9 @@
   "author": "KMH",
   "license": "MIT",
   "dependencies": {
-    "cors": "^2.8.5",
+    "@supabase/supabase-js": "github:supabase/supabase-js",
     "express": "^4.19.2",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "supabase": "^1.153.4"
   }
 }
