@@ -13,7 +13,6 @@ const io = new Server(httpServer, {
   },
 });
 const mafiaIo = io.of("/mafia");
-const userInRoom = {};
 
 app.get("/", (req, res) => {
   res.send("express 서버와 연결되어 있습니다.");
@@ -56,3 +55,5 @@ io.on("disconnection", () => {
 httpServer.listen(port, () => {
   console.log(`port(${port})으로 실행 중`);
 });
+
+const gamePlay = () => {};
