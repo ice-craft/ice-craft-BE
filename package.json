@@ -10,7 +10,7 @@
   "author": "KMH",
   "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "github:supabase/supabase-js",
+    "@supabase/supabase-js": "^2.42.0",
     "express": "^4.19.2",
     "socket.io": "^4.7.5",
     "supabase": "^1.153.4"
