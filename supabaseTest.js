@@ -1,3 +1,0 @@
-const test = async () => {};
-
-test();
