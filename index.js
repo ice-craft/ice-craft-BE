@@ -66,13 +66,12 @@ mafiaIo.on("connection", (socket) => {
       mafiaIo.to(roomId).emit("joinRoom", userInfo);
     } catch (error) {
       console.log("[joinRoomError] : 방 입장에 실패했습니다.");
-      mafiaIo.to(roomId).emit("joinRoomError", "방 입장에 실패했습니다.");
+      socket.emit("joinRoomError", "방 입장에 실패했습니다.");
     }
   });
 
   socket.on("fastJoinRoom", async (userId, nickname) => {
     console.log(`[fastJoinRoom] : userId : ${userId}, nickname : ${nickname}`);
-    let roomId;
     try {
       const roomId = await fastJoinRoom(userId, nickname);
       socket.join(roomId);
@@ -82,9 +81,7 @@ mafiaIo.on("connection", (socket) => {
       mafiaIo.to(roomId).emit("fastJoinRoom", roomId, userInfo);
     } catch (error) {
       console.log("[fastJoinRoomError] : 빠른 방 입장에 실패했습니다.");
-      mafiaIo
-        .to(roomId)
-        .emit("fastJoinRoomError", "빠른 방 입장에 실패했습니다.");
+      socket.emit("fastJoinRoomError", "빠른 방 입장에 실패했습니다.");
     }
   });
 
@@ -98,7 +95,17 @@ mafiaIo.on("connection", (socket) => {
       mafiaIo.to(roomId).emit("exitRoom", userInfo);
     } catch (error) {
       console.log("[exitRoomError] : 방에서 나가기에 실패했습니다.");
-      mafiaIo.to(roomId).emit("exitRoomError", "방에서 나가기에 실패했습니다.");
+      socket.emit("exitRoomError", "방에서 나가기에 실패했습니다.");
+    }
+  });
+
+  socket.on("setReady", async (userId, ready) => {
+    console.log(`[setReady] : userId : ${userId}, ready:${ready}`);
+    try {
+      await setReady(userId, ready);
+    } catch (error) {
+      console.log("[setReady] : 레디를 설정하는데 실패했습니다.");
+      socket.emit("setReadyError", "방에서 나가기에 실패했습니다.");
     }
   });
 
