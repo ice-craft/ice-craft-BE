@@ -162,3 +162,7 @@ httpServer.listen(port, () => {
 const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
   mafiaIo.emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
 };
+
+const setCamera = (roomName, isOn) => {
+  mafiaIo.emit("setCamera", isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
+};
