@@ -4,9 +4,11 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import {
+  fastJoinRoom,
   getRooms,
   getUserIdInRoom,
   getUserInfoInRoom,
+  joinRoom,
 } from "./api/supabse/roomAPI.js";
 
 const app = express();
@@ -43,19 +45,40 @@ mafiaIo.on("connection", (socket) => {
   //   socket.emit("userIdInRoom", userId);
   // });
 
-  socket.on("getUserInfoInRoom", async (roomId) => {
-    console.log("방 안의 유저들 id와 닉네임목록 가져오기", roomId);
-    const userInfo = await getUserInfoInRoom(roomId);
-    socket.emit("userInfoInRoom", userInfo);
+  // socket.on("getUserInfoInRoom", async (roomId) => {
+  //   console.log("방 안의 유저들 id와 닉네임목록 가져오기", roomId);
+  //   const userInfo = await getUserInfoInRoom(roomId);
+  //   socket.emit("userInfoInRoom", userInfo);
+  // });
+
+  socket.on("joinRoom", async (userId, roomId, nickname) => {
+    console.log(
+      `[joinRoom] : userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`
+    );
+    try {
+      socket.join(roomId);
+
+      await joinRoom(roomId, userId, nickname);
+      const userInfo = await getUserInfoInRoom(roomId);
+
+      mafiaIo.to(roomId).emit("joinRoom", userInfo);
+    } catch (error) {
+      mafiaIo.to(roomId).emit("joinRoomError", "방 입장에 실패했습니다.");
+    }
   });
 
-  socket.on("enterRoom", (nickname, roomId) => {
-    socket.join(roomId);
-    userInRoom[nickname] = roomId;
-    socket.broadcast
-      .to(roomId)
-      .emit("server", `${nickname}님이 방${roomId}에 들어오셨습니다.`);
-    socket.emit("server", `방${roomId}에 들어오신 것을 환영합니다.`);
+  socket.on("fastJoinRoom", async (userId, nickname) => {
+    console.log(`[fastJoinRoom] : userId : ${userId}, nickname : ${nickname}`);
+    try {
+      socket.join(roomId);
+
+      await fastJoinRoom(userId, nickname);
+      const userInfo = await getUserInfoInRoom(roomId);
+
+      mafiaIo.to(roomId).emit("fastJoinRoom", userInfo);
+    } catch (error) {
+      mafiaIo.to(roomId).emit("fastJoinRoomError", "방 입장에 실패했습니다.");
+    }
   });
 
   socket.on("exit", (nickname) => {
