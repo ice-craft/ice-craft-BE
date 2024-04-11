@@ -84,3 +84,16 @@ export const voteYesOrNo = async (user_id, yesOrNo) => {
 
   return data;
 };
+
+export const getVoteYesOrNoResult = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_id, user_nickname, vote_to")
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};

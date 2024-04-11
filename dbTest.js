@@ -1,5 +1,5 @@
 import {
-  getVoteResult,
+  getVoteYesOrNoResult,
   resetVote,
   setReady,
   voteYesOrNo,
@@ -7,9 +7,8 @@ import {
 import { fastJoinRoom } from "./api/supabse/roomAPI.js";
 
 try {
-  const result = await voteYesOrNo(
-    "a38e5be5-423d-4f14-9675-b6598df96c9d",
-    "no"
+  const result = await getVoteYesOrNoResult(
+    "ab3a638d-90e5-4965-9b9f-adec7a5bb6df"
   );
   console.log(result);
 } catch (error) {
