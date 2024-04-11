@@ -22,7 +22,6 @@ const io = new Server(httpServer, {
   },
 });
 const mafiaIo = io.of("/mafia");
-const userIdToSocket = {};
 
 app.get("/", (req, res) => {
   res.send("express 서버와 연결되어 있습니다.");
