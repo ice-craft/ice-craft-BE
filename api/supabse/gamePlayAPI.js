@@ -111,3 +111,17 @@ export const choosePlayer = async (user_id) => {
 
   return data;
 };
+
+export const checkChosenPlayer = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_id")
+    .eq("room_id", room_id)
+    .neq("vote_to", null);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
