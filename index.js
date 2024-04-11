@@ -37,11 +37,11 @@ mafiaIo.on("connection", (socket) => {
     socket.emit("rooms", rooms);
   });
 
-  socket.on("getUserIdInRoom", async (roomId) => {
-    console.log("방 안의 유저들 id 목록 가져오기", roomId);
-    const userId = await getUserIdInRoom(roomId);
-    socket.emit("userIdInRoom", userId);
-  });
+  // socket.on("getUserIdInRoom", async (roomId) => {
+  //   console.log("방 안의 유저들 id 목록 가져오기", roomId);
+  //   const userId = await getUserIdInRoom(roomId);
+  //   socket.emit("userIdInRoom", userId);
+  // });
 
   socket.on("getUserInfoInRoom", async (roomId) => {
     console.log("방 안의 유저들 id와 닉네임목록 가져오기", roomId);
