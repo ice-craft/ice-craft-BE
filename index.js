@@ -33,10 +33,10 @@ mafiaIo.on("connection", (socket) => {
     socket.emit("rooms", rooms);
   });
 
-  socket.on("getUsersInRoom", async (roomId) => {
+  socket.on("getUserIdInRoom", async (roomId) => {
     console.log("방 안의 유저들 목록 가져오기", roomId);
     const users = await getUsersInRoom(roomId);
-    socket.emit("usersInRoom", users);
+    socket.emit("userIdInRoom", users);
   });
 
   socket.on("enterRoom", (nickname, roomId) => {

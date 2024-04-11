@@ -43,7 +43,7 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
   const { total_user_count, current_user_count } = await getUserCountInRoom(
     room_id
   );
-  const usersInRoom = await getUsersInRoom(room_id);
+  const usersInRoom = await getUserIdInRoom(room_id);
 
   if (
     total_user_count - current_user_count > 0 &&
@@ -68,7 +68,7 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
 //NOTE - 방 나가기 (내가 방에 존재하고 나 이외에 유저가 있으면 방에서 나감, 다른 유저가 방에 없으면 방 삭제)
 export const exitRoom = async (room_id, user_id) => {
   const { current_user_count } = await getUserCountInRoom(room_id);
-  const usersInRoom = await getUsersInRoom(room_id);
+  const usersInRoom = await getUserIdInRoom(room_id);
 
   if (current_user_count > 1 && usersInRoom.indexOf(user_id) !== -1) {
     await changeUserCountInRoom(room_id, -1);
@@ -95,7 +95,7 @@ export const exitRoom = async (room_id, user_id) => {
 //NOTE - 방 삭제하기 (방에 있는 유저가 오직 자신일 경우에 방 삭제)
 export const deleteRoom = async (room_id, user_id) => {
   const { current_user_count } = await getUserCountInRoom(room_id);
-  const usersInRoom = await getUsersInRoom(room_id);
+  const usersInRoom = await getUserIdInRoom(room_id);
 
   if (current_user_count === 1 && usersInRoom.indexOf(user_id) !== -1) {
     const { data, error } = await supabase
@@ -178,10 +178,23 @@ export const getRoomsCount = async () => {
 };
 
 //NOTE - roomId의 방에 입장한 유저들 id 목록 반환
-export const getUsersInRoom = async (roomId) => {
+export const getUserIdInRoom = async (roomId) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id")
+    .eq("room_id", roomId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data.map((row) => row.user_id);
+};
+
+//NOTE - roomId의 방에 입장한 유저들 id와 닉네임 목록 반환
+export const getUserInfoInRoom = async (roomId) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_id, user_nickname")
     .eq("room_id", roomId);
 
   if (error) {
