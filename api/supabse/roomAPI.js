@@ -121,7 +121,7 @@ export const fastJoinRoom = async (user_id, user_nickname) => {
     .order("total_user_count", { ascending: true })
     .order("current_user_count", { ascending: false });
   if (error) {
-    throw new Error(error.message);
+    throw new Error("빠른 방 찾기를 실패했습니다.");
   }
   try {
     const rows = data.filter(
