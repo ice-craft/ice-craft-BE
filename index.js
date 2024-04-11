@@ -11,7 +11,12 @@ import {
   getUserInfoInRoom,
   joinRoom,
 } from "./api/supabse/roomAPI.js";
-import { resetVote, setReady, voteTo } from "./api/supabse/gamePlayAPI.js";
+import {
+  resetVote,
+  setReady,
+  voteTo,
+  voteYesOrNo,
+} from "./api/supabse/gamePlayAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -125,6 +130,18 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[voteToError] : 투표하는데 실패했습니다.");
       socket.emit("voteToError", "투표하는데 실패했습니다.");
+    }
+  });
+
+  socket.on("voteYesOrNo", async (userId, yesOrNo) => {
+    console.log(`[voteYesOrNo] : userId : ${userId}, yesOrNo : ${yesOrNo}`);
+
+    try {
+      await voteYesOrNo(userId, yesOrNo);
+      socket.emit("voteYesOrNo", "찬성/반대 투표하는데 성공했습니다.");
+    } catch (error) {
+      console.log("[voteYesOrNoError] : 찬성/반대 투표하는데 실패했습니다.");
+      socket.emit("voteYesOrNoError", "찬성/반대 투표하는데 실패했습니다.");
     }
   });
 
