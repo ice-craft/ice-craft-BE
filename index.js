@@ -166,3 +166,7 @@ const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
 const setCamera = (roomName, isOn) => {
   mafiaIo.emit("setCamera", isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
 };
+
+const setMike = (roomName, isOn) => {
+  mafiaIo.emit("setMike", isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
+};
