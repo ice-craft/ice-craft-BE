@@ -33,6 +33,7 @@ app.get("/", (req, res) => {
 });
 
 mafiaIo.on("connection", (socket) => {
+  showModal("룸 아이디", "제목", "메시지", 90, "user1", true);
   socket.on("toAll", (nickname, message) => {
     socket.broadcast
       .to(userInRoom[nickname])
@@ -157,3 +158,9 @@ mafiaIo.on("connection", (socket) => {
 httpServer.listen(port, () => {
   console.log(`port(${port})으로 실행 중`);
 });
+
+const showModal = (roomId, title, message, timer, nickname, yesOrNo) => {
+  mafiaIo
+    //NOTE - 테스트 코드라서 .to(roomId) 제외
+    .emit("showModal", title, message, timer, nickname, yesOrNo);
+};
