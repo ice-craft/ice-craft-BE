@@ -13,6 +13,7 @@ export const setReady = async (user_id, is_ready) => {
   return data;
 };
 
+//NOTE - 반드시 리팩토링할 것
 export const voteTo = async (sender_user_id, receiver_user_id) => {
   const { error1 } = await supabase
     .from("room_user_match_table")
@@ -50,6 +51,19 @@ export const resetVote = async (room_id) => {
     .update({ vote_to: null, voted_count: 0 })
     .eq("room_id", room_id)
     .select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const getVoteResult = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_id, user_nickname, voted_count")
+    .eq("room_id", room_id);
 
   if (error) {
     throw new Error(error.message);
