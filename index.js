@@ -159,8 +159,6 @@ httpServer.listen(port, () => {
   console.log(`port(${port})으로 실행 중`);
 });
 
-const showModal = (roomId, title, message, timer, nickname, yesOrNo) => {
-  mafiaIo
-    //NOTE - 테스트 코드라서 .to(roomId) 제외
-    .emit("showModal", title, message, timer, nickname, yesOrNo);
+const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
+  mafiaIo.emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
 };
