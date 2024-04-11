@@ -4,12 +4,14 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import {
+  exitRoom,
   fastJoinRoom,
   getRooms,
   getUserIdInRoom,
   getUserInfoInRoom,
   joinRoom,
 } from "./api/supabse/roomAPI.js";
+import { setReady } from "./api/supabse/gamePlayAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -79,17 +81,34 @@ mafiaIo.on("connection", (socket) => {
 
       mafiaIo.to(roomId).emit("fastJoinRoom", roomId, userInfo);
     } catch (error) {
-      mafiaIo.to(roomId).emit("fastJoinRoomError", "방 입장에 실패했습니다.");
+      console.log("[fastJoinRoomError] : 빠른 방 입장에 실패했습니다.");
+      mafiaIo
+        .to(roomId)
+        .emit("fastJoinRoomError", "빠른 방 입장에 실패했습니다.");
+    }
+  });
+
+  socket.on("exitRoom", async (roomId, userId) => {
+    console.log(`[exitRoom] : roomId : ${roomId}, userId : ${userId}`);
+    try {
+      await exitRoom(roomId, userId);
+
+      const userInfo = await getUserInfoInRoom(roomId);
+
+      mafiaIo.to(roomId).emit("exitRoom", userInfo);
+    } catch (error) {
+      console.log("[exitRoomError] : 방에서 나가기에 실패했습니다.");
+      mafiaIo.to(roomId).emit("exitRoomError", "방에서 나가기에 실패했습니다.");
     }
   });
 
   socket.on("exit", (nickname) => {
     socket.broadcast.emit("server", `${nickname}님이 나가셨습니다.`);
   });
-});
 
-io.on("disconnection", () => {
-  console.log("클라이언트와의 연결이 끊겼습니다.");
+  io.on("disconnection", () => {
+    console.log("클라이언트와의 연결이 끊겼습니다.");
+  });
 });
 
 httpServer.listen(port, () => {
