@@ -56,10 +56,10 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
       .select();
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error("방 입장에 실패했습니다.");
     }
 
-    return data;
+    return data[0].room_id;
   }
 
   throw new Error("방에 입장할 수 없습니다.");
@@ -123,16 +123,13 @@ export const fastJoinRoom = async (user_id, user_nickname) => {
   if (error) {
     throw new Error("빠른 방 찾기를 실패했습니다.");
   }
-  try {
-    const rows = data.filter(
-      (row) => row.current_user_count !== row.total_user_count
-    );
-    const room_id = rows[0].room_id;
-    const result = await joinRoom(room_id, user_id, user_nickname);
-    return result;
-  } catch (e) {
-    throw new Error("빠른 방 입장에 실패했습니다.");
-  }
+
+  const rows = data.filter(
+    (row) => row.current_user_count !== row.total_user_count
+  );
+  const room_id = rows[0].room_id;
+  const result = await joinRoom(room_id, user_id, user_nickname);
+  return result;
 };
 
 //NOTE - 방의 현재 인원 변경 (방의 인원을 change만큼 더함, change는 음수가 될 수 있어서, 인원을 감소할 수 있음)
