@@ -3,7 +3,11 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { getRooms, getUsersInRoom } from "./api/supabse/roomAPI.js";
+import {
+  getRooms,
+  getUserIdInRoom,
+  getUserInfoInRoom,
+} from "./api/supabse/roomAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -34,9 +38,15 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("getUserIdInRoom", async (roomId) => {
-    console.log("방 안의 유저들 목록 가져오기", roomId);
-    const users = await getUsersInRoom(roomId);
-    socket.emit("userIdInRoom", users);
+    console.log("방 안의 유저들 id 목록 가져오기", roomId);
+    const userId = await getUserIdInRoom(roomId);
+    socket.emit("userIdInRoom", userId);
+  });
+
+  socket.on("getUserInfoInRoom", async (roomId) => {
+    console.log("방 안의 유저들 id와 닉네임목록 가져오기", roomId);
+    const userInfo = await getUserInfoInRoom(roomId);
+    socket.emit("userInfoInRoom", userInfo);
   });
 
   socket.on("enterRoom", (nickname, roomId) => {

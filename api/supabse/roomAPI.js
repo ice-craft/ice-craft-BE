@@ -200,5 +200,5 @@ export const getUserInfoInRoom = async (roomId) => {
   if (error) {
     throw new Error(error.message);
   }
-  return data.map((row) => row.user_id);
+  return data;
 };
