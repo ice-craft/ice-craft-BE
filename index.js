@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
 });
 
 mafiaIo.on("connection", (socket) => {
-  showModal("룸 아이디", "제목", "메시지", 90, "user1", true);
+  setMike("111", "222", true);
   socket.on("toAll", (nickname, message) => {
     socket.broadcast
       .to(userInRoom[nickname])
@@ -194,4 +194,8 @@ const setMike = (roomName, mikeUserId, isOn) => {
 
 const openPlayerRole = (roomName, userId, role) => {
   mafiaIo.emit("openPlayerRole", userId, role); //NOTE - 테스트 코드라서 .to(roomName) 제외
+};
+
+const showVoteYesOrNoResult = (roomName, voteResult) => {
+  mafiaIo.emit("showVoteYesOrNoResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
 };
