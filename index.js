@@ -11,7 +11,7 @@ import {
   getUserInfoInRoom,
   joinRoom,
 } from "./api/supabse/roomAPI.js";
-import { setReady } from "./api/supabse/gamePlayAPI.js";
+import { resetVote, setReady, voteTo } from "./api/supabse/gamePlayAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -110,7 +110,21 @@ mafiaIo.on("connection", (socket) => {
       socket.emit("setReady", "레디를 설정하는데 성공했습니다.");
     } catch (error) {
       console.log("[setReadyError] : 레디를 설정하는데 실패했습니다.");
-      socket.emit("setReadyError", "레디를  설정하는데 실패했습니다..");
+      socket.emit("setReadyError", "레디를  설정하는데 실패했습니다.");
+    }
+  });
+
+  socket.on("voteTo", async (senderUserId, receiverUserId) => {
+    console.log(
+      `[voteTo] : senderUserId : ${senderUserId}, receiverUserId:${receiverUserId}`
+    );
+
+    try {
+      await voteTo(senderUserId, receiverUserId);
+      socket.emit("voteTo", "투표하는데 성공했습니다.");
+    } catch (error) {
+      console.log("[voteToError] : 투표하는데 실패했습니다.");
+      socket.emit("voteToError", "투표하는데 실패했습니다.");
     }
   });
 
