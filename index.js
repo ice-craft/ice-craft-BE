@@ -22,6 +22,7 @@ const io = new Server(httpServer, {
   },
 });
 const mafiaIo = io.of("/mafia");
+const userIdToSocket = {};
 
 app.get("/", (req, res) => {
   res.send("express 서버와 연결되어 있습니다.");
@@ -59,6 +60,7 @@ mafiaIo.on("connection", (socket) => {
     );
     try {
       socket.join(roomId);
+      socket.join(userId);
 
       await joinRoom(roomId, userId, nickname);
       const userInfo = await getUserInfoInRoom(roomId);
@@ -102,10 +104,14 @@ mafiaIo.on("connection", (socket) => {
   socket.on("setReady", async (userId, ready) => {
     console.log(`[setReady] : userId : ${userId}, ready:${ready}`);
     try {
-      await setReady(userId, ready);
+      const result = await setReady(userId, ready);
+      if (result.length === 0) {
+        throw new Error();
+      }
+      socket.emit("setReady", "레디를 설정하는데 성공했습니다.");
     } catch (error) {
-      console.log("[setReady] : 레디를 설정하는데 실패했습니다.");
-      socket.emit("setReadyError", "방에서 나가기에 실패했습니다.");
+      console.log("[setReadyError] : 레디를 설정하는데 실패했습니다.");
+      socket.emit("setReadyError", "레디를  설정하는데 실패했습니다..");
     }
   });
 
