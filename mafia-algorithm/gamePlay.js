@@ -6,7 +6,10 @@ export const gamePlay = () => {
 
   //NOTE - 플레이어들 게임 참가
   for (let playerIndex = 0; playerIndex < playerCount; playerIndex++) {
-    moderator.players[playerIndex] = new Citizen(`${playerIndex}-${playerIndex}-${playerIndex}`, "user" + playerIndex);
+    moderator.players[playerIndex] = new Citizen(
+      `${playerIndex}-${playerIndex}-${playerIndex}`,
+      "user" + playerIndex
+    );
   }
 
   //NOTE - 모든 플레이어들이 레디함
@@ -42,12 +45,14 @@ export const gamePlay = () => {
   moderator.shufflePlayers();
 
   //NOTE - 모든 유저들 작업
-  moderator.players.forEach((player) => moderator.speak(player, "마피아를 뽑겠습니다."));
+  moderator.players.forEach((player) =>
+    moderator.speak(player, "마피아를 뽑겠습니다.")
+  );
 
   //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
   for (let playerIndex = 0; playerIndex < mafiaCount; playerIndex++) {
     randomPlayer = moderator.players[playerIndex]; //NOTE - 랜덤으로 플레이어 선택
-    moderator.players[playerIndex] = new Mafia(randomPlayer); //NOTE - 플레이어들의 역할으 마피아로 지정
+    moderator.players[playerIndex] = new Mafia(randomPlayer); //NOTE - 플레이어들의 역할을 마피아로 지정
   }
 
   moderator.setRoles();
@@ -55,10 +60,14 @@ export const gamePlay = () => {
 
   //NOTE - 마피아 유저들에게 자신이 마피아인 것을 알리고 마피아인 유저가 누구인지 공개
   mafiaPlayers.forEach((clientPlayer) =>
-    mafiaPlayers.forEach((rolePlayer) => moderator.openPlayerRole(clientPlayer, rolePlayer, "마피아"))
+    mafiaPlayers.forEach((rolePlayer) =>
+      moderator.openPlayerRole(clientPlayer, rolePlayer, "마피아")
+    )
   );
 
-  moderator.players.forEach((player) => moderator.speak(player, "마피아 들은 고개를 들어 서로를 확인해 주세요."));
+  moderator.players.forEach((player) =>
+    moderator.speak(player, "마피아 들은 고개를 들어 서로를 확인해 주세요.")
+  );
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
   mafiaPlayers.forEach((clientPlayer) =>
@@ -78,7 +87,9 @@ export const gamePlay = () => {
     })
   );
 
-  moderator.players.forEach((player) => moderator.speak(player, "의사를 뽑겠습니다."));
+  moderator.players.forEach((player) =>
+    moderator.speak(player, "의사를 뽑겠습니다.")
+  );
 
   randomPlayer = moderator.players[mafiaCount]; //NOTE - 랜덤으로 플레이어 선택
   moderator.players[mafiaCount] = new Doctor(randomPlayer); //NOTE - 참가자를 의사 플레이어로 설정
@@ -88,7 +99,9 @@ export const gamePlay = () => {
 
   moderator.openPlayerRole(doctorPlayer, doctorPlayer, "의사"); //NOTE - 의사 플레이어의 화면에서 자신이 의사임을 알림
 
-  moderator.players.forEach((player) => moderator.speak(player, "경찰을 뽑겠습니다."));
+  moderator.players.forEach((player) =>
+    moderator.speak(player, "경찰을 뽑겠습니다.")
+  );
 
   randomPlayer = moderator.players[mafiaCount + 1]; //NOTE - 랜덤으로 플레이어 선택
   moderator.players[mafiaCount + 1] = new Police(randomPlayer); //NOTE - 참가자를 경찰 플레이어로 설정
@@ -101,7 +114,9 @@ export const gamePlay = () => {
   citizenPlayers = moderator.roles["시민"];
 
   //NOTE - 시민 플레이어의 화면에서 자신이 시민임을 알림
-  citizenPlayers.forEach((citizenPlayer) => moderator.openPlayerRole(citizenPlayer, citizenPlayer, "시민"));
+  citizenPlayers.forEach((citizenPlayer) =>
+    moderator.openPlayerRole(citizenPlayer, citizenPlayer, "시민")
+  );
 
   moderator.nightOver(); //NOTE - 밤 종료
   moderator.roundOver(); //NOTE - 라운드 종료
@@ -117,13 +132,19 @@ export const gamePlay = () => {
     })
   );
 
-  moderator.players.forEach((player) => moderator.speak(player, "모든 유저는 토론을 통해 마피아를 찾아내세요."));
+  moderator.players.forEach((player) =>
+    moderator.speak(player, "모든 유저는 토론을 통해 마피아를 찾아내세요.")
+  );
 
   moderator.startTimer(90); //NOTE - 시간 재기
 
-  moderator.players.forEach((player) => moderator.speak(player, "토론이 끝났습니다."));
+  moderator.players.forEach((player) =>
+    moderator.speak(player, "토론이 끝났습니다.")
+  );
 
-  moderator.players.forEach((player) => moderator.speak(player, "마피아일 것 같은 사람의 화면을 클릭해주세요."));
+  moderator.players.forEach((player) =>
+    moderator.speak(player, "마피아일 것 같은 사람의 화면을 클릭해주세요.")
+  );
 
   moderator.players[0].voteToPlayer(moderator.players[1]); //NOTE - 0번 인덱스 플레이어가 1번 인덱스 플레이어에게 투표
   moderator.players[1].voteToPlayer(moderator.players[2]); //NOTE - 1번 인덱스 플레이어가 2번 인덱스 플레이어에게 투표
@@ -146,16 +167,24 @@ export const gamePlay = () => {
     //NOTE - 투표 성공
 
     moderator.players.forEach((player) =>
-      moderator.speak(player, `${mostVoteResult.result.userNickname}님이 마피아로 지복되었습니다.`)
+      moderator.speak(
+        player,
+        `${mostVoteResult.result.userNickname}님이 마피아로 지복되었습니다.`
+      )
     );
 
     moderator.players.forEach((player) =>
-      moderator.speak(player, `${mostVoteResult.result.userNickname}님은 최후의 변론을 시작하세요.`)
+      moderator.speak(
+        player,
+        `${mostVoteResult.result.userNickname}님은 최후의 변론을 시작하세요.`
+      )
     );
 
     moderator.startTimer(90); //NOTE - 시간 재기
 
-    moderator.players.forEach((player) => moderator.speak(player, "찬성/반대 투표를 해주세요."));
+    moderator.players.forEach((player) =>
+      moderator.speak(player, "찬성/반대 투표를 해주세요.")
+    );
 
     moderator.startTimer(90); //NOTE - 시간 재기
 
@@ -186,7 +215,9 @@ export const gamePlay = () => {
 
       //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
       moderator.players.forEach((player) =>
-        isPlayerMafia ? moderator.speak(player, "마피아가 죽었습니다.") : moderator.speak(player, "시민이 죽었습니다.")
+        isPlayerMafia
+          ? moderator.speak(player, "마피아가 죽었습니다.")
+          : moderator.speak(player, "시민이 죽었습니다.")
       );
 
       moderator.players.forEach((clientPlayer) => {
@@ -211,7 +242,9 @@ export const gamePlay = () => {
     })
   );
 
-  moderator.players.forEach((player) => moderator.speak(player, "마피아는 누구를 죽일지 결정해주세요."));
+  moderator.players.forEach((player) =>
+    moderator.speak(player, "마피아는 누구를 죽일지 결정해주세요.")
+  );
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
   mafiaPlayers.forEach((clientPlayer) => {
@@ -237,7 +270,9 @@ export const gamePlay = () => {
     });
   });
 
-  mafiaPlayers.forEach((player) => moderator.speak(player, "의사는 누구를 살릴 지 결정하세요."));
+  mafiaPlayers.forEach((player) =>
+    moderator.speak(player, "의사는 누구를 살릴 지 결정하세요.")
+  );
 
   //NOTE - 의사가 살아있을 경우
   if (moderator.roles["의사"] !== undefined) {
@@ -248,7 +283,9 @@ export const gamePlay = () => {
     playerToSave = doctorPlayer.choosePlayer(moderator.players[0]); //NOTE - 의사가 살릴 플레이어를 선택
   }
 
-  moderator.players.forEach((player) => moderator.speak(player, "경찰은 마피아 의심자를 결정해주세요."));
+  moderator.players.forEach((player) =>
+    moderator.speak(player, "경찰은 마피아 의심자를 결정해주세요.")
+  );
 
   //NOTE - 경찰이 살아있을 경우
   if (moderator.roles["경찰"] !== undefined) {
@@ -288,9 +325,13 @@ export const gamePlay = () => {
 
   //NOTE - 마피아가 죽일려고한 마피아가 살았는지 죽었는지 확인
   if (killedPlayer.isLived) {
-    moderator.players.forEach((player) => moderator.speak(player, "의사의 활약으로 아무도 죽지 않았습니다."));
+    moderator.players.forEach((player) =>
+      moderator.speak(player, "의사의 활약으로 아무도 죽지 않았습니다.")
+    );
   } else {
-    moderator.players.forEach((player) => moderator.speak(player, `${killedPlayer.userNickname}님이 죽었습니다.`));
+    moderator.players.forEach((player) =>
+      moderator.speak(player, `${killedPlayer.userNickname}님이 죽었습니다.`)
+    );
   }
 
   moderator.speak(killedPlayer, "게임을 관전 하시겠습니까? 나가시겠습니까?");
@@ -306,7 +347,10 @@ export const gamePlay = () => {
   if (moderator.whoWins.isValid) {
     //NOTE - 게임 종료 만족하는 지
     for (let playerIndex = 0; playerIndex < playerCount; playerIndex++) {
-      moderator.speak(players, playerIndex`${moderator.whoWins.result} 팀이 이겼습니다.`); //NOTE - 어느 팀이 이겼는지 알림
+      moderator.speak(
+        players,
+        playerIndex`${moderator.whoWins.result} 팀이 이겼습니다.`
+      ); //NOTE - 어느 팀이 이겼는지 알림
     }
 
     gameOver(); //NOTE - 게임 종료

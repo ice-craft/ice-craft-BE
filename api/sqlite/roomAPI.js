@@ -1,7 +1,6 @@
 import { db } from "../DB/db.js";
 
 db.pragma("journal_mode = WAL");
-// db.pragma("PRAGMA foreign_keys = ON");
 
 export const getRooms = (rowStart, rowCount) => {
   try {
