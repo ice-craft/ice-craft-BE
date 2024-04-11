@@ -12,6 +12,7 @@ import {
   joinRoom,
 } from "./api/supabse/roomAPI.js";
 import {
+  choosePlayer,
   resetVote,
   setReady,
   voteTo,
@@ -143,6 +144,26 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[voteYesOrNoError] : 찬성/반대 투표하는데 실패했습니다.");
       socket.emit("voteYesOrNoError", "찬성/반대 투표하는데 실패했습니다.");
+    }
+  });
+
+  socket.on("choosePlayer", async (userId) => {
+    console.log(`[choosePlayer] : userId : ${userId}`);
+
+    try {
+      await choosePlayer(userId);
+      socket.emit(
+        "choosePlayer",
+        "역할을 수행할 대상을 정하는데 성공했습니다."
+      );
+    } catch (error) {
+      console.log(
+        "[choosePlayerError] : 역할을 수행할 대상을 정하는데 실패했습니다."
+      );
+      socket.emit(
+        "choosePlayerError",
+        "역할을 수행할 대상을 정하는데 실패했습니다."
+      );
     }
   });
 
