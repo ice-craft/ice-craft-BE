@@ -199,3 +199,7 @@ const openPlayerRole = (roomName, userId, role) => {
 const showVoteYesOrNoResult = (roomName, voteResult) => {
   mafiaIo.emit("showVoteYesOrNoResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
 };
+
+const showVoteToResult = (roomName, voteResult) => {
+  mafiaIo.emit("showVoteToResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
+};
