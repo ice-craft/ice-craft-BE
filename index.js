@@ -3,6 +3,7 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { getRooms, getUsersInRoom } from "./api/supabse/roomAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -26,12 +27,16 @@ mafiaIo.on("connection", (socket) => {
     socket.emit("server", `[나] ${message}`);
   });
 
-  socket.on("enterMafia", (nickname) => {
-    socket.emit("server", "마피아 게임에 들어오신 것을 환영합니다.");
-    socket.broadcast.emit(
-      "server",
-      `${nickname}님이 마피아 게임에들어오셨습니다.`
-    );
+  socket.on("enterMafia", async () => {
+    console.log("방 목록 가져오기");
+    const rooms = await getRooms(0, 10);
+    socket.emit("rooms", rooms);
+  });
+
+  socket.on("getUsersInRoom", async (roomId) => {
+    console.log("방 안의 유저들 목록 가져오기", roomId);
+    const users = await getUsersInRoom(roomId);
+    socket.emit("usersInRoom", users);
   });
 
   socket.on("enterRoom", (nickname, roomId) => {
@@ -55,5 +60,3 @@ io.on("disconnection", () => {
 httpServer.listen(port, () => {
   console.log(`port(${port})으로 실행 중`);
 });
-
-const gamePlay = () => {};
