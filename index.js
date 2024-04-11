@@ -170,3 +170,7 @@ const setCamera = (roomName, cameraUserId, isOn) => {
 const setMike = (roomName, mikeUserId, isOn) => {
   mafiaIo.emit("setMike", mikeUserId, isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
 };
+
+const openPlayerRole = (roomName, userId, role) => {
+  mafiaIo.emit("openPlayerRole", userId, role); //NOTE - 테스트 코드라서 .to(roomName) 제외
+};
