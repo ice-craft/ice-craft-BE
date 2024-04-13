@@ -34,31 +34,16 @@ app.get("/", (req, res) => {
 });
 
 mafiaIo.on("connection", (socket) => {
-  setMike("111", "222", true);
-  socket.on("toAll", (nickname, message) => {
-    socket.broadcast
-      .to(userInRoom[nickname])
-      .emit("server", `[${nickname}] ${message}`);
-    socket.emit("server", `[나] ${message}`);
+  socket.on("enterMafia", async (rowStart, rowEnd) => {
+    console.log(`[enterMafia] : rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
+    try {
+      const rooms = await getRooms(rowStart, rowEnd);
+      socket.emit("enterMafia", rooms);
+    } catch (error) {
+      console.log("[enterMafia] : 방 목록을 불러오는데 실패했습니다.");
+      socket.emit("enterMafia", "방 목록을 불러오는데 실패했습니다.");
+    }
   });
-
-  socket.on("enterMafia", async () => {
-    console.log("방 목록 가져오기");
-    const rooms = await getRooms(0, 10);
-    socket.emit("rooms", rooms);
-  });
-
-  // socket.on("getUserIdInRoom", async (roomId) => {
-  //   console.log("방 안의 유저들 id 목록 가져오기", roomId);
-  //   const userId = await getUserIdInRoom(roomId);
-  //   socket.emit("userIdInRoom", userId);
-  // });
-
-  // socket.on("getUserInfoInRoom", async (roomId) => {
-  //   console.log("방 안의 유저들 id와 닉네임목록 가져오기", roomId);
-  //   const userInfo = await getUserInfoInRoom(roomId);
-  //   socket.emit("userInfoInRoom", userInfo);
-  // });
 
   socket.on("joinRoom", async (userId, roomId, nickname) => {
     console.log(

@@ -8,7 +8,7 @@ export const getRooms = async (rowStart, rowEnd) => {
     .range(rowStart, rowEnd)
     .order("created_at", { ascending: false });
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
   return data;
 };
