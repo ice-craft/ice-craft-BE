@@ -202,14 +202,38 @@ const showVoteToResult = (roomName, voteResult) => {
   mafiaIo.emit("showVoteToResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
 };
 
-const playMafia = (roomId, totalUserCount) => {
+const playMafia = async (roomId, totalUserCount) => {
   //NOTE - roomId : 12dc28ad-4764-460f-9a54-58c31fdacd1f
 
   const moderator = new Moderator(totalUserCount); //NOTE - 사회자 생성
 
-  const isAllPlayerEnoughCount = moderator.checkPlayerCountEnough(); //NOTE - 플레이어들이 방 정원을 채웠는지
-  const isAllPlayersReady = moderator.checkAllPlayersReady(); //NOTE - 플레이어들이 전부 레디했는지
+  let startTime = Date.now();
 
+  while (true) {
+    let canStart = false;
+    let intervalTime = 500;
+    let passedTime = 0;
+
+    passedTime = Date.now() - startTime;
+    if (passedTime > intervalTime) {
+      startTime = Date.now();
+      const isAllPlayerEnoughCount = await moderator.checkPlayerCountEnough(
+        roomId,
+        totalUserCount
+      ); //NOTE - 플레이어들이 방 정원을 채웠는지
+      const isAllPlayersReady = await moderator.checkAllPlayersReady(
+        roomId,
+        totalUserCount
+      ); //NOTE - 플레이어들이 전부 레디했는지
+      canStart = moderator.canGameStart(
+        isAllPlayerEnoughCount,
+        isAllPlayersReady
+      );
+      if (canStart) {
+        break;
+      }
+    }
+  }
   /*
   playerCount = getUserCountInRoom(); //NOTE - 방 정원 인원 수 가져오기
   const moderator = new Moderator(playerCount); //NOTE - 사회자 생성
@@ -571,3 +595,5 @@ const playMafia = (roomId, totalUserCount) => {
   
    */
 };
+
+playMafia("12dc28ad-4764-460f-9a54-58c31fdacd1f", 5);

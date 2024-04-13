@@ -1,3 +1,5 @@
+import * as db from "../../api/supabse/gamePlayAPI.js";
+
 export class Moderator {
   constructor(playerCount) {
     this.players = [];
@@ -6,33 +8,60 @@ export class Moderator {
 
     switch (this.playerCount) {
       case 5:
-        this.roomComposition = { mafiaCount: 1, citizenCount: 4, policeCount: 0, doctorCount: 0 };
+        this.roomComposition = {
+          mafiaCount: 1,
+          citizenCount: 4,
+          policeCount: 0,
+          doctorCount: 0,
+        };
       case 6:
-        this.roomComposition = { mafiaCount: 2, citizenCount: 3, policeCount: 1, doctorCount: 0 };
+        this.roomComposition = {
+          mafiaCount: 2,
+          citizenCount: 3,
+          policeCount: 1,
+          doctorCount: 0,
+        };
       case 7:
-        this.roomComposition = { mafiaCount: 2, citizenCount: 4, policeCount: 1, doctorCount: 0 };
+        this.roomComposition = {
+          mafiaCount: 2,
+          citizenCount: 4,
+          policeCount: 1,
+          doctorCount: 0,
+        };
       case 8:
-        this.roomComposition = { mafiaCount: 3, citizenCount: 3, policeCount: 1, doctorCount: 1 };
+        this.roomComposition = {
+          mafiaCount: 3,
+          citizenCount: 3,
+          policeCount: 1,
+          doctorCount: 1,
+        };
       case 9:
-        this.roomComposition = { mafiaCount: 3, citizenCount: 4, policeCount: 1, doctorCount: 1 };
+        this.roomComposition = {
+          mafiaCount: 3,
+          citizenCount: 4,
+          policeCount: 1,
+          doctorCount: 1,
+        };
       case 10:
-        this.roomComposition = { mafiaCount: 3, citizenCount: 4, policeCount: 1, doctorCount: 1 };
+        this.roomComposition = {
+          mafiaCount: 3,
+          citizenCount: 4,
+          policeCount: 1,
+          doctorCount: 1,
+        };
     }
   }
 
   //NOTE - 인원 수 맞는지 확인
-  checkPlayerCountEnough() {
-    return this.players.length === this.playerCount;
+  async checkPlayerCountEnough(roomId, totalUserCount) {
+    const result = await db.checkPlayerCountEnough(roomId, totalUserCount);
+
+    return result;
   }
 
   //NOTE - 모든 플레이어들이 전부 레디했는지 확인
-  checkAllPlayersReady() {
-    let result = true;
-    this.players.forEach((player) => {
-      if (player.isReady === false) {
-        result = false;
-      }
-    });
+  async checkAllPlayersReady(roomId, totalUserCount) {
+    const result = await db.checkAllPlayersReady(roomId, totalUserCount);
 
     return result;
   }
@@ -44,7 +73,9 @@ export class Moderator {
 
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개
   openPlayerRole(clientPlayer, rolePlayer, roleName) {
-    console.log(`${clientPlayer.userNickname} 클라이언트, ${rolePlayer.userNickname}의 역할은 ${roleName}입니다.`);
+    console.log(
+      `${clientPlayer.userNickname} 클라이언트, ${rolePlayer.userNickname}의 역할은 ${roleName}입니다.`
+    );
   }
 
   //NOTE - 게임 시작
@@ -151,13 +182,15 @@ export class Moderator {
     return {
       isValid,
       result: yesCount > noCount,
-      detail: { yesCount, noCount }
+      detail: { yesCount, noCount },
     };
   }
 
   //NOTE - 유저들에게 투표 결과 보여줌
   showVoteResult(vote) {
-    this.players.forEach((player) => console.log(`사회자[to : ${player.userNickname}] : ${vote}`));
+    this.players.forEach((player) =>
+      console.log(`사회자[to : ${player.userNickname}] : ${vote}`)
+    );
   }
 
   //NOTE - 유저가 살았는지 확인
@@ -198,22 +231,30 @@ export class Moderator {
 
   //NOTE - 사회자가 플레이어의 카메라를 켬
   turnOnCamera(clientPlayer, cameraPlayer) {
-    console.log(`${clientPlayer.userNickname} 클라이언트의 ${cameraPlayer.userNickname} 카메라 켬`);
+    console.log(
+      `${clientPlayer.userNickname} 클라이언트의 ${cameraPlayer.userNickname} 카메라 켬`
+    );
   }
 
   //NOTE - 사회자가 플레이어의 카메라를 끔
   turnOffCamera(clientPlayer, cameraPlayer) {
-    console.log(`${clientPlayer.userNickname} 클라이언트의 ${cameraPlayer.userNickname} 카메라 끔`);
+    console.log(
+      `${clientPlayer.userNickname} 클라이언트의 ${cameraPlayer.userNickname} 카메라 끔`
+    );
   }
 
   //NOTE - 사회자가 플레이어의 마이크를 켬
   turnOnMike(clientPlayer, mikePlayer) {
-    console.log(`${clientPlayer.userNickname} 클라이언트의 ${mikePlayer.userNickname} 마이크 켬`);
+    console.log(
+      `${clientPlayer.userNickname} 클라이언트의 ${mikePlayer.userNickname} 마이크 켬`
+    );
   }
 
   //NOTE - 사회자가 플레이어의 마이크를 끔
   turnOffMike(clientPlayer, mikePlayer) {
-    console.log(`${clientPlayer.userNickname} 클라이언트의 ${mikePlayer.userNickname} 마이크 끔`);
+    console.log(
+      `${clientPlayer.userNickname} 클라이언트의 ${mikePlayer.userNickname} 마이크 끔`
+    );
   }
 
   //NOTE - 어느 팀이 이겼는지 결과 반환
