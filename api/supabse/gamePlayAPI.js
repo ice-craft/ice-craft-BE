@@ -8,7 +8,7 @@ export const setReady = async (user_id, is_ready) => {
     .select();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
   return data;
 };
@@ -21,7 +21,7 @@ export const voteTo = async (sender_user_id, receiver_user_id) => {
     .select();
 
   if (error1) {
-    throw new Error(error1.message);
+    throw new Error();
   }
 
   const { data, error2 } = await supabase
@@ -30,7 +30,7 @@ export const voteTo = async (sender_user_id, receiver_user_id) => {
     .eq("user_id", receiver_user_id);
 
   if (error2) {
-    throw new Error(error2.message);
+    throw new Error();
   }
 
   const { error3 } = await supabase
@@ -40,7 +40,7 @@ export const voteTo = async (sender_user_id, receiver_user_id) => {
     .select();
 
   if (error3) {
-    throw new Error(error2.message);
+    throw new Error();
   }
 };
 
@@ -52,7 +52,7 @@ export const resetVote = async (room_id) => {
     .select();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
 
   return data;
@@ -65,7 +65,7 @@ export const getVoteToResult = async (room_id) => {
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
 
   return data;
@@ -79,7 +79,7 @@ export const voteYesOrNo = async (user_id, yesOrNo) => {
     .select();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
 
   return data;
@@ -92,7 +92,7 @@ export const getVoteYesOrNoResult = async (room_id) => {
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
 
   return data;
@@ -106,7 +106,7 @@ export const choosePlayer = async (user_id) => {
     .select();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
 
   return data;
@@ -120,7 +120,7 @@ export const checkChosenPlayer = async (room_id) => {
     .neq("vote_to", null);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
 
   return data;
