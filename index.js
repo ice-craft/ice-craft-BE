@@ -8,19 +8,18 @@ import {
   exitRoom,
   fastJoinRoom,
   getRooms,
-  getUserIdInRoom,
   getUserInfoInRoom,
   joinRoom,
 } from "./api/supabse/roomAPI.js";
 import {
   choosePlayer,
-  resetVote,
   setReady,
   voteTo,
   voteYesOrNo,
 } from "./api/supabse/gamePlayAPI.js";
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
 import { Citizen } from "./mafia-algorithm/class/citizenClass.js";
+import { Mafia } from "./mafia-algorithm/class/mafiaClass.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -272,6 +271,19 @@ const playMafia = async (roomId, totalUserCount) => {
     "닉네임",
     true
   );
+
+  //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
+  for (
+    let playerIndex = 0;
+    playerIndex < moderator.roomComposition.mafiaCount;
+    playerIndex++
+  ) {
+    randomPlayer = moderator.players[playerIndex]; //NOTE - 랜덤으로 플레이어 선택
+    moderator.players[playerIndex] = new Mafia(randomPlayer); //NOTE - 플레이어들의 역할을 마피아로 지정
+  }
+
+  moderator.setRoles();
+  mafiaPlayers = moderator.roles["마피아"];
 
   /*
   //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
