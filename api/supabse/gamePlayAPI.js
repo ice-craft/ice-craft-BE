@@ -13,6 +13,17 @@ export const setReady = async (user_id, is_ready) => {
   return data;
 };
 
+export const checkPlayerCountEnough = async (room_id, total_user_count) => {
+  const { count, error } = await supabase
+    .from("room_user_match_table")
+    .select("*", { count: "exact", head: true })
+    .eq("room_id", room_id);
+  if (error) {
+    throw new Error();
+  }
+  return total_user_count === count;
+};
+
 export const voteTo = async (user_id) => {
   const { data, selectError } = await supabase
     .from("room_user_match_table")
