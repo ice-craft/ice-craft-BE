@@ -4,6 +4,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import {
+  createRoom,
   exitRoom,
   fastJoinRoom,
   getRooms,
@@ -40,8 +41,21 @@ mafiaIo.on("connection", (socket) => {
       const rooms = await getRooms(rowStart, rowEnd);
       socket.emit("enterMafia", rooms);
     } catch (error) {
-      console.log("[enterMafia] : 방 목록을 불러오는데 실패했습니다.");
-      socket.emit("enterMafia", "방 목록을 불러오는데 실패했습니다.");
+      console.log("[enterMafiaError] : 방 목록을 불러오는데 실패했습니다.");
+      socket.emit("enterMafiaError", "방 목록을 불러오는데 실패했습니다.");
+    }
+  });
+
+  socket.on("createRoom", async (title, game_category, total_user_count) => {
+    console.log(
+      `[createRoom] : title : ${title}, game_category : ${game_category}, total_user_count : ${total_user_count}`
+    );
+    try {
+      const room = await createRoom(title, game_category, total_user_count);
+      socket.emit("createRoom", room);
+    } catch (error) {
+      console.log("[createRoomError] : 방을 생성하는데 실패했습니다.");
+      socket.emit("createRoomError", "방을 생성하는데 실패했습니다.");
     }
   });
 

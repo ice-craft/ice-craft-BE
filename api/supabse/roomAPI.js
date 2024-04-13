@@ -46,7 +46,6 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
       room_id
     );
     const usersInRoom = await getUserIdInRoom(room_id);
-
     if (
       total_user_count - current_user_count > 0 &&
       usersInRoom.indexOf(user_id) === -1
@@ -158,13 +157,14 @@ export const changeUserCountInRoom = async (room_id, change) => {
 export const getUserCountInRoom = async (room_id) => {
   const { data, error } = await supabase
     .from("room_table")
-    .eq("room_id", room_id)
     .select("current_user_count, total_user_count")
+    .eq("room_id", room_id)
     .single();
 
   if (error) {
     throw new Error();
   }
+
   return {
     total_user_count: data.total_user_count,
     current_user_count: data.current_user_count,
