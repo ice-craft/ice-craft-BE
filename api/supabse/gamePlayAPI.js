@@ -119,3 +119,14 @@ export const checkChosenPlayer = async (room_id, role) => {
 
   return data[0].user_id;
 };
+
+export const resetChosenPlayer = async (room_id) => {
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({ chosen_by: null })
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error();
+  }
+};

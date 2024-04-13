@@ -2,6 +2,7 @@ import {
   checkChosenPlayer,
   choosePlayer,
   getVoteYesOrNoResult,
+  resetChosenPlayer,
   resetVote,
   setReady,
   voteYesOrNo,
@@ -9,9 +10,8 @@ import {
 import { fastJoinRoom } from "./api/supabse/roomAPI.js";
 
 try {
-  const result = await checkChosenPlayer(
-    "12dc28ad-4764-460f-9a54-58c31fdacd1f",
-    "마피"
+  const result = await resetChosenPlayer(
+    "12dc28ad-4764-460f-9a54-58c31fdacd1f"
   );
   console.log(result);
 } catch (error) {
