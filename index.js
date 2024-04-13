@@ -406,9 +406,9 @@ const playMafia = async (roomId, totalUserCount) => {
   }
 
   citizenPlayers = await moderator.getPlayerByRole(roomId, "시민");
-  console.log("시민", citizenPlayers);
 
   //NOTE - 시민 플레이어의 화면에서 자신이 시민임을 알림
+  console.log("시민들 각자 역할 공개");
   citizenPlayers.forEach((clientUserId) =>
     citizenPlayers.forEach((playerUserId) => {
       moderator.openPlayerRole(clientUserId, playerUserId);
@@ -416,34 +416,78 @@ const playMafia = async (roomId, totalUserCount) => {
     })
   );
 
+  moderator.showModal(
+    roomId,
+    "제목",
+    "밤이 종료되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
+
+  moderator.showModal(
+    roomId,
+    "제목",
+    "라운드가 종료되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
+
+  moderator.showModal(
+    roomId,
+    "제목",
+    "라운드가 시작되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
+
+  moderator.showModal(
+    roomId,
+    "제목",
+    "아침이 시작되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
+
+  //NOTE - 모든 플레이어들의 카메라와 마이크 켬
+  console.log("카메라, 마이크 켬");
+  moderator.players.forEach((player) => {
+    moderator.turnOnCamera(roomId, player);
+    moderator.turnOnMike(roomId, player);
+  });
+
+  moderator.showModal(
+    roomId,
+    "제목",
+    "모든 유저는 토론을 통해 마피아를 찾아내세요.",
+    500,
+    "닉네임",
+    false
+  );
+
+  moderator.waitForMs(500);
+
+  moderator.showModal(
+    roomId,
+    "제목",
+    "토론이 끝났습니다.",
+    500,
+    "닉네임",
+    false
+  );
+
+  moderator.showModal(
+    roomId,
+    "제목",
+    "마피아일 것 같은 사람의 화면을 클릭해주세요.",
+    500,
+    "닉네임",
+    false
+  );
   /*
-  moderator.nightOver(); //NOTE - 밤 종료
-  moderator.roundOver(); //NOTE - 라운드 종료
-
-  moderator.roundStart(); //NOTE - 라운드 시작
-  moderator.morningStart(); //NOTE - 아침 시작
-
-  //NOTE - 모든 플레이어들의 화면과 마이크 켬
-  moderator.players.forEach((clientPlayer) =>
-    moderator.players.forEach((player) => {
-      moderator.turnOnCamera(clientPlayer, player);
-      moderator.turnOnMike(clientPlayer, player);
-    })
-  );
-
-  moderator.players.forEach((player) =>
-    moderator.speak(player, "모든 유저는 토론을 통해 마피아를 찾아내세요.")
-  );
-
-  moderator.startTimer(90); //NOTE - 시간 재기
-
-  moderator.players.forEach((player) =>
-    moderator.speak(player, "토론이 끝났습니다.")
-  );
-
-  moderator.players.forEach((player) =>
-    moderator.speak(player, "마피아일 것 같은 사람의 화면을 클릭해주세요.")
-  );
 
   moderator.players[0].voteToPlayer(moderator.players[1]); //NOTE - 0번 인덱스 플레이어가 1번 인덱스 플레이어에게 투표
   moderator.players[1].voteToPlayer(moderator.players[2]); //NOTE - 1번 인덱스 플레이어가 2번 인덱스 플레이어에게 투표
