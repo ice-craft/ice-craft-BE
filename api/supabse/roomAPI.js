@@ -21,7 +21,7 @@ export const getRoomsWithKeyword = async (keyword) => {
     .like("title", `%${keyword}%`)
     .order("created_at", { ascending: false });
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
   return data;
 };
@@ -31,38 +31,44 @@ export const createRoom = async (title, game_category, total_user_count) => {
   const { data, error } = await supabase
     .from("room_table")
     .insert([{ title, game_category, current_user_count: 0, total_user_count }])
-    .select();
+    .select()
+    .single();
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
-  return data[0];
+  return data;
 };
 
 //NOTE - 방에 들어가기 (방 자리에 여유가 있고, 자신이 방에 없으면 방에 들어갈 수 있음 )
 export const joinRoom = async (room_id, user_id, user_nickname) => {
-  const { total_user_count, current_user_count } = await getUserCountInRoom(
-    room_id
-  );
-  const usersInRoom = await getUserIdInRoom(room_id);
+  try {
+    const { total_user_count, current_user_count } = await getUserCountInRoom(
+      room_id
+    );
+    const usersInRoom = await getUserIdInRoom(room_id);
 
-  if (
-    total_user_count - current_user_count > 0 &&
-    usersInRoom.indexOf(user_id) === -1
-  ) {
-    await changeUserCountInRoom(room_id, 1);
-    const { data, error } = await supabase
-      .from("room_user_match_table")
-      .insert([{ room_id, user_id, user_nickname }])
-      .select();
+    if (
+      total_user_count - current_user_count > 0 &&
+      usersInRoom.indexOf(user_id) === -1
+    ) {
+      await changeUserCountInRoom(room_id, 1);
+      const { data, error } = await supabase
+        .from("room_user_match_table")
+        .insert([{ room_id, user_id, user_nickname }])
+        .select()
+        .single();
 
-    if (error) {
-      throw new Error("방 입장에 실패했습니다.");
+      if (error) {
+        throw new Error("방 입장에 실패했습니다.");
+      }
+
+      return data.room_id;
     }
 
-    return data[0].room_id;
+    throw new Error();
+  } catch (error) {
+    throw new Error();
   }
-
-  throw new Error("방에 입장할 수 없습니다.");
 };
 
 //NOTE - 방 나가기 (내가 방에 존재하고 나 이외에 유저가 있으면 방에서 나감, 다른 유저가 방에 없으면 방 삭제)
@@ -104,13 +110,13 @@ export const deleteRoom = async (room_id, user_id) => {
       .eq("room_id", room_id);
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error();
     }
 
     return data;
   }
 
-  throw new Error("방을 삭제할 수 없습니다.");
+  throw new Error();
 };
 
 //NOTE - 빠른 방 입장 (전체 인원 오름차순으로 정렬 후, 현재 인원 내림차순 정렬 후, 남은 인원이 0명인 방을 제외한 후, 첫 번째 방 입장)
@@ -121,7 +127,7 @@ export const fastJoinRoom = async (user_id, user_nickname) => {
     .order("total_user_count", { ascending: true })
     .order("current_user_count", { ascending: false });
   if (error) {
-    throw new Error("빠른 방 찾기를 실패했습니다.");
+    throw new Error();
   }
 
   const rows = data.filter(
@@ -142,7 +148,7 @@ export const changeUserCountInRoom = async (room_id, change) => {
     .select();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
 
   return data;
@@ -152,14 +158,16 @@ export const changeUserCountInRoom = async (room_id, change) => {
 export const getUserCountInRoom = async (room_id) => {
   const { data, error } = await supabase
     .from("room_table")
+    .eq("room_id", room_id)
     .select("current_user_count, total_user_count")
-    .eq("room_id", room_id);
+    .single();
+
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
   return {
-    total_user_count: data[0].total_user_count,
-    current_user_count: data[0].current_user_count,
+    total_user_count: data.total_user_count,
+    current_user_count: data.current_user_count,
   };
 };
 
@@ -169,7 +177,7 @@ export const getRoomsCount = async () => {
     .from("room_table")
     .select("*", { count: "exact", head: true });
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
   return count;
 };
@@ -182,7 +190,7 @@ export const getUserIdInRoom = async (roomId) => {
     .eq("room_id", roomId);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
   return data.map((row) => row.user_id);
 };
@@ -195,7 +203,7 @@ export const getUserInfoInRoom = async (roomId) => {
     .eq("room_id", roomId);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error();
   }
   return data;
 };
