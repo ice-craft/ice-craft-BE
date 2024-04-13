@@ -120,13 +120,11 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("voteTo", async (senderUserId, receiverUserId) => {
-    console.log(
-      `[voteTo] : senderUserId : ${senderUserId}, receiverUserId:${receiverUserId}`
-    );
+  socket.on("voteTo", async (userId) => {
+    console.log(`[voteTo] : UserId : ${userId}`);
 
     try {
-      await voteTo(senderUserId, receiverUserId);
+      await voteTo(userId);
       socket.emit("voteTo", "투표하는데 성공했습니다.");
     } catch (error) {
       console.log("[voteToError] : 투표하는데 실패했습니다.");

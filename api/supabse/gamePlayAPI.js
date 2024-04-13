@@ -13,35 +13,29 @@ export const setReady = async (user_id, is_ready) => {
   return data;
 };
 
-export const voteTo = async (sender_user_id, receiver_user_id) => {
-  const { error1 } = await supabase
+export const voteTo = async (user_id) => {
+  const { data, selectError } = await supabase
     .from("room_user_match_table")
-    .update({ vote_to: receiver_user_id })
-    .eq("user_id", sender_user_id)
-    .select();
+    .select("voted_count")
+    .eq("user_id", user_id)
+    .single();
 
-  if (error1) {
+  if (selectError) {
+    throw new Error();
+  }
+  const votedCount = data.voted_count;
+  console.log("투표수", votedCount);
+
+  const { userId, updateError } = await supabase
+    .from("room_user_match_table")
+    .update({ voted_count: votedCount + 1 })
+    .eq("user_id", user_id);
+
+  if (updateError) {
     throw new Error();
   }
 
-  const { data, error2 } = await supabase
-    .from("room_user_match_table")
-    .select("votedCount")
-    .eq("user_id", receiver_user_id);
-
-  if (error2) {
-    throw new Error();
-  }
-
-  const { error3 } = await supabase
-    .from("room_user_match_table")
-    .update({ voted_count: data + 1 })
-    .eq("user_id", receiver_user_id)
-    .select();
-
-  if (error3) {
-    throw new Error();
-  }
+  return userId;
 };
 
 export const resetVote = async (room_id) => {
