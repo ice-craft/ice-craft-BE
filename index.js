@@ -502,40 +502,51 @@ const playMafia = async (roomId, totalUserCount) => {
 
   moderator.waitForMs(500); //NOTE - 시간 재기
 
-  const voteBoard = await moderator.getPlayersVoteResult(); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-  const mostVoteResult = await moderator.getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+  const voteBoard = await moderator.getPlayersVoteResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+  const mostVoteResult = moderator.getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+  console.log(voteBoard);
+  await moderator.resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋
 
-  moderator.resetVote(); //NOTE - 플레이어들이 한 투표 기록 리셋
-  moderator.players.forEach((player) => moderator.showVoteResult(voteBoard));
-
-  /*
-  
+  moderator.showVoteToResult(roomId, voteBoard);
 
   if (mostVoteResult.isValid) {
     //NOTE - 투표 성공
 
-    moderator.players.forEach((player) =>
-      moderator.speak(
-        player,
-        `${mostVoteResult.result.userNickname}님이 마피아로 지복되었습니다.`
-      )
+    moderator.showModal(
+      roomId,
+      "제목",
+      `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`,
+      500,
+      "닉네임",
+      false
     );
 
-    moderator.players.forEach((player) =>
-      moderator.speak(
-        player,
-        `${mostVoteResult.result.userNickname}님은 최후의 변론을 시작하세요.`
-      )
+    moderator.showModal(
+      roomId,
+      "제목",
+      `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`,
+      500,
+      "닉네임",
+      false
     );
 
-    moderator.startTimer(90); //NOTE - 시간 재기
+    moderator.waitForMs(500); //NOTE - 시간 재기
 
-    moderator.players.forEach((player) =>
-      moderator.speak(player, "찬성/반대 투표를 해주세요.")
+    moderator.showModal(
+      roomId,
+      "제목",
+      "찬성/반대 투표를 해주세요.",
+      500,
+      "닉네임",
+      false
     );
 
-    moderator.startTimer(90); //NOTE - 시간 재기
+    moderator.waitForMs(500); //NOTE - 시간 재기
 
+    //NOTE - 여기부터
+
+    //NOTE - 예시
+    /*
     moderator.players[0].voteYesOrNo(votes, false); //NOTE - 0번 인덱스 플레이어가 찬성에 투표
     moderator.players[1].voteYesOrNo(votes, true); //NOTE - 1번 인덱스 플레이어가 찬성에 투표
     moderator.players[2].voteYesOrNo(votes, true); //NOTE - 2번 인덱스 플레이어가 찬성에 투표
@@ -544,7 +555,7 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.players[5].voteYesOrNo(votes, false); //NOTE - 5번 인덱스 플레이어가 찬성에 투표
     moderator.players[6].voteYesOrNo(votes, true); //NOTE - 6번 인덱스 플레이어가 찬성에 투표
     moderator.players[7].voteYesOrNo(votes, true); //NOTE - 7번 인덱스 플레이어가 찬성에 투표
-
+*/
     const yesOrNoVoteResult = moderator.getYesOrNoVoteResult(votes); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
 
     moderator.showVoteResult(yesOrNoVoteResult.result.detail);
@@ -578,6 +589,9 @@ const playMafia = async (roomId, totalUserCount) => {
       console.log("동률 나옴");
     }
   }
+
+  /*
+    
 
   moderator.morningOver(); //NOTE - 아침 종료
   moderator.nightStart(); //NOTE - 밤이 시작됨

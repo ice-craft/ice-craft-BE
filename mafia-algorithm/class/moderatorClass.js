@@ -197,16 +197,13 @@ export class Moderator {
   }
 
   //NOTE - 투표 리셋
-  resetVote() {
-    this.players.forEach((player) => {
-      player.votedCount = 0;
-      player.voteTo = null;
-    });
+  async resetVote(roomId) {
+    await gamePlayDB.resetVote(roomId);
   }
 
   //NOTE - 플레이어들이 받은 표 확인
-  async getPlayersVoteResult() {
-    const result = await gamePlayDB.getVoteToResult();
+  async getPlayersVoteResult(roomId) {
+    const result = await gamePlayDB.getVoteToResult(roomId);
     return result;
   }
 
@@ -242,11 +239,9 @@ export class Moderator {
     };
   }
 
-  //NOTE - 유저들에게 투표 결과 보여줌
-  showVoteResult(vote) {
-    this.players.forEach((player) =>
-      console.log(`사회자[to : ${player.userNickname}] : ${vote}`)
-    );
+  //NOTE - 유저들에게 마피아 지목 투표 결과 보여줌
+  showVoteToResult(roomId, voteBoard) {
+    this.mafiaIo.emit("showVoteToResult", voteBoard); //NOTE - 테스트 코드라서 .to(roomId) 제외
   }
 
   //NOTE - 유저가 살았는지 확인
