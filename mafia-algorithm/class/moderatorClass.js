@@ -118,9 +118,12 @@ export class Moderator {
   }
 
   //NOTE - 플레이어에게 역할 배정
-  setPlayerRole(userId, role) {
-    gamePlayDB.setPlayerRole(userId, role);
+  async setPlayerRole(userId, role) {
+    await gamePlayDB.setPlayerRole(userId, role);
   }
+
+  //NOTE - 각 역할의 플레이어들 반환
+  getPlayerByRole(roomId, role) {}
 
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개
   openPlayerRole(clientPlayer, rolePlayer, roleName) {
