@@ -92,30 +92,30 @@ export const getVoteYesOrNoResult = async (room_id) => {
   return data;
 };
 
-export const choosePlayer = async (user_id) => {
-  const { data, error } = await supabase
+export const choosePlayer = async (user_id, role) => {
+  const { error } = await supabase
     .from("room_user_match_table")
-    .update({ vote_to: user_id })
-    .eq("user_id", user_id)
-    .select();
-
+    .update({ chosen_by: role })
+    .eq("user_id", user_id);
   if (error) {
     throw new Error();
   }
-
-  return data;
 };
 
-export const checkChosenPlayer = async (room_id) => {
+export const checkChosenPlayer = async (room_id, role) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id")
     .eq("room_id", room_id)
-    .neq("vote_to", null);
+    .eq("chosen_by", role);
 
   if (error) {
     throw new Error();
   }
 
-  return data;
+  if (data.length === 0) {
+    return null;
+  }
+
+  return data[0].user_id;
 };
