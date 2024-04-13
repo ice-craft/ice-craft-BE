@@ -1,7 +1,9 @@
-import * as db from "../../api/supabse/gamePlayAPI.js";
+import * as gamePlayDB from "../../api/supabse/gamePlayAPI.js";
+import * as roomDB from "../../api/supabse/roomAPI.js";
 
 export class Moderator {
-  constructor(playerCount) {
+  constructor(playerCount, mafiaIo) {
+    this.mafiaIo = mafiaIo;
     this.players = [];
     this.playerCount = playerCount;
     this.roles = {};
@@ -54,14 +56,20 @@ export class Moderator {
 
   //NOTE - 인원 수 맞는지 확인
   async checkPlayerCountEnough(roomId, totalUserCount) {
-    const result = await db.checkPlayerCountEnough(roomId, totalUserCount);
+    const result = await gamePlayDB.checkPlayerCountEnough(
+      roomId,
+      totalUserCount
+    );
 
     return result;
   }
 
   //NOTE - 모든 플레이어들이 전부 레디했는지 확인
   async checkAllPlayersReady(roomId, totalUserCount) {
-    const result = await db.checkAllPlayersReady(roomId, totalUserCount);
+    const result = await gamePlayDB.checkAllPlayersReady(
+      roomId,
+      totalUserCount
+    );
 
     return result;
   }
@@ -69,6 +77,12 @@ export class Moderator {
   //NOTE - 게임이 시작가능한 지 확인
   canGameStart(isEnoughCount, isAllReady) {
     return isEnoughCount && isAllReady;
+  }
+
+  //NOTE - 방안의 모든 유저들의 정보 반환
+  async getAllUserInfo(roomId) {
+    const users = await roomDB.getUserInfoInRoom(roomId);
+    return users;
   }
 
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개

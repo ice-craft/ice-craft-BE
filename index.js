@@ -20,6 +20,7 @@ import {
   voteYesOrNo,
 } from "./api/supabse/gamePlayAPI.js";
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
+import { Citizen } from "./mafia-algorithm/class/citizenClass.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -205,7 +206,7 @@ const showVoteToResult = (roomName, voteResult) => {
 const playMafia = async (roomId, totalUserCount) => {
   //NOTE - roomId : 12dc28ad-4764-460f-9a54-58c31fdacd1f
 
-  const moderator = new Moderator(totalUserCount); //NOTE - 사회자 생성
+  const moderator = new Moderator(totalUserCount, mafiaIo); //NOTE - 사회자 생성
 
   let startTime = Date.now();
 
@@ -234,36 +235,13 @@ const playMafia = async (roomId, totalUserCount) => {
       }
     }
   }
+
+  const users = await moderator.getAllUserInfo(roomId);
+  users.forEach((user, index) => {
+    moderator.players[index] = new Citizen(user.user_id, user.user_nickname);
+  });
+
   /*
-  playerCount = getUserCountInRoom(); //NOTE - 방 정원 인원 수 가져오기
-  const moderator = new Moderator(playerCount); //NOTE - 사회자 생성
-
-  mafiaCount = moderator.roomComposition.mafiaCount; //NOTE - 마피아 플레이어 수
-
-  //NOTE - 플레이어들 게임 참가
-  for (let playerIndex = 0; playerIndex < playerCount; playerIndex++) {
-    moderator.players[playerIndex] = new Citizen(
-      `${playerIndex}-${playerIndex}-${playerIndex}`,
-      "user" + playerIndex
-    );
-  }
-
-  //NOTE - 모든 플레이어들이 레디함
-  for (let playerIndex = 0; playerIndex < playerCount; playerIndex++) {
-    moderator.players[playerIndex].ready(true);
-  }
-
-  const isAllPlayerEnoughCount = moderator.checkPlayerCountEnough(); //NOTE - 플레이어들이 방 정원을 채웠는지
-  const isAllPlayersReady = moderator.checkAllPlayersReady(); //NOTE - 플레이어들이 전부 레디했는지
-
-  if (
-    moderator.canGameStart(isAllPlayerEnoughCount, isAllPlayersReady) //NOTE - 게임이 시작 가능한 상태인지 확인
-  ) {
-    moderator.gameStart(); //NOTE - 게임 시작
-  } else {
-    console.log("게임 시작 불가"); //NOTE - 게임 시작 조건 못 갖춤
-  }
-
   moderator.roundStart();
 
   //NOTE - 모든 참가자들은 역할을 배정받고 플레이어로 변경 (매개 변수가 participant라서 이렇게 대처, 클래스면 게임 순서대로 구현 가능)
