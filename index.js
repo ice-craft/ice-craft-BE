@@ -242,13 +242,10 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.players[index] = new Citizen(user.user_id, user.user_nickname);
   });
 
-  showModal(roomId, "제목", "라운드 시작", 100, "닉네임", true);
-  showModal(roomId, "제목", "밤 시작", 100, "닉네임", true);
+  moderator.showModal(roomId, "제목", "라운드 시작", 100, "닉네임", true);
+  moderator.showModal(roomId, "제목", "밤 시작", 100, "닉네임", true);
 
   /*
-  //NOTE - 모든 참가자들은 역할을 배정받고 플레이어로 변경 (매개 변수가 participant라서 이렇게 대처, 클래스면 게임 순서대로 구현 가능)
-  moderator.nightStart(); //NOTE - 밤이 시작됨
-
   //NOTE - 모든 플레이어들의 카메라와 마이크 끔
   moderator.players.forEach((clientPlayer) =>
     moderator.players.forEach((player) => {

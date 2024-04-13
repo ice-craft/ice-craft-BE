@@ -90,6 +90,14 @@ export class Moderator {
     this.mafiaIo
       .to(roomName)
       .emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
+
+    this.waitForMs(timer);
+  }
+
+  waitForMs(ms) {
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < ms) {}
   }
 
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개
