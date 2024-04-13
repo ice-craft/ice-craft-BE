@@ -16,6 +16,7 @@ export class Moderator {
           policeCount: 0,
           doctorCount: 0,
         };
+        break;
       case 6:
         this.roomComposition = {
           mafiaCount: 2,
@@ -23,6 +24,7 @@ export class Moderator {
           policeCount: 1,
           doctorCount: 0,
         };
+        break;
       case 7:
         this.roomComposition = {
           mafiaCount: 2,
@@ -30,6 +32,7 @@ export class Moderator {
           policeCount: 1,
           doctorCount: 0,
         };
+        break;
       case 8:
         this.roomComposition = {
           mafiaCount: 3,
@@ -37,6 +40,7 @@ export class Moderator {
           policeCount: 1,
           doctorCount: 1,
         };
+        break;
       case 9:
         this.roomComposition = {
           mafiaCount: 3,
@@ -44,6 +48,7 @@ export class Moderator {
           policeCount: 1,
           doctorCount: 1,
         };
+        break;
       case 10:
         this.roomComposition = {
           mafiaCount: 3,
@@ -51,6 +56,7 @@ export class Moderator {
           policeCount: 1,
           doctorCount: 1,
         };
+        break;
     }
   }
 
@@ -130,7 +136,7 @@ export class Moderator {
 
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개
   openPlayerRole(clientUserId, roleUserId, role) {
-    this.mafiaIo.to(clientUserId).emit("openPlayerRole", roleUserId, role); //NOTE - 테스트 코드라서 .to(clientPlayer.userId) 제외
+    this.mafiaIo.emit("openPlayerRole", roleUserId, role); //NOTE - 테스트 코드라서 to(clientUserId) 제외
   }
 
   //NOTE - 게임 시작

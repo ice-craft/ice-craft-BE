@@ -1,3 +1,5 @@
+import { Citizen } from "./citizenClass.js";
+
 export class Doctor extends Citizen {
   constructor(citizen) {
     super(citizen.userId, citizen.userNickname, citizen.index);

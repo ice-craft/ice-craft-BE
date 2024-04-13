@@ -20,6 +20,8 @@ import {
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
 import { Citizen } from "./mafia-algorithm/class/citizenClass.js";
 import { Mafia } from "./mafia-algorithm/class/mafiaClass.js";
+import { Doctor } from "./mafia-algorithm/class/doctorClass.js";
+import { Police } from "./mafia-algorithm/class/policeClass.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -328,62 +330,93 @@ const playMafia = async (roomId, totalUserCount) => {
     )
   );
 
-  /*
-  
-
-  moderator.players.forEach((player) =>
-    moderator.speak(player, "마피아 들은 고개를 들어 서로를 확인해 주세요.")
+  moderator.showModal(
+    roomId,
+    "제목",
+    "마피아 들은 고개를 들어 서로를 확인해 주세요.",
+    500,
+    "닉네임",
+    true
   );
+
+  mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
-  mafiaPlayers.forEach((clientPlayer) =>
-    mafiaPlayers.forEach((player) => {
-      moderator.turnOnCamera(clientPlayer, player);
-      moderator.turnOnMike(clientPlayer, player);
+  console.log("마피아 유저들의 카메라, 마이크 켬");
+  mafiaPlayers.forEach((clientUserId) =>
+    mafiaPlayers.forEach((playerUserId) => {
+      moderator.turnOnCamera(clientUserId, playerUserId);
+      moderator.turnOnMike(clientUserId, playerUserId);
     })
   );
 
-  moderator.startTimer(90); //NOTE - 시간 재기
+  moderator.waitForMs(500); //NOTE - 시간 재기
+
+  mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 끔
-  mafiaPlayers.forEach((clientPlayer) =>
-    mafiaPlayers.forEach((player) => {
-      moderator.turnOffCamera(clientPlayer, player);
-      moderator.turnOffMike(clientPlayer, player);
+  console.log("마피아 유저들의 카메라, 마이크 끔");
+  mafiaPlayers.forEach((clientUserId) =>
+    mafiaPlayers.forEach((playerUserId) => {
+      moderator.turnOffCamera(clientUserId, playerUserId);
+      moderator.turnOffMike(clientUserId, playerUserId);
     })
   );
 
-  moderator.players.forEach((player) =>
-    moderator.speak(player, "의사를 뽑겠습니다.")
-  );
+  if (moderator.roomComposition.doctorCount !== 0) {
+    console.log("의사 수", moderator.roomComposition.doctorCount);
+    moderator.showModal(
+      roomId,
+      "제목",
+      "의사를 뽑겠습니다.",
+      500,
+      "닉네임",
+      false
+    );
 
-  randomPlayer = moderator.players[mafiaCount]; //NOTE - 랜덤으로 플레이어 선택
-  moderator.players[mafiaCount] = new Doctor(randomPlayer); //NOTE - 참가자를 의사 플레이어로 설정
+    console.log("의사 뽑음");
+    randomPlayer = moderator.players[moderator.roomComposition.mafiaCount]; //NOTE - 랜덤으로 플레이어 선택
+    moderator.players[moderator.roomComposition.mafiaCount] = new Doctor(
+      randomPlayer
+    ); //NOTE - 참가자를 의사 플레이어로 설정
 
-  moderator.setRoles();
-  doctorPlayer = moderator.roles["의사"];
+    doctorPlayer = await moderator.setPlayerRole(randomPlayer.userId, "의사");
+    moderator.openPlayerRole(doctorPlayer, doctorPlayer, "의사"); //NOTE - 의사 플레이어의 화면에서 자신이 의사임을 알림
+  }
 
-  moderator.openPlayerRole(doctorPlayer, doctorPlayer, "의사"); //NOTE - 의사 플레이어의 화면에서 자신이 의사임을 알림
+  if (moderator.roomComposition.policeCount !== 0) {
+    moderator.showModal(
+      roomId,
+      "제목",
+      "경찰을 뽑겠습니다.",
+      500,
+      "닉네임",
+      false
+    );
 
-  moderator.players.forEach((player) =>
-    moderator.speak(player, "경찰을 뽑겠습니다.")
-  );
+    console.log("경찰 뽑음");
+    randomPlayer = moderator.players[moderator.roomComposition.mafiaCount + 1]; //NOTE - 랜덤으로 플레이어 선택
+    moderator.players[moderator.roomComposition.mafiaCount + 1] = new Police(
+      randomPlayer
+    );
+    await moderator.setPlayerRole(moderator.players[playerIndex], "경찰");
 
-  randomPlayer = moderator.players[mafiaCount + 1]; //NOTE - 랜덤으로 플레이어 선택
-  moderator.players[mafiaCount + 1] = new Police(randomPlayer); //NOTE - 참가자를 경찰 플레이어로 설정
+    policePlayer = moderator.getPlayerByRole(randomPlayer.userId, "경찰"); //NOTE - 참가자를 경찰 플레이어로 설정
+    moderator.openPlayerRole(policePlayer, policePlayer, "경찰"); //NOTE - 경찰 플레이어의 화면에서 자신이 경찰임을 알림
+  }
 
-  moderator.setRoles();
-  policePlayer = moderator.roles["경찰"];
-
-  moderator.openPlayerRole(policePlayer, policePlayer, "경찰"); //NOTE - 경찰 플레이어의 화면에서 자신이 경찰임을 알림
-
-  citizenPlayers = moderator.roles["시민"];
+  citizenPlayers = await moderator.getPlayerByRole(roomId, "시민");
+  console.log("시민", citizenPlayers);
 
   //NOTE - 시민 플레이어의 화면에서 자신이 시민임을 알림
-  citizenPlayers.forEach((citizenPlayer) =>
-    moderator.openPlayerRole(citizenPlayer, citizenPlayer, "시민")
+  citizenPlayers.forEach((clientUserId) =>
+    citizenPlayers.forEach((playerUserId) => {
+      moderator.openPlayerRole(clientUserId, playerUserId);
+      moderator.openPlayerRole(clientUserId, playerUserId);
+    })
   );
 
+  /*
   moderator.nightOver(); //NOTE - 밤 종료
   moderator.roundOver(); //NOTE - 라운드 종료
 
