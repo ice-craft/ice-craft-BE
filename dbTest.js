@@ -1,9 +1,13 @@
-import { checkAllPlayersReady } from "./api/supabse/gamePlayAPI.js";
+import {
+  checkAllPlayersReady,
+  getRoleCount,
+  setPlayerRole,
+} from "./api/supabse/gamePlayAPI.js";
 
 try {
-  const result = await checkAllPlayersReady(
-    "12dc28ad-4764-460f-9a54-58c31fdacd1f",
-    5
+  const result = await setPlayerRole(
+    "11143912-e9c4-4658-987c-6715bebb1224",
+    "의사"
   );
   console.log(result);
 } catch (error) {

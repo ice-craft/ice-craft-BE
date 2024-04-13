@@ -117,6 +117,11 @@ export class Moderator {
     this.mafiaIo.emit("setMike", clientPlayer.userId, false); //NOTE - 테스트 코드라서 .to(roomName) 제외
   }
 
+  //NOTE - 플레이어에게 역할 배정
+  setPlayerRole(userId, role) {
+    gamePlayDB.setPlayerRole(userId, role);
+  }
+
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개
   openPlayerRole(clientPlayer, rolePlayer, roleName) {
     console.log(

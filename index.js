@@ -280,6 +280,7 @@ const playMafia = async (roomId, totalUserCount) => {
   ) {
     randomPlayer = moderator.players[playerIndex]; //NOTE - 랜덤으로 플레이어 선택
     moderator.players[playerIndex] = new Mafia(randomPlayer); //NOTE - 플레이어들의 역할을 마피아로 지정
+    moderator.setPlayerRole(players[playerIndex]);
   }
 
   moderator.setRoles();

@@ -51,6 +51,17 @@ export const getRoleCount = async (room_id, role) => {
   return count;
 };
 
+export const setPlayerRole = async (user_id, role) => {
+  const { count, error } = await supabase
+    .from("room_user_match_table")
+    .update({ role })
+    .eq("user_id", user_id);
+
+  if (error) {
+    throw new Error();
+  }
+};
+
 export const voteTo = async (user_id) => {
   const { data, selectError } = await supabase
     .from("room_user_match_table")
