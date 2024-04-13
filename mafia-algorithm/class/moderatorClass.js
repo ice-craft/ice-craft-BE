@@ -87,10 +87,7 @@ export class Moderator {
 
   //NOTE - 클라이언트의 화면에 모달창을 띄움
   showModal(roomName, title, message, timer, nickname, yesOrNo) {
-    this.mafiaIo
-      .to(roomName)
-      .emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
-
+    this.mafiaIo.emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
     this.waitForMs(timer);
   }
 
@@ -98,6 +95,26 @@ export class Moderator {
     const startTime = Date.now();
 
     while (Date.now() - startTime < ms) {}
+  }
+
+  //NOTE - 사회자가 플레이어의 카메라를 켬
+  turnOnCamera(roomName, clientPlayer) {
+    this.mafiaIo.emit("setCamera", clientPlayer.userId, true); //NOTE - 테스트 코드라서 .to(roomName) 제외
+  }
+
+  //NOTE - 사회자가 플레이어의 카메라를 끔
+  turnOffCamera(roomName, clientPlayer) {
+    this.mafiaIo.emit("setCamera", clientPlayer.userId, false); //NOTE - 테스트 코드라서 .to(roomName) 제외
+  }
+
+  //NOTE - 사회자가 플레이어의 마이크를 켬
+  turnOnMike(roomName, clientPlayer) {
+    this.mafiaIo.emit("setMike", clientPlayer.userId, true); //NOTE - 테스트 코드라서 .to(roomName) 제외
+  }
+
+  //NOTE - 사회자가 플레이어의 마이크를 끔
+  turnOffMike(roomName, clientPlayer) {
+    this.mafiaIo.emit("setMike", clientPlayer.userId, false); //NOTE - 테스트 코드라서 .to(roomName) 제외
   }
 
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개
@@ -257,37 +274,6 @@ export class Moderator {
       }
     });
   };
-
-  //NOTE - 사회자가 플레이어의 카메라를 켬
-  turnOnCamera(clientPlayer, cameraPlayer) {
-    const setCamera = (roomName, cameraUserId, isOn) => {
-      mafiaIo.emit("setCamera", cameraUserId, isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
-    };
-    console.log(
-      `${clientPlayer.userNickname} 클라이언트의 ${cameraPlayer.userNickname} 카메라 켬`
-    );
-  }
-
-  //NOTE - 사회자가 플레이어의 카메라를 끔
-  turnOffCamera(clientPlayer, cameraPlayer) {
-    console.log(
-      `${clientPlayer.userNickname} 클라이언트의 ${cameraPlayer.userNickname} 카메라 끔`
-    );
-  }
-
-  //NOTE - 사회자가 플레이어의 마이크를 켬
-  turnOnMike(clientPlayer, mikePlayer) {
-    console.log(
-      `${clientPlayer.userNickname} 클라이언트의 ${mikePlayer.userNickname} 마이크 켬`
-    );
-  }
-
-  //NOTE - 사회자가 플레이어의 마이크를 끔
-  turnOffMike(clientPlayer, mikePlayer) {
-    console.log(
-      `${clientPlayer.userNickname} 클라이언트의 ${mikePlayer.userNickname} 마이크 끔`
-    );
-  }
 
   //NOTE - 어느 팀이 이겼는지 결과 반환
   whoWins(roles) {

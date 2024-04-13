@@ -206,6 +206,7 @@ const showVoteToResult = (roomName, voteResult) => {
 
 const playMafia = async (roomId, totalUserCount) => {
   //NOTE - roomId : 12dc28ad-4764-460f-9a54-58c31fdacd1f
+  console.log("마피아 시작");
 
   const moderator = new Moderator(totalUserCount, mafiaIo); //NOTE - 사회자 생성
 
@@ -227,6 +228,7 @@ const playMafia = async (roomId, totalUserCount) => {
         roomId,
         totalUserCount
       ); //NOTE - 플레이어들이 전부 레디했는지
+      console.log("게임 레디 확인");
       canStart = moderator.canGameStart(
         isAllPlayerEnoughCount,
         isAllPlayersReady
@@ -237,31 +239,41 @@ const playMafia = async (roomId, totalUserCount) => {
     }
   }
 
+  console.log("게임 시작"); //NOTE - 테스트 코드
+
   const users = await moderator.getAllUserInfo(roomId);
   users.forEach((user, index) => {
     moderator.players[index] = new Citizen(user.user_id, user.user_nickname);
   });
+  console.log(moderator.players);
 
-  moderator.showModal(roomId, "제목", "라운드 시작", 100, "닉네임", true);
-  moderator.showModal(roomId, "제목", "밤 시작", 100, "닉네임", true);
+  console.log("라운드 시작"); //NOTE - 테스트 코드
+  moderator.showModal(roomId, "제목", "라운드 시작", 500, "닉네임", true);
 
-  /*
+  console.log("밤 시작"); //NOTE - 테스트 코드
+  moderator.showModal(roomId, "제목", "밤 시작", 500, "닉네임", true);
+
   //NOTE - 모든 플레이어들의 카메라와 마이크 끔
-  moderator.players.forEach((clientPlayer) =>
-    moderator.players.forEach((player) => {
-      moderator.turnOffCamera(clientPlayer, player);
-      moderator.turnOffMike(clientPlayer, player);
-    })
-  );
+  console.log("카메라, 마이크 끔");
+  moderator.players.forEach((player) => {
+    moderator.turnOffCamera(roomId, player);
+    moderator.turnOffMike(roomId, player);
+  });
 
   //NOTE - 플레이어들을 무작위로 섞음
   moderator.shufflePlayers();
 
   //NOTE - 모든 유저들 작업
-  moderator.players.forEach((player) =>
-    moderator.speak(player, "마피아를 뽑겠습니다.")
+  moderator.showModal(
+    roomId,
+    "제목",
+    "마피아를 뽑겠습니다.",
+    500,
+    "닉네임",
+    true
   );
 
+  /*
   //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
   for (let playerIndex = 0; playerIndex < mafiaCount; playerIndex++) {
     randomPlayer = moderator.players[playerIndex]; //NOTE - 랜덤으로 플레이어 선택
