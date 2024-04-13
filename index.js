@@ -205,6 +205,40 @@ const showVoteToResult = (roomName, voteResult) => {
 
 const playMafia = async (roomId, totalUserCount) => {
   //NOTE - roomId : 12dc28ad-4764-460f-9a54-58c31fdacd1f
+
+  //NOTE - 랜덤으로 지정된 플레이어
+  let randomPlayer;
+
+  //NOTE - 플레이어들의 찬반 투표 결과
+  const votes = [];
+
+  //NOTE - 역할이 마피아인 플레이어 목록
+  let mafiaPlayers;
+
+  //NOTE - 역할이 의사인 플레이어
+  let doctorPlayer;
+
+  //NOTE - 역할이 경찰인 플레이어
+  let policePlayer;
+
+  //NOTE - 역할이 시민인 플레이어 목록
+  let citizenPlayers;
+
+  //NOTE - 죽은 플레이아
+  let killedPlayer;
+
+  //NOTE - 죽기로 결정된 플레이어
+  let playerToKill;
+
+  //NOTE - 살리기로 결정된 플레이어
+  let playerToSave;
+
+  //NOTE - 경찰이 조사한 플레이어가 마피아인지 여부
+  let isPlayerMafia;
+
+  //NOTE - 방을 나갈지 선택
+  let choiceToExit;
+
   console.log("마피아 시작");
 
   const moderator = new Moderator(totalUserCount, mafiaIo); //NOTE - 사회자 생성
@@ -273,6 +307,7 @@ const playMafia = async (roomId, totalUserCount) => {
   );
 
   //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
+  console.log("마피아 역할 배정");
   for (
     let playerIndex = 0;
     playerIndex < moderator.roomComposition.mafiaCount;
@@ -280,28 +315,21 @@ const playMafia = async (roomId, totalUserCount) => {
   ) {
     randomPlayer = moderator.players[playerIndex]; //NOTE - 랜덤으로 플레이어 선택
     moderator.players[playerIndex] = new Mafia(randomPlayer); //NOTE - 플레이어들의 역할을 마피아로 지정
-    moderator.setPlayerRole(players[playerIndex]);
+    await moderator.setPlayerRole(moderator.players[playerIndex], "마피아");
   }
 
-  moderator.setRoles();
-  mafiaPlayers = moderator.roles["마피아"];
-
-  /*
-  //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
-  for (let playerIndex = 0; playerIndex < mafiaCount; playerIndex++) {
-    randomPlayer = moderator.players[playerIndex]; //NOTE - 랜덤으로 플레이어 선택
-    moderator.players[playerIndex] = new Mafia(randomPlayer); //NOTE - 플레이어들의 역할을 마피아로 지정
-  }
-
-  moderator.setRoles();
-  mafiaPlayers = moderator.roles["마피아"];
+  mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
 
   //NOTE - 마피아 유저들에게 자신이 마피아인 것을 알리고 마피아인 유저가 누구인지 공개
-  mafiaPlayers.forEach((clientPlayer) =>
-    mafiaPlayers.forEach((rolePlayer) =>
-      moderator.openPlayerRole(clientPlayer, rolePlayer, "마피아")
+  console.log("역할 공개");
+  mafiaPlayers.forEach((clientUserId) =>
+    mafiaPlayers.forEach((roleUserId) =>
+      moderator.openPlayerRole(clientUserId, roleUserId, "마피아")
     )
   );
+
+  /*
+  
 
   moderator.players.forEach((player) =>
     moderator.speak(player, "마피아 들은 고개를 들어 서로를 확인해 주세요.")

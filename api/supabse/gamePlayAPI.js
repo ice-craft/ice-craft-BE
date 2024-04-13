@@ -72,7 +72,10 @@ export const getPlayerByRole = async (room_id, role) => {
   if (error) {
     throw new Error();
   }
-  return data;
+
+  const result = data.map((item) => item.user_id);
+
+  return result;
 };
 
 export const voteTo = async (user_id) => {

@@ -118,18 +118,19 @@ export class Moderator {
   }
 
   //NOTE - 플레이어에게 역할 배정
-  async setPlayerRole(userId, role) {
-    await gamePlayDB.setPlayerRole(userId, role);
+  async setPlayerRole(player, role) {
+    await gamePlayDB.setPlayerRole(player.userId, role);
   }
 
   //NOTE - 각 역할의 플레이어들 반환
-  getPlayerByRole(roomId, role) {}
+  async getPlayerByRole(roomId, role) {
+    const players = await gamePlayDB.getPlayerByRole(roomId, role);
+    return players;
+  }
 
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개
-  openPlayerRole(clientPlayer, rolePlayer, roleName) {
-    console.log(
-      `${clientPlayer.userNickname} 클라이언트, ${rolePlayer.userNickname}의 역할은 ${roleName}입니다.`
-    );
+  openPlayerRole(clientUserId, roleUserId, role) {
+    this.mafiaIo.to(clientUserId).emit("openPlayerRole", roleUserId, role); //NOTE - 테스트 코드라서 .to(clientPlayer.userId) 제외
   }
 
   //NOTE - 게임 시작
