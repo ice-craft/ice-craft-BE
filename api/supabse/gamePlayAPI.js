@@ -121,7 +121,8 @@ export const getVoteToResult = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id, user_nickname, voted_count")
-    .eq("room_id", room_id);
+    .eq("room_id", room_id)
+    .order("voted_count", { ascending: false });
 
   if (error) {
     throw new Error();

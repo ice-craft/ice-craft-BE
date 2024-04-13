@@ -280,7 +280,6 @@ const playMafia = async (roomId, totalUserCount) => {
   users.forEach((user, index) => {
     moderator.players[index] = new Citizen(user.user_id, user.user_nickname);
   });
-  console.log(moderator.players);
 
   console.log("라운드 시작"); //NOTE - 테스트 코드
   moderator.showModal(roomId, "제목", "라운드 시작", 500, "닉네임", true);
@@ -291,8 +290,8 @@ const playMafia = async (roomId, totalUserCount) => {
   //NOTE - 모든 플레이어들의 카메라와 마이크 끔
   console.log("카메라, 마이크 끔");
   moderator.players.forEach((player) => {
-    moderator.turnOffCamera(roomId, player);
-    moderator.turnOffMike(roomId, player);
+    moderator.turnOffCamera(roomId, player.userId);
+    moderator.turnOffMike(roomId, player.userId);
   });
 
   //NOTE - 플레이어들을 무작위로 섞음
@@ -333,7 +332,7 @@ const playMafia = async (roomId, totalUserCount) => {
   moderator.showModal(
     roomId,
     "제목",
-    "마피아 들은 고개를 들어 서로를 확인해 주세요.",
+    "마피아들은 고개를 들어 서로를 확인해 주세요.",
     500,
     "닉네임",
     true
@@ -353,6 +352,7 @@ const playMafia = async (roomId, totalUserCount) => {
   moderator.waitForMs(500); //NOTE - 시간 재기
 
   mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
+  console.log("마피아", mafiaPlayers);
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 끔
   console.log("마피아 유저들의 카메라, 마이크 끔");
@@ -455,8 +455,8 @@ const playMafia = async (roomId, totalUserCount) => {
   //NOTE - 모든 플레이어들의 카메라와 마이크 켬
   console.log("카메라, 마이크 켬");
   moderator.players.forEach((player) => {
-    moderator.turnOnCamera(roomId, player);
-    moderator.turnOnMike(roomId, player);
+    moderator.turnOnCamera(roomId, player.userId);
+    moderator.turnOnMike(roomId, player.userId);
   });
 
   moderator.showModal(
@@ -487,8 +487,9 @@ const playMafia = async (roomId, totalUserCount) => {
     "닉네임",
     false
   );
-  /*
 
+  //NOTE - 예시
+  /*
   moderator.players[0].voteToPlayer(moderator.players[1]); //NOTE - 0번 인덱스 플레이어가 1번 인덱스 플레이어에게 투표
   moderator.players[1].voteToPlayer(moderator.players[2]); //NOTE - 1번 인덱스 플레이어가 2번 인덱스 플레이어에게 투표
   moderator.players[2].voteToPlayer(moderator.players[1]); //NOTE - 2번 인덱스 플레이어가 1번 인덱스 플레이어에게 투표
@@ -497,14 +498,18 @@ const playMafia = async (roomId, totalUserCount) => {
   moderator.players[5].voteToPlayer(moderator.players[1]); //NOTE - 5번 인덱스 플레이어가 1번 인덱스 플레이어에게 투표
   moderator.players[6].voteToPlayer(moderator.players[2]); //NOTE - 6번 인덱스 플레이어가 2번 인덱스 플레이어에게 투표
   moderator.players[7].voteToPlayer(moderator.players[1]); //NOTE - 7번 인덱스 플레이어가 1번 인덱스 플레이어에게 투표
+*/
 
-  moderator.startTimer(90); //NOTE - 시간 재기
+  moderator.waitForMs(500); //NOTE - 시간 재기
 
-  const voteBoard = moderator.getPlayersVoteResult(); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-  const mostVoteResult = moderator.getMostVotedPlayer(); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+  const voteBoard = await moderator.getPlayersVoteResult(); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+  const mostVoteResult = await moderator.getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
 
   moderator.resetVote(); //NOTE - 플레이어들이 한 투표 기록 리셋
   moderator.players.forEach((player) => moderator.showVoteResult(voteBoard));
+
+  /*
+  
 
   if (mostVoteResult.isValid) {
     //NOTE - 투표 성공

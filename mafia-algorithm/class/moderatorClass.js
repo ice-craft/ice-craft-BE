@@ -105,22 +105,22 @@ export class Moderator {
 
   //NOTE - 사회자가 플레이어의 카메라를 켬
   turnOnCamera(roomName, clientPlayer) {
-    this.mafiaIo.emit("setCamera", clientPlayer.userId, true); //NOTE - 테스트 코드라서 .to(roomName) 제외
+    this.mafiaIo.emit("setCamera", clientPlayer, true); //NOTE - 테스트 코드라서 .to(roomName) 제외
   }
 
   //NOTE - 사회자가 플레이어의 카메라를 끔
   turnOffCamera(roomName, clientPlayer) {
-    this.mafiaIo.emit("setCamera", clientPlayer.userId, false); //NOTE - 테스트 코드라서 .to(roomName) 제외
+    this.mafiaIo.emit("setCamera", clientPlayer, false); //NOTE - 테스트 코드라서 .to(roomName) 제외
   }
 
   //NOTE - 사회자가 플레이어의 마이크를 켬
   turnOnMike(roomName, clientPlayer) {
-    this.mafiaIo.emit("setMike", clientPlayer.userId, true); //NOTE - 테스트 코드라서 .to(roomName) 제외
+    this.mafiaIo.emit("setMike", clientPlayer, true); //NOTE - 테스트 코드라서 .to(roomName) 제외
   }
 
   //NOTE - 사회자가 플레이어의 마이크를 끔
   turnOffMike(roomName, clientPlayer) {
-    this.mafiaIo.emit("setMike", clientPlayer.userId, false); //NOTE - 테스트 코드라서 .to(roomName) 제외
+    this.mafiaIo.emit("setMike", clientPlayer, false); //NOTE - 테스트 코드라서 .to(roomName) 제외
   }
 
   //NOTE - 플레이어에게 역할 배정
@@ -205,23 +205,18 @@ export class Moderator {
   }
 
   //NOTE - 플레이어들이 받은 표 확인
-  getPlayersVoteResult = () => {
-    const voteResult = {};
-    this.players.forEach((player) => {
-      voteResult[player.userNickname] = player.votedCount;
-    });
-    return voteResult;
-  };
+  async getPlayersVoteResult() {
+    const result = await gamePlayDB.getVoteToResult();
+    return result;
+  }
 
   //NOTE - 표를 가장 많이 받은 플레이어 확인
-  getMostVotedPlayer() {
-    let sortedResult = [...this.players];
+  getMostVotedPlayer(voteBoard) {
     let isValid;
 
-    sortedResult.sort((a, b) => b.votedCount - a.votedCount);
-    isValid = sortedResult[0].votedCount !== sortedResult[1].votedCount;
+    isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
 
-    return { isValid, result: sortedResult[0] };
+    return { isValid, result: voteBoard[0] };
   }
 
   //NOTE - 찬성 반대 투표 결과
