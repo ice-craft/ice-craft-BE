@@ -85,6 +85,13 @@ export class Moderator {
     return users;
   }
 
+  //NOTE - 클라이언트의 화면에 모달창을 띄움
+  showModal(roomName, title, message, timer, nickname, yesOrNo) {
+    this.mafiaIo
+      .to(roomName)
+      .emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
+  }
+
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개
   openPlayerRole(clientPlayer, rolePlayer, roleName) {
     console.log(
@@ -245,6 +252,9 @@ export class Moderator {
 
   //NOTE - 사회자가 플레이어의 카메라를 켬
   turnOnCamera(clientPlayer, cameraPlayer) {
+    const setCamera = (roomName, cameraUserId, isOn) => {
+      mafiaIo.emit("setCamera", cameraUserId, isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
+    };
     console.log(
       `${clientPlayer.userNickname} 클라이언트의 ${cameraPlayer.userNickname} 카메라 켬`
     );
