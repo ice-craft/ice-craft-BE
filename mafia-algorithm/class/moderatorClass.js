@@ -190,10 +190,10 @@ export class Moderator {
   }
 
   //NOTE - 플레이어 죽임,setRoles 따로 처리하기
-  killPlayer(player) {
-    player.isLived = false;
+  async killPlayer(userId) {
+    const result = await gamePlayDB.killPlayer(userId);
 
-    return player;
+    return result;
   }
 
   //NOTE - 투표 리셋
