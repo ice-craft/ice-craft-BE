@@ -259,8 +259,9 @@ export class Moderator {
   //NOTE - 유저를 살림
 
   //NOTE - 유저가 살았는지 확인
-  checkPlayerLived(player) {
-    return player.isLived === true;
+  async checkPlayerLived(userId) {
+    const result = gamePlayDB.checkPlayerLived(userId);
+    return result;
   }
 
   //NOTE - 사회자가 특정 유저에게 진행 상황 말함
