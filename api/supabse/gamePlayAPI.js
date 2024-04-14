@@ -67,7 +67,8 @@ export const getPlayerByRole = async (room_id, role) => {
     .from("room_user_match_table")
     .select("user_id")
     .eq("room_id", room_id)
-    .eq("role", role);
+    .eq("role", role)
+    .eq("is_lived", true);
 
   if (error) {
     throw new Error();
