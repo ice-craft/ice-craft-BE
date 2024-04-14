@@ -238,6 +238,9 @@ const playMafia = async (roomId, totalUserCount) => {
   //NOTE - 경찰이 조사한 플레이어가 마피아인지 여부
   let isPlayerMafia;
 
+  //NOTE - 플레이어의 생사 여부
+  let isPlayerLived;
+
   //NOTE - 방을 나갈지 선택
   let choiceToExit;
 
@@ -741,7 +744,7 @@ const playMafia = async (roomId, totalUserCount) => {
   citizenPlayers = await moderator.getPlayerByRole(roomId, "시민");
 
   moderator.showModal(
-    policePlayer,
+    roomId,
     "제목",
     "밤이 종료되었습니다.",
     500,
@@ -750,7 +753,7 @@ const playMafia = async (roomId, totalUserCount) => {
   );
 
   moderator.showModal(
-    policePlayer,
+    roomId,
     "제목",
     "라운드가 종료되었습니다.",
     500,
@@ -759,7 +762,7 @@ const playMafia = async (roomId, totalUserCount) => {
   );
 
   moderator.showModal(
-    policePlayer,
+    roomId,
     "제목",
     "라운드가 시작되었습니다.",
     500,
@@ -768,7 +771,7 @@ const playMafia = async (roomId, totalUserCount) => {
   );
 
   moderator.showModal(
-    policePlayer,
+    roomId,
     "제목",
     "아침이 시작되었습니다.",
     500,
@@ -783,17 +786,30 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.turnOnMike(roomId, player.userId);
   });
 
-  /*
   //NOTE - 마피아가 죽일려고한 마피아가 살았는지 죽었는지 확인
-  if (killedPlayer.isLived) {
-    moderator.players.forEach((player) =>
-      moderator.speak(player, "의사의 활약으로 아무도 죽지 않았습니다.")
+  isPlayerLived = await moderator.checkPlayerLived(killedPlayer);
+  if (isPlayerLived) {
+    moderator.showModal(
+      roomId,
+      "제목",
+      "의사의 활약으로 아무도 죽지 않았습니다.", //FIXME - 의사가 없는 경우도 있어서 대사가 이상함
+      500,
+      "닉네임",
+      false
     );
   } else {
-    moderator.players.forEach((player) =>
-      moderator.speak(player, `${killedPlayer.userNickname}님이 죽었습니다.`)
+    moderator.showModal(
+      roomId,
+      "제목",
+      `${killedPlayer}님이 죽었습니다.`, //FIXME - 유저 닉네임으로 고쳐야함, killedPlayer에 현재 user_id만 들어있음 수정할 것
+      500,
+      "닉네임",
+      false
     );
   }
+
+  /*
+  
 
   moderator.speak(killedPlayer, "게임을 관전 하시겠습니까? 나가시겠습니까?");
   choiceToExit = true; //NOTE - 나간다고 가정
