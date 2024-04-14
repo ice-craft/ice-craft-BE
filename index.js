@@ -731,29 +731,59 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //NOTE - 죽일 플레이어와 살릴 플레이어 결정하고 생사 결정
   if (playerToKill !== playerToSave) {
-    mafiaPlayers[0].killPlayer(playerToKill);
-    doctorPlayer.savePlayer(playerToSave);
+    moderator.killPlayer(playerToKill);
+    moderator.savePlayer(playerToSave);
   }
-  /*
-  moderator.setRoles();
-  mafiaPlayers = moderator.roles["마피아"];
-  doctorPlayer = moderator.roles["의사"];
-  policePlayer = moderator.roles["경찰"];
-  citizenPlayers = moderator.roles["시민"];
 
-  moderator.nightOver(); //NOTE - 밤 종료
-  moderator.roundOver(); //NOTE - 라운드 종료
-  moderator.roundStart(); //NOTE - 라운드 시작
-  moderator.morningStart(); //NOTE - 아침 시작
+  mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아");
+  doctorPlayer = await moderator.getPlayerByRole(roomId, "의사");
+  policePlayer = await moderator.getPlayerByRole(roomId, "경찰");
+  citizenPlayers = await moderator.getPlayerByRole(roomId, "시민");
 
-  //NOTE - 모든 유저들 화상 카메라와 마이크만 켬
-  moderator.players.forEach((clientPlayer) =>
-    moderator.players.forEach((player) => {
-      moderator.turnOnCamera(clientPlayer, player);
-      moderator.turnOnMike(clientPlayer, player);
-    })
+  moderator.showModal(
+    policePlayer,
+    "제목",
+    "밤이 종료되었습니다.",
+    500,
+    "닉네임",
+    false
   );
 
+  moderator.showModal(
+    policePlayer,
+    "제목",
+    "라운드가 종료되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
+
+  moderator.showModal(
+    policePlayer,
+    "제목",
+    "라운드가 시작되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
+
+  moderator.showModal(
+    policePlayer,
+    "제목",
+    "아침이 시작되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
+
+  //NOTE - 모든 플레이어들의 카메라와 마이크 켬
+  console.log("카메라, 마이크 켬");
+  moderator.players.forEach((player) => {
+    moderator.turnOnCamera(roomId, player.userId);
+    moderator.turnOnMike(roomId, player.userId);
+  });
+
+  /*
   //NOTE - 마피아가 죽일려고한 마피아가 살았는지 죽었는지 확인
   if (killedPlayer.isLived) {
     moderator.players.forEach((player) =>

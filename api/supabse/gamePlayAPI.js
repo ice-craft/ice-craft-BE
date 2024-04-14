@@ -232,3 +232,17 @@ export const resetChosenPlayer = async (room_id) => {
     throw new Error();
   }
 };
+
+export const checkPlayerLived = async (user_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("is_lived")
+    .eq("user_id", user_id)
+    .single();
+
+  if (error) {
+    throw new Error();
+  }
+
+  return data.is_lived;
+};

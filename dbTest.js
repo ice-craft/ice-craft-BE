@@ -1,5 +1,6 @@
 import {
   checkAllPlayersReady,
+  checkPlayerLived,
   getPlayerByRole,
   getRoleCount,
   getVoteToResult,
@@ -10,7 +11,7 @@ import {
 } from "./api/supabse/gamePlayAPI.js";
 
 try {
-  const result = await savePlayer(
+  const result = await checkPlayerLived(
     // "12dc28ad-4764-460f-9a54-58c31fdacd1f",
     "79043912-e9c4-4658-987c-6715bebb1224"
   );
