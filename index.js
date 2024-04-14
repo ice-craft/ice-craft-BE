@@ -505,7 +505,7 @@ const playMafia = async (roomId, totalUserCount) => {
   const voteBoard = await moderator.getPlayersVoteResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
   const mostVoteResult = moderator.getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
   console.log(voteBoard);
-  await moderator.resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋
+  //await moderator.resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
   moderator.showVoteToResult(roomId, voteBoard);
 
