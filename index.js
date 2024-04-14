@@ -662,7 +662,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
   moderator.waitForMs(500);
 
-  playerToKill = await moderator.checkChosenPlayer(roomId, "마피아"); //NOTE - 가장 나중에 선택한 마피아의 지시를 따름, 죽일 플레이어 결정
+  playerToKill = await moderator.checkChosenPlayer(roomId, "마피아"); //FIXME - 가장 나중에 선택한 마피아의 지시를 따름, 죽일 플레이어 결정
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 끔
   console.log("마피아 유저들의 카메라, 마이크 끔");
@@ -808,10 +808,15 @@ const playMafia = async (roomId, totalUserCount) => {
     );
   }
 
-  /*
-  
+  moderator.showModal(
+    killedPlayer,
+    "제목",
+    "게임을 관전 하시겠습니까? 나가시겠습니까?",
+    500,
+    "닉네임",
+    false
+  );
 
-  moderator.speak(killedPlayer, "게임을 관전 하시겠습니까? 나가시겠습니까?");
   choiceToExit = true; //NOTE - 나간다고 가정
 
   //NOTE - 방을 나갈지 관전할지
@@ -832,7 +837,4 @@ const playMafia = async (roomId, totalUserCount) => {
 
     gameOver(); //NOTE - 게임 종료
   }
-
-  
-   */
 };

@@ -257,6 +257,10 @@ export class Moderator {
   }
 
   //NOTE - 유저를 살림
+  async savePlayer(userId) {
+    const result = gamePlayDB.savePlayer(userId);
+    return result;
+  }
 
   //NOTE - 유저가 살았는지 확인
   async checkPlayerLived(userId) {
