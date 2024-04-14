@@ -562,102 +562,171 @@ const playMafia = async (roomId, totalUserCount) => {
 
     //NOTE - 투표 결과가 유효하고(동률이 아님), 찬성이 반대보다 많은 경우
     if (yesOrNoVoteResult.isValid && yesOrNoVoteResult.result) {
-      killedPlayer = moderator.killPlayer(mostVoteResult); //NOTE - 투표를 가장 많이 받은 플레이어 사망
+      killedPlayer = await moderator.killPlayer(mostVoteResult.result.user_id); //NOTE - 투표를 가장 많이 받은 플레이어 사망
 
-      moderator.setRoles();
-      mafiaPlayers = moderator.roles["마피아"];
-      doctorPlayer = moderator.roles["의사"];
-      policePlayer = moderator.roles["경찰"];
-      citizenPlayers = moderator.roles["시민"];
+      mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아");
+      doctorPlayer = await moderator.getPlayerByRole(roomId, "의사");
+      policePlayer = await moderator.getPlayerByRole(roomId, "경찰");
+      citizenPlayers = await moderator.getPlayerByRole(roomId, "시민");
 
       isPlayerMafia = mafiaPlayers.indexOf(killedPlayer) !== -1; //NOTE - 죽은 플레이어가 마피아인지 확인
 
       //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
-      moderator.players.forEach((player) =>
-        isPlayerMafia
-          ? moderator.speak(player, "마피아가 죽었습니다.")
-          : moderator.speak(player, "시민이 죽었습니다.")
-      );
+      if (isPlayerMafia) {
+        moderator.showModal(
+          roomId,
+          "제목",
+          "마피아가 죽었습니다.",
+          500,
+          "닉네임",
+          false
+        );
 
-      moderator.players.forEach((clientPlayer) => {
-        const role = isPlayerMafia ? "마피아" : "시민";
+        moderator.openPlayerRole(roomId, killedPlayer, "마피아");
+      } else {
+        moderator.showModal(
+          roomId,
+          "제목",
+          "시민이 죽었습니다.",
+          500,
+          "닉네임",
+          false
+        );
 
-        moderator.openPlayerRole(clientPlayer, killedPlayer, role);
-      });
+        moderator.openPlayerRole(roomId, killedPlayer, "시민");
+      }
     } else {
       //NOTE - 투표 실패, 동률이 나옴
       console.log("동률 나옴");
     }
   }
 
-  /*
-    
+  moderator.showModal(
+    roomId,
+    "제목",
+    "아침이 종료되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
 
-  moderator.morningOver(); //NOTE - 아침 종료
-  moderator.nightStart(); //NOTE - 밤이 시작됨
+  moderator.showModal(
+    roomId,
+    "제목",
+    "밤이 시작되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
 
-  //NOTE - 모든 유저들 화상 카메라와 마이크만 끔
-  moderator.players.forEach((clientPlayer) =>
-    moderator.players.forEach((player) => {
-      moderator.turnOffCamera(clientPlayer, player);
-      moderator.turnOffMike(clientPlayer, player);
+  //NOTE - 모든 플레이어들의 카메라와 마이크 끔
+  console.log("카메라, 마이크 끔");
+  moderator.players.forEach((player) => {
+    moderator.turnOffCamera(roomId, player.userId);
+    moderator.turnOffMike(roomId, player.userId);
+  });
+
+  moderator.showModal(
+    roomId,
+    "제목",
+    "마피아는 누구를 죽일지 결정해주세요.",
+    500,
+    "닉네임",
+    false
+  );
+
+  mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
+
+  //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
+  console.log("마피아 유저들의 카메라, 마이크 켬");
+  mafiaPlayers.forEach((clientUserId) =>
+    mafiaPlayers.forEach((playerUserId) => {
+      moderator.turnOnCamera(clientUserId, playerUserId);
+      moderator.turnOnMike(clientUserId, playerUserId);
     })
   );
 
-  moderator.players.forEach((player) =>
-    moderator.speak(player, "마피아는 누구를 죽일지 결정해주세요.")
-  );
-
-  //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
-  mafiaPlayers.forEach((clientPlayer) => {
-    mafiaPlayers.forEach((player) => {
-      moderator.turnOnCamera(clientPlayer, player);
-      moderator.turnOnMike(clientPlayer, player);
-    });
+  mafiaPlayers.forEach((mafiaUserId) => {
+    moderator.showModal(
+      mafiaUserId,
+      "제목",
+      "누구를 죽일지 제스처를 통해 상의하세요.",
+      0,
+      "닉네임",
+      false
+    );
   });
 
-  mafiaPlayers.forEach((mafiaPlayer) => {
-    moderator.speak(mafiaPlayer, "제스처를 통해 상의하세요.");
-    moderator.speak(mafiaPlayer, "누구를 죽일지 선택하세요.");
-  });
+  moderator.waitForMs(500);
 
-  moderator.startTimer(90); //NOTE - 시간 재기
-  playerToKill = mafiaPlayers[0].choosePlayer(moderator.players[0]); //NOTE - 가장 먼저 선택한 마피아의 지시를 따름, 죽일 플레이어 결정
+  playerToKill = await moderator.checkChosenPlayer(roomId, "마피아"); //NOTE - 가장 나중에 선택한 마피아의 지시를 따름, 죽일 플레이어 결정
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 끔
-  mafiaPlayers.forEach((clientPlayer) => {
-    mafiaPlayers.forEach((player) => {
-      moderator.turnOffCamera(clientPlayer, player);
-      moderator.turnOffMike(clientPlayer, player);
-    });
-  });
-
-  mafiaPlayers.forEach((player) =>
-    moderator.speak(player, "의사는 누구를 살릴 지 결정하세요.")
+  console.log("마피아 유저들의 카메라, 마이크 끔");
+  mafiaPlayers.forEach((clientUserId) =>
+    mafiaPlayers.forEach((playerUserId) => {
+      moderator.turnOffCamera(clientUserId, playerUserId);
+      moderator.turnOffMike(clientUserId, playerUserId);
+    })
   );
 
-  //NOTE - 의사가 살아있을 경우
-  if (moderator.roles["의사"] !== undefined) {
-    doctorPlayer = moderator.roles["의사"]; //NOTE - 역할이 의사인 플레이어 인덱스 반환
+  //NOTE - 방 구성인원 중 의사가 있을 경우
+  if (moderator.roomComposition.doctorCount !== 0) {
+    moderator.showModal(
+      roomId,
+      "제목",
+      "의사는 누구를 살릴 지 결정하세요.",
+      500,
+      "닉네임",
+      false
+    );
 
-    moderator.startTimer(90); //NOTE - 시간 재기
+    //NOTE - 의사가 살아있을 경우
+    doctorPlayer = await moderator.getPlayerByRole(roomId, "의사");
+    if (doctorPlayer) {
+      moderator.waitForMs(500); //NOTE - 시간 재기
 
-    playerToSave = doctorPlayer.choosePlayer(moderator.players[0]); //NOTE - 의사가 살릴 플레이어를 선택
+      playerToSave = await moderator.checkChosenPlayer(roomId, "의사"); //NOTE - 의사가 살릴 플레이어를 선택
+    }
   }
 
-  moderator.players.forEach((player) =>
-    moderator.speak(player, "경찰은 마피아 의심자를 결정해주세요.")
-  );
+  //NOTE - 방 구성인원 중 경찰 있을 경우
+  if (moderator.roomComposition.policeCount !== 0) {
+    moderator.showModal(
+      roomId,
+      "제목",
+      "경찰은 마피아 의심자를 결정해주세요.",
+      500,
+      "닉네임",
+      false
+    );
+  }
 
   //NOTE - 경찰이 살아있을 경우
-  if (moderator.roles["경찰"] !== undefined) {
-    policePlayer = moderator.roles["경찰"];
+  policePlayer = await moderator.getPlayerByRole(roomId, "경찰");
+  if (policePlayer) {
+    const playerDoubted = moderator.checkChosenPlayer(roomId, "경찰"); //NOTE - 0번 인덱스 플레이어가 마피아인지 의심
+    isPlayerMafia = mafiaPlayers.indexOf(playerDoubted) !== -1;
 
-    isPlayerMafia = policePlayer.checkPlayerMafia(moderator.players[0]); //NOTE - 0번 인덱스 플레이어가 마피아인지 의심
-
-    isPlayerMafia
-      ? moderator.speak(policePlayer, "해당 플레이어는 마피아가 맞습니다.")
-      : moderator.speak(policePlayer, "해당 플레이어는 마피아가 아닙니다.");
+    if (isPlayerMafia) {
+      moderator.showModal(
+        policePlayer,
+        "제목",
+        "해당 플레이어는 마피아가 맞습니다.",
+        500,
+        "닉네임",
+        false
+      );
+    } else {
+      moderator.showModal(
+        policePlayer,
+        "제목",
+        "해당 플레이어는 마피아가 아닙니다.",
+        500,
+        "닉네임",
+        false
+      );
+    }
   }
 
   //NOTE - 죽일 플레이어와 살릴 플레이어 결정하고 생사 결정
@@ -665,7 +734,7 @@ const playMafia = async (roomId, totalUserCount) => {
     mafiaPlayers[0].killPlayer(playerToKill);
     doctorPlayer.savePlayer(playerToSave);
   }
-
+  /*
   moderator.setRoles();
   mafiaPlayers = moderator.roles["마피아"];
   doctorPlayer = moderator.roles["의사"];

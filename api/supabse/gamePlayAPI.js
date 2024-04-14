@@ -74,6 +74,10 @@ export const getPlayerByRole = async (room_id, role) => {
     throw new Error();
   }
 
+  if (data.length === 0) {
+    return null;
+  }
+
   const result = data.map((item) => item.user_id);
 
   return result;

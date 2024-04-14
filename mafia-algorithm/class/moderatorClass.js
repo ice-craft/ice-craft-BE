@@ -189,7 +189,7 @@ export class Moderator {
     console.log("아침이 끝났습니다.");
   }
 
-  //NOTE - 플레이어 죽임,setRoles 따로 처리하기
+  //NOTE - 플레이어 죽임
   async killPlayer(userId) {
     const result = await gamePlayDB.killPlayer(userId);
 
@@ -248,6 +248,11 @@ export class Moderator {
   //NOTE - 유저들에게 찬성/반대 투표 결과 보여줌
   showVoteYesOrNoResult(roomId, voteResult) {
     this.mafiaIo.emit("showVoteYesOrNoResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
+  }
+
+  async checkChosenPlayer(roomId, role) {
+    const result = gamePlayDB.checkChosenPlayer(roomId, role);
+    return result;
   }
 
   //NOTE - 유저가 살았는지 확인
