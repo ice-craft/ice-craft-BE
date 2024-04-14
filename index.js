@@ -556,9 +556,9 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.players[6].voteYesOrNo(votes, true); //NOTE - 6번 인덱스 플레이어가 찬성에 투표
     moderator.players[7].voteYesOrNo(votes, true); //NOTE - 7번 인덱스 플레이어가 찬성에 투표
 */
-    const yesOrNoVoteResult = moderator.getYesOrNoVoteResult(votes); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
+    const yesOrNoVoteResult = moderator.getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
 
-    moderator.showVoteResult(yesOrNoVoteResult.result.detail);
+    moderator.showVoteYesOrNoResult(roomId, yesOrNoVoteResult.result.detail);
 
     //NOTE - 투표 결과가 유효하고(동률이 아님), 찬성이 반대보다 많은 경우
     if (yesOrNoVoteResult.isValid && yesOrNoVoteResult.result) {

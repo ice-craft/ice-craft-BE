@@ -89,7 +89,6 @@ export const voteTo = async (user_id) => {
     throw new Error();
   }
   const votedCount = data.voted_count;
-  console.log("투표수", votedCount);
 
   const { userId, updateError } = await supabase
     .from("room_user_match_table")
