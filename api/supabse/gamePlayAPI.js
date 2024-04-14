@@ -179,6 +179,21 @@ export const killPlayer = async (user_id) => {
   return data.user_id;
 };
 
+export const savePlayer = async (user_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .update({ is_lived: true })
+    .eq("user_id", user_id)
+    .select("user_id")
+    .single();
+
+  if (error) {
+    throw new Error();
+  }
+
+  return data.user_id;
+};
+
 export const choosePlayer = async (user_id, role) => {
   const { error } = await supabase
     .from("room_user_match_table")

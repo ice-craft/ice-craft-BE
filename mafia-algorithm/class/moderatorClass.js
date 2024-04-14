@@ -250,10 +250,13 @@ export class Moderator {
     this.mafiaIo.emit("showVoteYesOrNoResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
   }
 
+  //NOTE - 역할에 해당하는 유저들의 아이디를 반환
   async checkChosenPlayer(roomId, role) {
     const result = gamePlayDB.checkChosenPlayer(roomId, role);
     return result;
   }
+
+  //NOTE - 유저를 살림
 
   //NOTE - 유저가 살았는지 확인
   checkPlayerLived(player) {
