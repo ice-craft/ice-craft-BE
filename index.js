@@ -211,9 +211,6 @@ const playMafia = async (roomId, totalUserCount) => {
   //NOTE - 랜덤으로 지정된 플레이어
   let randomPlayer;
 
-  //NOTE - 플레이어들의 찬반 투표 결과
-  const votes = [];
-
   //NOTE - 역할이 마피아인 플레이어 목록
   let mafiaPlayers;
 
@@ -735,7 +732,9 @@ const playMafia = async (roomId, totalUserCount) => {
   //NOTE - 죽일 플레이어와 살릴 플레이어 결정하고 생사 결정
   if (playerToKill !== playerToSave) {
     moderator.killPlayer(playerToKill);
-    moderator.savePlayer(playerToSave);
+    if (doctorPlayer) {
+      moderator.savePlayer(playerToSave);
+    }
   }
 
   mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아");
@@ -821,10 +820,26 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //NOTE - 방을 나갈지 관전할지
   if (choiceToExit) {
-    killedPlayer.exit(); //NOTE - 플레이어는 방을 나감, 중간에 나가는 경우에도 사용할 수 있음
+    //killedPlayer.exit(); //FIXME - 플레이어는 방을 나감, 중간에 나가는 경우에도 사용할 수 있음, 구현해야 함
   }
-  moderator.morningOver(); //NOTE - 아침 종료
-  moderator.roundOver(); //NOTE - 라운드 종료
+
+  moderator.showModal(
+    roomId,
+    "제목",
+    "아침이 종료되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
+
+  moderator.showModal(
+    killedPlayer,
+    "제목",
+    "라운드가 종료되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
 
   if (moderator.whoWins.isValid) {
     //NOTE - 게임 종료 만족하는 지

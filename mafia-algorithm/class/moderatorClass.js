@@ -91,6 +91,12 @@ export class Moderator {
     return users;
   }
 
+  //NOTE - 방안의 모든 유저들의 아이디 반환
+  async getAllUserId(roomId) {
+    const users = await roomDB.getAllUserId(roomId);
+    return users;
+  }
+
   //NOTE - 클라이언트의 화면에 모달창을 띄움
   showModal(roomName, title, message, timer, nickname, yesOrNo) {
     this.mafiaIo.emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
