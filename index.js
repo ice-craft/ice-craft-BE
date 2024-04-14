@@ -38,7 +38,8 @@ app.get("/", (req, res) => {
 });
 
 mafiaIo.on("connection", (socket) => {
-  playMafia("12dc28ad-4764-460f-9a54-58c31fdacd1f", 5); //NOTE - 테스트 코드
+  // playMafia("12dc28ad-4764-460f-9a54-58c31fdacd1f", 5); //NOTE - 테스트 코드
+  showModal("111", "제목", "내용", 0, "닉네임", false);
   socket.on("enterMafia", async (rowStart, rowEnd) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
     try {
@@ -222,6 +223,9 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //NOTE - 역할이 시민인 플레이어 목록
   let citizenPlayers;
+
+  //NOTE - 방안의 모든 플레이어들의 아이디 목록
+  let allPlayers;
 
   //NOTE - 죽은 플레이아
   let killedPlayer;

@@ -142,6 +142,7 @@ export class Moderator {
 
   //NOTE - 플레이어에게 다른 플레이어의 역할 공개
   openPlayerRole(clientUserId, roleUserId, role) {
+    console.log("역할 공개", roleUserId, role);
     this.mafiaIo.emit("openPlayerRole", roleUserId, role); //NOTE - 테스트 코드라서 to(clientUserId) 제외
   }
 
