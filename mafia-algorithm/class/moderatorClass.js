@@ -218,7 +218,7 @@ export class Moderator {
 
   //NOTE - 찬성 반대 투표 결과
   async getYesOrNoVoteResult(roomId) {
-    const votes = await gamePlayAPI.getVoteYesOrNoResult(roomId);
+    const votes = await gamePlayDB.getVoteYesOrNoResult(roomId);
     let yesCount = 0;
     let noCount = 0;
     let isValid;
@@ -247,7 +247,7 @@ export class Moderator {
 
   //NOTE - 유저들에게 찬성/반대 투표 결과 보여줌
   showVoteYesOrNoResult(roomId, voteResult) {
-    mafiaIo.emit("showVoteYesOrNoResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
+    this.mafiaIo.emit("showVoteYesOrNoResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
   }
 
   //NOTE - 유저가 살았는지 확인
