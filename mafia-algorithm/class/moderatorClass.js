@@ -262,6 +262,12 @@ export class Moderator {
     return result;
   }
 
+  //NOTE - 플레이어가 마피아인지 확인
+  async checkPlayerMafia(userId) {
+    const result = gamePlayDB.checkPlayerMafia(userId);
+    return result;
+  }
+
   //NOTE - 유저를 살림
   async savePlayer(userId) {
     const result = gamePlayDB.savePlayer(userId);

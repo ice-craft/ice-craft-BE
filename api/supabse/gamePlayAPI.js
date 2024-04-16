@@ -222,6 +222,24 @@ export const checkChosenPlayer = async (room_id, role) => {
   return data[0].user_id;
 };
 
+export const checkPlayerMafia = async (user_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_id")
+    .eq("user_id", user_id)
+    .eq("role", "마피아");
+
+  if (error) {
+    throw new Error();
+  }
+
+  if (data.length === 0) {
+    return false;
+  }
+
+  return true;
+};
+
 export const resetChosenPlayer = async (room_id) => {
   const { error } = await supabase
     .from("room_user_match_table")

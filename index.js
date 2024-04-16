@@ -328,14 +328,8 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
   console.log("마피아 역할 배정");
-  for (
-    let playerIndex = 0;
-    playerIndex < moderator.roomComposition.mafiaCount;
-    playerIndex++
-  ) {
-    randomPlayer = moderator.players[playerIndex]; //NOTE - 랜덤으로 플레이어 선택
-    moderator.players[playerIndex] = new Mafia(randomPlayer); //NOTE - 플레이어들의 역할을 마피아로 지정
-    await moderator.setPlayerRole(moderator.players[playerIndex], "마피아");
+  for (let playerIndex = 0; playerIndex < maxMafiaCount; playerIndex++) {
+    await moderator.setPlayerRole(allPlayers[playerIndex], "마피아");
   }
 
   mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
@@ -381,8 +375,8 @@ const playMafia = async (roomId, totalUserCount) => {
     })
   );
 
-  if (moderator.roomComposition.doctorCount !== 0) {
-    console.log("의사 수", moderator.roomComposition.doctorCount);
+  if (maxDoctorCount !== 0) {
+    console.log("의사 수", maxDoctorCount);
     moderator.showModal(
       roomId,
       "제목",
@@ -393,16 +387,14 @@ const playMafia = async (roomId, totalUserCount) => {
     );
 
     console.log("의사 뽑음");
-    randomPlayer = moderator.players[moderator.roomComposition.mafiaCount]; //NOTE - 랜덤으로 플레이어 선택
-    moderator.players[moderator.roomComposition.mafiaCount] = new Doctor(
-      randomPlayer
-    ); //NOTE - 참가자를 의사 플레이어로 설정
-
-    doctorPlayer = await moderator.setPlayerRole(randomPlayer.userId, "의사");
+    doctorPlayer = await moderator.setPlayerRole(
+      allPlayers[maxMafiaCount],
+      "의사"
+    );
     moderator.openPlayerRole(doctorPlayer, doctorPlayer, "의사"); //NOTE - 의사 플레이어의 화면에서 자신이 의사임을 알림
   }
 
-  if (moderator.roomComposition.policeCount !== 0) {
+  if (maxPoliceCount !== 0) {
     moderator.showModal(
       roomId,
       "제목",
@@ -413,13 +405,12 @@ const playMafia = async (roomId, totalUserCount) => {
     );
 
     console.log("경찰 뽑음");
-    randomPlayer = moderator.players[moderator.roomComposition.mafiaCount + 1]; //NOTE - 랜덤으로 플레이어 선택
-    moderator.players[moderator.roomComposition.mafiaCount + 1] = new Police(
-      randomPlayer
-    );
-    await moderator.setPlayerRole(moderator.players[playerIndex], "경찰");
+    await moderator.setPlayerRole(allPlayers[maxMafiaCount + 1], "경찰");
 
-    policePlayer = moderator.getPlayerByRole(randomPlayer.userId, "경찰"); //NOTE - 참가자를 경찰 플레이어로 설정
+    policePlayer = moderator.getPlayerByRole(
+      allPlayers[maxMafiaCount + 1],
+      "경찰"
+    ); //NOTE - 참가자를 경찰 플레이어로 설정
     moderator.openPlayerRole(policePlayer, policePlayer, "경찰"); //NOTE - 경찰 플레이어의 화면에서 자신이 경찰임을 알림
   }
 
@@ -428,10 +419,7 @@ const playMafia = async (roomId, totalUserCount) => {
   //NOTE - 시민 플레이어의 화면에서 자신이 시민임을 알림
   console.log("시민들 각자 역할 공개");
   citizenPlayers.forEach((clientUserId) =>
-    citizenPlayers.forEach((playerUserId) => {
-      moderator.openPlayerRole(clientUserId, playerUserId, "시민");
-      moderator.openPlayerRole(clientUserId, playerUserId, "시민");
-    })
+    moderator.openPlayerRole(clientUserId, clientUserId, "시민")
   );
 
   moderator.showModal(
@@ -472,9 +460,9 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //NOTE - 모든 플레이어들의 카메라와 마이크 켬
   console.log("카메라, 마이크 켬");
-  moderator.players.forEach((player) => {
-    moderator.turnOnCamera(roomId, player.userId);
-    moderator.turnOnMike(roomId, player.userId);
+  allPlayers.forEach((player) => {
+    moderator.turnOnCamera(roomId, player);
+    moderator.turnOnMike(roomId, player);
   });
 
   moderator.showModal(
@@ -522,7 +510,6 @@ const playMafia = async (roomId, totalUserCount) => {
 
   const voteBoard = await moderator.getPlayersVoteResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
   const mostVoteResult = moderator.getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
-  console.log(voteBoard);
   //await moderator.resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
   moderator.showVoteToResult(roomId, voteBoard);
@@ -585,11 +572,7 @@ const playMafia = async (roomId, totalUserCount) => {
       policePlayer = await moderator.getPlayerByRole(roomId, "경찰");
       citizenPlayers = await moderator.getPlayerByRole(roomId, "시민");
 
-      if (mafiaPlayers) {
-        isPlayerMafia = mafiaPlayers.indexOf(killedPlayer) !== -1; //NOTE - 죽은 플레이어가 마피아인지 확인
-      } else {
-        isPlayerMafia = true;
-      }
+      isPlayerMafia = moderator.checkPlayerMafia(killedPlayer); //NOTE - 죽은 플레이어가 마피아인지 확인
 
       //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
       if (isPlayerMafia) {
@@ -641,7 +624,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //NOTE - 모든 플레이어들의 카메라와 마이크 끔
   console.log("카메라, 마이크 끔");
-  moderator.players.forEach((player) => {
+  allPlayers.forEach((player) => {
     moderator.turnOffCamera(roomId, player.userId);
     moderator.turnOffMike(roomId, player.userId);
   });
