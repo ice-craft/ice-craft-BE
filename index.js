@@ -262,6 +262,11 @@ const playMafia = async (roomId, totalUserCount) => {
 
   const moderator = new Moderator(totalUserCount, mafiaIo); //NOTE - 사회자 생성
 
+  maxMafiaCount = moderator.roomComposition.mafiaCount;
+  maxDoctorCount = moderator.roomComposition.doctorCount;
+  maxPoliceCount = moderator.roomComposition.policeCount;
+  maxCitizenCount = moderator.roomComposition.citizenCount;
+
   let startTime = Date.now();
 
   while (true) {
@@ -293,10 +298,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
   console.log("게임 시작"); //NOTE - 테스트 코드
 
-  const users = await moderator.getAllUserInfo(roomId);
-  users.forEach((user, index) => {
-    moderator.players[index] = new Citizen(user.user_id, user.user_nickname);
-  });
+  allPlayers = await moderator.getAllUserId(roomId);
 
   console.log("라운드 시작"); //NOTE - 테스트 코드
   moderator.showModal(roomId, "제목", "라운드 시작", 500, "닉네임", true);
@@ -306,13 +308,13 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //NOTE - 모든 플레이어들의 카메라와 마이크 끔
   console.log("카메라, 마이크 끔");
-  moderator.players.forEach((player) => {
+  allPlayers.forEach((player) => {
     moderator.turnOffCamera(roomId, player.userId);
     moderator.turnOffMike(roomId, player.userId);
   });
 
   //NOTE - 플레이어들을 무작위로 섞음
-  moderator.shufflePlayers();
+  allPlayers = moderator.shufflePlayers(allPlayers);
 
   //NOTE - 모든 유저들 작업
   moderator.showModal(

@@ -280,11 +280,12 @@ export class Moderator {
   }
 
   //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
-  shufflePlayers() {
-    for (let i = this.players.length - 1; i > 0; i--) {
+  shufflePlayers(allPlayers) {
+    for (let i = allPlayers.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1)); //NOTE - math.random() 대체제 생각해보기
-      [this.players[i], this.players[j]] = [this.players[j], this.players[i]];
+      [allPlayers[i], allPlayers[j]] = [allPlayers[j], allPlayers[i]];
     }
+    return allPlayers;
   }
 
   //NOTE - 게임을 진행하면서 각 역할을 누가 맡았는지 객체에 저장
