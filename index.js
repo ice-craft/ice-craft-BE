@@ -38,8 +38,9 @@ app.get("/", (req, res) => {
 });
 
 mafiaIo.on("connection", (socket) => {
-  // playMafia("12dc28ad-4764-460f-9a54-58c31fdacd1f", 5); //NOTE - 테스트 코드
-  showModal("111", "제목", "내용", 0, "닉네임", false);
+  //socket.join("12dc28ad-4764-460f-9a54-58c31fdacd1f");
+  playMafia("12dc28ad-4764-460f-9a54-58c31fdacd1f", 5); //NOTE - 테스트 코드
+  //showModal("111", "제목", "내용", 0, "닉네임", false);
   socket.on("enterMafia", async (rowStart, rowEnd) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
     try {
@@ -209,6 +210,18 @@ const showVoteToResult = (roomName, voteResult) => {
 const playMafia = async (roomId, totalUserCount) => {
   //NOTE - roomId : 12dc28ad-4764-460f-9a54-58c31fdacd1f
 
+  //NOTE - 현재 방의 마피아 최대 인원 수
+  let maxMafiaCount;
+
+  //NOTE - 현재 방의 의사 최대 인원 수
+  let maxDoctorCount;
+
+  //NOTE - 현재 방의 경찰 최대 인원 수
+  let maxPoliceCount;
+
+  //NOTE - 현재 방의 시민 최대 인원 수
+  let maxCitizenCount;
+
   //NOTE - 랜덤으로 지정된 플레이어
   let randomPlayer;
 
@@ -356,7 +369,6 @@ const playMafia = async (roomId, totalUserCount) => {
   moderator.waitForMs(500); //NOTE - 시간 재기
 
   mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
-  console.log("마피아", mafiaPlayers);
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 끔
   console.log("마피아 유저들의 카메라, 마이크 끔");
@@ -415,8 +427,8 @@ const playMafia = async (roomId, totalUserCount) => {
   console.log("시민들 각자 역할 공개");
   citizenPlayers.forEach((clientUserId) =>
     citizenPlayers.forEach((playerUserId) => {
-      moderator.openPlayerRole(clientUserId, playerUserId);
-      moderator.openPlayerRole(clientUserId, playerUserId);
+      moderator.openPlayerRole(clientUserId, playerUserId, "시민");
+      moderator.openPlayerRole(clientUserId, playerUserId, "시민");
     })
   );
 
@@ -512,7 +524,6 @@ const playMafia = async (roomId, totalUserCount) => {
   //await moderator.resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
   moderator.showVoteToResult(roomId, voteBoard);
-
   if (mostVoteResult.isValid) {
     //NOTE - 투표 성공
 
@@ -563,7 +574,6 @@ const playMafia = async (roomId, totalUserCount) => {
     const yesOrNoVoteResult = await moderator.getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
     moderator.showVoteYesOrNoResult(roomId, yesOrNoVoteResult.detail); //NOTE - 투표 결과를 방의 유저들에게 보여줌
     // await moderator.resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석
-
     //NOTE - 투표 결과가 유효하고(동률이 아님), 찬성이 반대보다 많은 경우
     if (yesOrNoVoteResult.isValid && yesOrNoVoteResult.result) {
       killedPlayer = await moderator.killPlayer(mostVoteResult.result.user_id); //NOTE - 투표를 가장 많이 받은 플레이어 사망
@@ -573,7 +583,11 @@ const playMafia = async (roomId, totalUserCount) => {
       policePlayer = await moderator.getPlayerByRole(roomId, "경찰");
       citizenPlayers = await moderator.getPlayerByRole(roomId, "시민");
 
-      isPlayerMafia = mafiaPlayers.indexOf(killedPlayer) !== -1; //NOTE - 죽은 플레이어가 마피아인지 확인
+      if (mafiaPlayers) {
+        isPlayerMafia = mafiaPlayers.indexOf(killedPlayer) !== -1; //NOTE - 죽은 플레이어가 마피아인지 확인
+      } else {
+        isPlayerMafia = true;
+      }
 
       //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
       if (isPlayerMafia) {
