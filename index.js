@@ -662,7 +662,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
   moderator.waitForMs(500);
 
-  playerToKill = await moderator.checkChosenPlayer(roomId, "마피아"); //FIXME - 가장 나중에 선택한 마피아의 지시를 따름, 죽일 플레이어 결정
+  playerToKill = await moderator.checkChosenPlayer(roomId, "마피아"); //NOTE - 가장 먼저 선택한 마피아의 지시를 따름, 죽일 플레이어 결정
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 끔
   console.log("마피아 유저들의 카메라, 마이크 끔");
@@ -674,7 +674,7 @@ const playMafia = async (roomId, totalUserCount) => {
   );
 
   //NOTE - 방 구성인원 중 의사가 있을 경우
-  if (moderator.roomComposition.doctorCount !== 0) {
+  if (moderator.maxDoctorCount !== 0) {
     moderator.showModal(
       roomId,
       "제목",
@@ -694,7 +694,7 @@ const playMafia = async (roomId, totalUserCount) => {
   }
 
   //NOTE - 방 구성인원 중 경찰 있을 경우
-  if (moderator.roomComposition.policeCount !== 0) {
+  if (moderator.maxPoliceCount !== 0) {
     moderator.showModal(
       roomId,
       "제목",
@@ -703,38 +703,43 @@ const playMafia = async (roomId, totalUserCount) => {
       "닉네임",
       false
     );
-  }
 
-  //NOTE - 경찰이 살아있을 경우
-  policePlayer = await moderator.getPlayerByRole(roomId, "경찰");
-  if (policePlayer) {
-    const playerDoubted = moderator.checkChosenPlayer(roomId, "경찰"); //NOTE - 0번 인덱스 플레이어가 마피아인지 의심
-    isPlayerMafia = mafiaPlayers.indexOf(playerDoubted) !== -1;
+    //NOTE - 경찰이 살아있을 경우
+    policePlayer = await moderator.getPlayerByRole(roomId, "경찰");
+    if (policePlayer) {
+      const playerDoubted = moderator.checkChosenPlayer(roomId, "경찰"); //NOTE - 0번 인덱스 플레이어가 마피아인지 의심
+      isPlayerMafia = mafiaPlayers.checkPlayerMafia(playerDoubted);
 
-    if (isPlayerMafia) {
-      moderator.showModal(
-        policePlayer,
-        "제목",
-        "해당 플레이어는 마피아가 맞습니다.",
-        500,
-        "닉네임",
-        false
-      );
-    } else {
-      moderator.showModal(
-        policePlayer,
-        "제목",
-        "해당 플레이어는 마피아가 아닙니다.",
-        500,
-        "닉네임",
-        false
-      );
+      if (isPlayerMafia) {
+        moderator.showModal(
+          policePlayer,
+          "제목",
+          "해당 플레이어는 마피아가 맞습니다.",
+          500,
+          "닉네임",
+          false
+        );
+      } else {
+        moderator.showModal(
+          policePlayer,
+          "제목",
+          "해당 플레이어는 마피아가 아닙니다.",
+          500,
+          "닉네임",
+          false
+        );
+      }
     }
   }
 
+  mafiaPlayers = moderator.getPlayerByRole(roomId, "마피아");
+
   //NOTE - 죽일 플레이어와 살릴 플레이어 결정하고 생사 결정
   if (playerToKill !== playerToSave) {
-    moderator.killPlayer(playerToKill);
+    if (mafiaPlayers) {
+      moderator.killPlayer(playerToKill);
+    }
+
     if (doctorPlayer) {
       moderator.savePlayer(playerToSave);
     }
@@ -783,7 +788,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //NOTE - 모든 플레이어들의 카메라와 마이크 켬
   console.log("카메라, 마이크 켬");
-  moderator.players.forEach((player) => {
+  allPlayers.forEach((player) => {
     moderator.turnOnCamera(roomId, player.userId);
     moderator.turnOnMike(roomId, player.userId);
   });
@@ -794,7 +799,7 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.showModal(
       roomId,
       "제목",
-      "의사의 활약으로 아무도 죽지 않았습니다.", //FIXME - 의사가 없는 경우도 있어서 대사가 이상함
+      "의사의 활약으로 아무도 죽지 않았습니다.",
       500,
       "닉네임",
       false

@@ -210,9 +210,11 @@ export const checkChosenPlayer = async (room_id, role) => {
     .from("room_user_match_table")
     .select("user_id")
     .eq("room_id", room_id)
-    .eq("chosen_by", role);
+    .eq("chosen_by", role)
+    .order("choose_time", { ascending: true });
 
   if (error) {
+    console.log(error);
     throw new Error();
   }
 
