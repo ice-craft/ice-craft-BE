@@ -2,11 +2,12 @@ import * as gamePlayDB from "../../api/supabse/gamePlayAPI.js";
 import * as roomDB from "../../api/supabse/roomAPI.js";
 
 export class Moderator {
-  constructor(playerCount, mafiaIo) {
+  constructor(playerCount, mafiaIo, roomId) {
     this.mafiaIo = mafiaIo;
     this.players = [];
     this.playerCount = playerCount;
     this.roles = {};
+    this.roomId = roomId;
 
     switch (this.playerCount) {
       case 5:
@@ -99,8 +100,14 @@ export class Moderator {
 
   //NOTE - 클라이언트의 화면에 모달창을 띄움
   showModal(roomName, title, message, timer, nickname, yesOrNo) {
-    this.mafiaIo.emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
-    this.waitForMs(timer);
+    this.mafiaIo.emit("showModal", {
+      title,
+      message,
+      timer,
+      nickname,
+      yesOrNo,
+    }); //NOTE - 테스트 코드라서 .to(roomName) 제외
+    // this.waitForMs(timer);
   }
 
   waitForMs(ms) {
