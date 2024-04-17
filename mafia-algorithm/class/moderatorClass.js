@@ -280,6 +280,12 @@ export class Moderator {
     return result;
   }
 
+  //NOTE - 플레이어의 닉네임을 반환
+  async getPlayerNickname(userId) {
+    const result = gamePlayDB.getPlayerNickname(userId);
+    return result;
+  }
+
   //NOTE - 사회자가 특정 유저에게 진행 상황 말함
   speak(player, line) {
     console.log(`사회자[to : ${player.userNickname}] : ${line}`);

@@ -267,3 +267,17 @@ export const checkPlayerLived = async (user_id) => {
 
   return data.is_lived;
 };
+
+export const getPlayerNickname = async (user_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_nickname")
+    .eq("user_id", user_id)
+    .single();
+
+  if (error) {
+    throw new Error();
+  }
+
+  return data.user_nickname;
+};

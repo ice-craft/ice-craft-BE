@@ -243,6 +243,9 @@ const playMafia = async (roomId, totalUserCount) => {
   //NOTE - 죽은 플레이아
   let killedPlayer;
 
+  //NOTE - 죽은 펠리어어의 닉네임
+  let killedPlayerNickname;
+
   //NOTE - 죽기로 결정된 플레이어
   let playerToKill;
 
