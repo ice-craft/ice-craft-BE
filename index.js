@@ -18,10 +18,6 @@ import {
   voteYesOrNo,
 } from "./api/supabse/gamePlayAPI.js";
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
-import { Citizen } from "./mafia-algorithm/class/citizenClass.js";
-import { Mafia } from "./mafia-algorithm/class/mafiaClass.js";
-import { Doctor } from "./mafia-algorithm/class/doctorClass.js";
-import { Police } from "./mafia-algorithm/class/policeClass.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -798,6 +794,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //NOTE - 마피아가 죽일려고한 마피아가 살았는지 죽었는지 확인
   isPlayerLived = await moderator.checkPlayerLived(killedPlayer);
+  killedPlayerNickname = await moderator.getPlayerNickname(killedPlayer);
   if (isPlayerLived) {
     moderator.showModal(
       roomId,
@@ -811,7 +808,7 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.showModal(
       roomId,
       "제목",
-      `${killedPlayer}님이 죽었습니다.`, //FIXME - 유저 닉네임으로 고쳐야함, killedPlayer에 현재 user_id만 들어있음 수정할 것
+      `${killedPlayerNickname}님이 죽었습니다.`,
       500,
       "닉네임",
       false
@@ -844,7 +841,7 @@ const playMafia = async (roomId, totalUserCount) => {
   );
 
   moderator.showModal(
-    killedPlayer,
+    roomId,
     "제목",
     "라운드가 종료되었습니다.",
     500,
@@ -854,13 +851,22 @@ const playMafia = async (roomId, totalUserCount) => {
 
   if (moderator.whoWins.isValid) {
     //NOTE - 게임 종료 만족하는 지
-    for (let playerIndex = 0; playerIndex < playerCount; playerIndex++) {
-      moderator.speak(
-        players,
-        playerIndex`${moderator.whoWins.result} 팀이 이겼습니다.`
-      ); //NOTE - 어느 팀이 이겼는지 알림
-    }
+    moderator.showModal(
+      roomId,
+      "제목",
+      `${moderator.whoWins.result} 팀이 이겼습니다.`,
+      500,
+      "닉네임",
+      false
+    );
 
-    gameOver(); //NOTE - 게임 종료
+    moderator.showModal(
+      roomId,
+      "제목",
+      "게임이 종료되었습니다.",
+      500,
+      "닉네임",
+      false
+    );
   }
 };

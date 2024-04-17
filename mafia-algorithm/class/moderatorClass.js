@@ -319,9 +319,11 @@ export class Moderator {
   };
 
   //NOTE - 어느 팀이 이겼는지 결과 반환
-  whoWins(roles) {
-    const mafiaCount = roles["마피아"].length;
-    const citizenCount = roles["시민"].length;
+  async whoWins(roomId) {
+    const mafiaPlayers = await this.getPlayerByRole(roomId, "마피아");
+    const citizenPlayers = await this.getPlayerByRole(roomId, "시민");
+    const mafiaCount = mafiaPlayers.length;
+    const citizenCount = citizenPlayers.length;
 
     if (mafiaCount === 0) {
       return { isValid: true, result: "시민" };
