@@ -12,6 +12,8 @@ import {
   joinRoom,
 } from "./api/supabse/roomAPI.js";
 import {
+  checkAllPlayersReady,
+  checkPlayerCountEnough,
   choosePlayer,
   setReady,
   voteTo,
@@ -35,8 +37,11 @@ app.get("/", (req, res) => {
 
 mafiaIo.on("connection", (socket) => {
   //socket.join("12dc28ad-4764-460f-9a54-58c31fdacd1f");
-  playMafia("12dc28ad-4764-460f-9a54-58c31fdacd1f", 5); //NOTE - 테스트 코드
-  //showModal("111", "제목", "내용", 0, "닉네임", false);
+  // playMafia("12dc28ad-4764-460f-9a54-58c31fdacd1f", 5); //NOTE - 테스트 코드
+  socket.on("start", () => {
+    console.log("client : start");
+    mafiaIo.emit("go", "hello", 5000);
+  });
   socket.on("enterMafia", async (rowStart, rowEnd) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
     try {
@@ -108,14 +113,17 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("setReady", async (userId, ready) => {
-    console.log(`[setReady] userId : ${userId}, ready:${ready}`);
+  socket.on("setReady", async (userId, ready, roomId, totalUserCount) => {
+    console.log(
+      `[setReady] userId : ${userId}, ready : ${ready}, roomId : ${roomId}, totalUserCount : ${totalUserCount}`
+    );
     try {
       const result = await setReady(userId, ready);
       if (result.length === 0) {
         throw new Error();
       }
       socket.emit("setReady", "레디를 설정하는데 성공했습니다.");
+      canGameStart(roomId, totalUserCount);
     } catch (error) {
       console.log("[setReadyError] 레디를 설정하는데 실패했습니다.");
       socket.emit("setReadyError", "레디를  설정하는데 실패했습니다.");
@@ -179,29 +187,53 @@ httpServer.listen(port, () => {
   console.log(`port(${port})으로 실행 중`);
 });
 
-const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
-  mafiaIo.emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
+const canGameStart = async (roomId, totalUserCount) => {
+  console.log("게임 레디 확인");
+  totalUserCount = Number(totalUserCount);
+
+  const isAllPlayerEnoughCount = await checkPlayerCountEnough(
+    roomId,
+    totalUserCount
+  ); //NOTE - 플레이어들이 방 정원을 채웠는지
+  const isAllPlayersReady = await checkAllPlayersReady(roomId, totalUserCount); //NOTE - 플레이어들이 전부 레디했는지
+  const canStart = isAllPlayerEnoughCount && isAllPlayersReady;
+  console.log(isAllPlayerEnoughCount, isAllPlayersReady);
+
+  const moderator = new Moderator(totalUserCount, mafiaIo);
+  if (canStart) {
+    play(moderator);
+  } else {
+    console.log("준비X");
+  }
 };
 
-const setCamera = (roomName, cameraUserId, isOn) => {
-  mafiaIo.emit("setCamera", cameraUserId, isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
+const play = () => {
+  console.log("게임 시작");
 };
 
-const setMike = (roomName, mikeUserId, isOn) => {
-  mafiaIo.emit("setMike", mikeUserId, isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
-};
+// const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
+//   mafiaIo.emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
+// };
 
-const openPlayerRole = (roomName, userId, role) => {
-  mafiaIo.emit("openPlayerRole", userId, role); //NOTE - 테스트 코드라서 .to(roomName) 제외
-};
+// const setCamera = (roomName, cameraUserId, isOn) => {
+//   mafiaIo.emit("setCamera", cameraUserId, isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
+// };
 
-const showVoteYesOrNoResult = (roomName, voteResult) => {
-  mafiaIo.emit("showVoteYesOrNoResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
-};
+// const setMike = (roomName, mikeUserId, isOn) => {
+//   mafiaIo.emit("setMike", mikeUserId, isOn); //NOTE - 테스트 코드라서 .to(roomName) 제외
+// };
 
-const showVoteToResult = (roomName, voteResult) => {
-  mafiaIo.emit("showVoteToResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
-};
+// const openPlayerRole = (roomName, userId, role) => {
+//   mafiaIo.emit("openPlayerRole", userId, role); //NOTE - 테스트 코드라서 .to(roomName) 제외
+// };
+
+// const showVoteYesOrNoResult = (roomName, voteResult) => {
+//   mafiaIo.emit("showVoteYesOrNoResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
+// };
+
+// const showVoteToResult = (roomName, voteResult) => {
+//   mafiaIo.emit("showVoteToResult", voteResult); //NOTE - 테스트 코드라서 .to(roomName) 제외
+// };
 
 const playMafia = async (roomId, totalUserCount) => {
   //NOTE - roomId : 12dc28ad-4764-460f-9a54-58c31fdacd1f
