@@ -93,7 +93,7 @@ export class Moderator {
 
   //NOTE - 방안의 모든 유저들의 아이디 반환
   async getAllUserId(roomId) {
-    const users = await roomDB.getAllUserId(roomId);
+    const users = await roomDB.getUserIdInRoom(roomId);
     return users;
   }
 
@@ -130,8 +130,8 @@ export class Moderator {
   }
 
   //NOTE - 플레이어에게 역할 배정
-  async setPlayerRole(player, role) {
-    await gamePlayDB.setPlayerRole(player.userId, role);
+  async setPlayerRole(userId, role) {
+    await gamePlayDB.setPlayerRole(userId, role);
   }
 
   //NOTE - 각 역할의 플레이어들 반환
