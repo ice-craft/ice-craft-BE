@@ -350,9 +350,28 @@ mafiaIo.on("connection", (socket) => {
     const isDone = await getStatus(roomId, "r1MetingOver", total_user_count);
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1VoteToMafia(roomId);
     } else {
       console.log("r1MetingOver 준비 X");
+    }
+  });
+
+  socket.on("r1VoteToMafia", async (roomId, votedPlayer) => {
+    console.log("r1VoteToMafia 수신");
+
+    try {
+      await voteTo(votedPlayer);
+    } catch (error) {
+      console.log("[r1VoteToMafia] 투표하는데 실패했습니다.");
+    }
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(roomId, "r1VoteToMafia", total_user_count);
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1VoteToMafia 준비 X");
     }
   });
 
@@ -576,6 +595,22 @@ const r1MetingOver = (roomId) => {
     "r1MetingOver",
     "제목",
     "토론이 끝났습니다.",
+    500,
+    "닉네임",
+    true
+  );
+};
+
+const r1VoteToMafia = (roomId) => {
+  console.log("마피아일 것 같은 사람의 화면을 클릭해주세요.");
+  console.log("r1VoteToMafia 송신");
+
+  showModal(
+    mafiaIo,
+    roomId,
+    "r1VoteToMafia",
+    "제목",
+    "마피아일 것 같은 사람의 화면을 클릭해주세요.",
     500,
     "닉네임",
     true
