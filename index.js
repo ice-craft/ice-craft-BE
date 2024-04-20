@@ -190,6 +190,7 @@ mafiaIo.on("connection", (socket) => {
     console.log("r0NightStart 수신");
     const { total_user_count } = await getUserCountInRoom(roomId);
     const isDone = await getStatus(roomId, "r0NightStart", total_user_count);
+
     if (isDone) {
       r0TurnAllUserCameraMikeOff(roomId);
     } else {
@@ -205,10 +206,27 @@ mafiaIo.on("connection", (socket) => {
       "r0TurnAllUserCameraMikeOff",
       total_user_count
     );
+
     if (isDone) {
-      console.log("다음 거 실행");
+      r0SetAllUserRole(roomId);
     } else {
-      console.log("준비 X");
+      console.log("r0TurnAllUserCameraMikeOff 준비 X");
+    }
+  });
+
+  socket.on("r0SetAllUserRole", async (roomId) => {
+    console.log("r0TurnAllUserCameraMikeOff 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r0SetAllUserRole",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거");
+    } else {
+      console.log("r0SetAllUserRole 준비 X");
     }
   });
 
@@ -276,6 +294,20 @@ const r0TurnAllUserCameraMikeOff = async (roomId) => {
 
   console.log("r0TurnAllUserCameraMikeOff 송신");
   mafiaIo.to(roomId).emit("r0TurnAllUserCameraMikeOff");
+};
+
+const r0SetAllUserRole = (roomId) => {
+  console.log("r0SetAllUserRole 송신");
+  showModal(
+    mafiaIo,
+    roomId,
+    "r0SetAllUserRole",
+    "제목",
+    "역할 배정을 시작하겠습니다.",
+    500,
+    "닉네임",
+    true
+  );
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
