@@ -282,16 +282,15 @@ export const getPlayerNickname = async (user_id) => {
   return data.user_nickname;
 };
 
-export const setStatus = async (user_id, status) => {
-  const { data, error } = await supabase
+export const getStatus = async (room_id, status, total_user_count) => {
+  const { count, error } = await supabase
     .from("room_user_match_table")
-    .update(status)
-    .eq("user_id", user_id)
-    .select();
+    .select("*", { count: "exact", head: true })
+    .eq("room_id", room_id)
+    .eq(status, true);
 
   if (error) {
-    console.log(error);
     throw new Error();
   }
-  return data;
+  return total_user_count === count;
 };

@@ -8,6 +8,7 @@ import {
   exitRoom,
   fastJoinRoom,
   getRooms,
+  getUserCountInRoom,
   getUserInfoInRoom,
   joinRoom,
 } from "./api/supabse/roomAPI.js";
@@ -15,11 +16,13 @@ import {
   checkAllPlayersReady,
   checkPlayerCountEnough,
   choosePlayer,
+  getStatus,
   setReady,
   voteTo,
   voteYesOrNo,
 } from "./api/supabse/gamePlayAPI.js";
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
+import { showModal } from "./api/supabse/socket/moderatorAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -113,9 +116,9 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("setReady", async (userId, ready, roomId, totalUserCount) => {
+  socket.on("setReady", async (userId, ready, roomId) => {
     console.log(
-      `[setReady] userId : ${userId}, ready : ${ready}, roomId : ${roomId}, totalUserCount : ${totalUserCount}`
+      `[setReady] userId : ${userId}, ready : ${ready}, roomId : ${roomId}`
     );
     try {
       const result = await setReady(userId, ready);
@@ -123,7 +126,7 @@ mafiaIo.on("connection", (socket) => {
         throw new Error();
       }
       socket.emit("setReady", "레디를 설정하는데 성공했습니다.");
-      canGameStart(roomId, totalUserCount);
+      canGameStart(roomId);
     } catch (error) {
       console.log("[setReadyError] 레디를 설정하는데 실패했습니다.");
       socket.emit("setReadyError", "레디를  설정하는데 실패했습니다.");
@@ -178,6 +181,17 @@ mafiaIo.on("connection", (socket) => {
     socket.broadcast.emit("server", `${nickname}님이 나가셨습니다.`);
   });
 
+  socket.on("r0NightStart", async (roomId) => {
+    console.log("r0NightStart 실행 받음");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(roomId, "r0NightStart", total_user_count);
+    if (isDone) {
+      console.log("r0NightStart 다음 거 실행");
+    } else {
+      console.log("아직 준비 X");
+    }
+  });
+
   io.on("disconnection", () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
   });
@@ -187,10 +201,11 @@ httpServer.listen(port, () => {
   console.log(`port(${port})으로 실행 중`);
 });
 
-const canGameStart = async (roomId, totalUserCount) => {
+const canGameStart = async (roomId) => {
   console.log("게임 레디 확인");
-  totalUserCount = Number(totalUserCount);
+  const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
   console.log("총 인원 :", totalUserCount);
+  console.log("룸 아이디", roomId);
 
   const isAllPlayerEnoughCount = await checkPlayerCountEnough(
     roomId,
@@ -204,23 +219,25 @@ const canGameStart = async (roomId, totalUserCount) => {
     " 전부 레디 :" + isAllPlayersReady
   );
 
-  const moderator = new Moderator(totalUserCount, mafiaIo, roomId);
   if (canStart) {
-    play(moderator);
+    play(roomId);
   } else {
     console.log("준비X");
   }
 };
 
-const play = (moderator) => {
+const play = (roomId) => {
   console.log("게임 시작");
+  r0NightStart(roomId);
+};
 
-  console.log("라운드 시작");
-  moderator.showModal(
+const r0NightStart = (roomId) => {
+  showModal(
+    mafiaIo,
+    roomId,
     "r0NightStart",
-    moderator.roomId,
     "제목",
-    "라운드 시작",
+    "밤이 시작되었습니다.",
     500,
     "닉네임",
     true
