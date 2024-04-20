@@ -20,6 +20,7 @@ import {
   getPlayerByRole,
   getRoleMaxCount,
   getStatus,
+  getVoteToResult,
   setPlayerRole,
   setReady,
   voteTo,
@@ -27,8 +28,10 @@ import {
 } from "./api/supabse/gamePlayAPI.js";
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
 import {
+  getMostVotedPlayer,
   openPlayerRole,
   showModal,
+  showVoteToResult,
   shufflePlayers,
   turnOffCamera,
   turnOffMike,
@@ -369,9 +372,43 @@ mafiaIo.on("connection", (socket) => {
     const isDone = await getStatus(roomId, "r1VoteToMafia", total_user_count);
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1ShowVoteToResult(roomId);
     } else {
       console.log("r1VoteToMafia 준비 X");
+    }
+  });
+
+  socket.on("r1ShowVoteToResult", async (roomId) => {
+    console.log("r1ShowVoteToResult 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1ShowVoteToResult",
+      total_user_count
+    );
+
+    if (isDone) {
+      r1ShowMostVotedPlayer(roomId);
+    } else {
+      console.log("r1ShowVoteToResult 준비 X");
+    }
+  });
+
+  socket.on("r1ShowMostVotedPlayer", async (roomId) => {
+    console.log("r1ShowMostVotedPlayer 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1ShowMostVotedPlayer",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1ShowMostVotedPlayer 준비 X");
     }
   });
 
@@ -615,6 +652,50 @@ const r1VoteToMafia = (roomId) => {
     "닉네임",
     true
   );
+};
+
+const r1ShowVoteToResult = async (roomId) => {
+  console.log("r1ShowVoteToResult 송신");
+  console.log("투표 개표");
+  const voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+  //await moderator.resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+
+  console.log("투표 결과 전송");
+  showVoteToResult(mafiaIo, "r1ShowVoteToResult", roomId, voteBoard);
+};
+
+const r1ShowMostVotedPlayer = async (roomId) => {
+  console.log("r1ShowMostVotedPlayer 송신");
+  const voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+  const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+  if (mostVoteResult.isValid) {
+    console.log("투표 성공");
+    //NOTE - 투표 성공
+    console.log(
+      `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`
+    );
+    showModal(
+      mafiaIo,
+      roomId,
+      "r1ShowMostVotedPlayer",
+      "제목",
+      `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`,
+      500,
+      "닉네임",
+      true
+    );
+  } else {
+    showModal(
+      mafiaIo,
+      roomId,
+      "r1ShowMostVotedPlayer",
+      "제목",
+      `투표가 유효하지 않습니다.`,
+      500,
+      "닉네임",
+      true
+    );
+  }
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {

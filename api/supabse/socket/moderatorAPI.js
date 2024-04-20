@@ -47,3 +47,17 @@ export const shufflePlayers = (allPlayers) => {
 export const openPlayerRole = (mafiaIo, clientUserId, roleUserId, role) => {
   mafiaIo.to(clientUserId).emit("openPlayerRole", roleUserId, role);
 };
+
+//NOTE - 표를 가장 많이 받은 플레이어 확인
+export const getMostVotedPlayer = (voteBoard) => {
+  let isValid;
+
+  isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
+
+  return { isValid, result: voteBoard[0] };
+};
+
+//NOTE - 유저들에게 마피아 지목 투표 결과 보여줌
+export const showVoteToResult = (mafiaIo, eventName, roomId, voteBoard) => {
+  mafiaIo.to(roomId).emit(eventName, voteBoard);
+};
