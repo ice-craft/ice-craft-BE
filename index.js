@@ -17,14 +17,19 @@ import {
   checkAllPlayersReady,
   checkPlayerCountEnough,
   choosePlayer,
+  getPlayerByRole,
+  getRoleMaxCount,
   getStatus,
+  setPlayerRole,
   setReady,
   voteTo,
   voteYesOrNo,
 } from "./api/supabse/gamePlayAPI.js";
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
 import {
+  openPlayerRole,
   showModal,
+  shufflePlayers,
   turnOffCamera,
   turnOffMike,
 } from "./api/supabse/socket/moderatorAPI.js";
@@ -45,6 +50,7 @@ app.get("/", (req, res) => {
 
 mafiaIo.on("connection", (socket) => {
   socket.join("0ed9a099-f1b4-46eb-a187-2da752eed29c");
+  socket.join("11111111-f1b4-46eb-a187-2da752eed29c");
   // playMafia("12dc28ad-4764-460f-9a54-58c31fdacd1f", 5); //NOTE - 테스트 코드
   socket.on("start", () => {
     console.log("client : start");
@@ -224,9 +230,25 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거");
+      r0ShowAllUserRole(roomId);
     } else {
       console.log("r0SetAllUserRole 준비 X");
+    }
+  });
+
+  socket.on("r0ShowAllUserRole", async (roomId) => {
+    console.log("r0ShowAllUserRole 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r0ShowAllUserRole",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r0ShowAllUserRole 준비 X");
     }
   });
 
@@ -308,6 +330,68 @@ const r0SetAllUserRole = (roomId) => {
     "닉네임",
     true
   );
+};
+
+const r0ShowAllUserRole = async (roomId) => {
+  let allPlayers = await getUserIdInRoom(roomId);
+  const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
+  const maxMafiaCount = await getRoleMaxCount(totalUserCount, "mafia_count");
+  const maxDoctorCount = await getRoleMaxCount(totalUserCount, "doctor_count");
+  const maxPoliceCount = await getRoleMaxCount(totalUserCount, "police_count");
+  let mafiaPlayers;
+  let doctorPlayer;
+  let policePlayer;
+  let citizenPlayers;
+
+  allPlayers = shufflePlayers(allPlayers);
+
+  console.log("총 멤버", allPlayers);
+  console.log("최대 마피아 인원 수", maxMafiaCount);
+  console.log("최대 의사 인원 수", maxDoctorCount);
+  console.log("최대 경찰 인원 수", maxPoliceCount);
+
+  //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
+  console.log("마피아 역할 배정");
+  for (let playerIndex = 0; playerIndex < maxMafiaCount; playerIndex++) {
+    await setPlayerRole(allPlayers[playerIndex], "마피아");
+  }
+
+  mafiaPlayers = await getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
+
+  //NOTE - 마피아 유저들에게 자신이 마피아인 것을 알리고 마피아인 유저가 누구인지 공개
+  console.log("마피아 역할 공개");
+  mafiaPlayers.forEach((clientUserId) =>
+    mafiaPlayers.forEach((roleUserId) =>
+      openPlayerRole(mafiaIo, clientUserId, roleUserId, "마피아")
+    )
+  );
+
+  console.log("방에 의사가 있다면 실행");
+  if (maxDoctorCount !== 0) {
+    console.log("의사 뽑음");
+    doctorPlayer = await setPlayerRole(allPlayers[maxMafiaCount], "의사");
+    openPlayerRole(mafiaIo, doctorPlayer, doctorPlayer, "의사"); //NOTE - 의사 플레이어의 화면에서 자신이 의사임을 알림
+  }
+
+  console.log("경찰이 있다면 실행");
+  if (maxPoliceCount !== 0) {
+    console.log("경찰 뽑음");
+    await setPlayerRole(allPlayers[maxMafiaCount + 1], "경찰");
+  }
+
+  policePlayer = getPlayerByRole(allPlayers[maxMafiaCount + 1], "경찰"); //NOTE - 참가자를 경찰 플레이어로 설정
+  openPlayerRole(mafiaIo, policePlayer, policePlayer, "경찰"); //NOTE - 경찰 플레이어의 화면에서 자신이 경찰임을 알림
+
+  citizenPlayers = await getPlayerByRole(roomId, "시민");
+
+  //NOTE - 시민 플레이어의 화면에서 자신이 시민임을 알림
+  console.log("시민들 각자 역할 공개");
+  citizenPlayers.forEach((clientUserId) =>
+    openPlayerRole(mafiaIo, clientUserId, clientUserId, "시민")
+  );
+
+  console.log("r0ShowAllUserRole 송신");
+  mafiaIo.to(roomId).emit("r0ShowAllUserRole");
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {

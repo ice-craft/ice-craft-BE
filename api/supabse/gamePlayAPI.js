@@ -294,3 +294,18 @@ export const getStatus = async (room_id, status, total_user_count) => {
   }
   return total_user_count === count;
 };
+
+export const getRoleMaxCount = async (total_user_count, role) => {
+  const { data, error } = await supabase
+    .from("room_composition")
+    .select(role)
+    .eq("total_user_count", total_user_count)
+    .single();
+
+  if (error) {
+    console.log(error);
+    throw new Error();
+  }
+
+  return data[role];
+};

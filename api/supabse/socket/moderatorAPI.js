@@ -23,3 +23,17 @@ export const turnOffCamera = (mafiaIo, roomName, clientPlayer) => {
 export const turnOffMike = (mafiaIo, roomName, clientPlayer) => {
   mafiaIo.to(roomName).emit("setMike", clientPlayer, false);
 };
+
+//NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
+export const shufflePlayers = (allPlayers) => {
+  for (let i = allPlayers.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [allPlayers[i], allPlayers[j]] = [allPlayers[j], allPlayers[i]];
+  }
+  return allPlayers;
+};
+
+//NOTE - 플레이어에게 다른 플레이어의 역할 공개
+export const openPlayerRole = (mafiaIo, clientUserId, roleUserId, role) => {
+  mafiaIo.to(clientUserId).emit("openPlayerRole", roleUserId, role);
+};
