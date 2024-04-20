@@ -419,9 +419,28 @@ mafiaIo.on("connection", (socket) => {
     const isDone = await getStatus(roomId, "r1LastTalk", total_user_count);
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1VoteYesOrNo(roomId);
     } else {
       console.log("r1LastTalk 준비 X");
+    }
+  });
+
+  socket.on("r1VoteYesOrNo", async (roomId, userId, yesOrNo) => {
+    console.log("r1VoteYesOrNo 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(roomId, "r1VoteYesOrNo", total_user_count);
+
+    try {
+      await voteYesOrNo(userId, yesOrNo);
+    } catch (error) {
+      console.log("[r1VoteYesOrNo] 찬성/반대 투표하는데 실패했습니다.");
+    }
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1VoteYesOrNo 준비 X");
     }
   });
 
@@ -725,6 +744,22 @@ const r1LastTalk = async (roomId) => {
     "r1LastTalk",
     "제목",
     `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`,
+    500,
+    "닉네임",
+    false
+  );
+};
+
+//SECTION - [UI(모든 유저) : 찬성/반대 투표를 해주세요.] : r1VoteYesOrNo
+const r1VoteYesOrNo = (roomId) => {
+  console.log("r1VoteYesOrNo 송신");
+  console.log("찬성/반대 투표를 해주세요.");
+  showModal(
+    mafiaIo,
+    roomId,
+    "r1VoteYesOrNo",
+    "제목",
+    "찬성/반대 투표를 해주세요.",
     500,
     "닉네임",
     false
