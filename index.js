@@ -9,6 +9,7 @@ import {
   fastJoinRoom,
   getRooms,
   getUserCountInRoom,
+  getUserIdInRoom,
   getUserInfoInRoom,
   joinRoom,
 } from "./api/supabse/roomAPI.js";
@@ -22,7 +23,11 @@ import {
   voteYesOrNo,
 } from "./api/supabse/gamePlayAPI.js";
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
-import { showModal } from "./api/supabse/socket/moderatorAPI.js";
+import {
+  showModal,
+  turnOffCamera,
+  turnOffMike,
+} from "./api/supabse/socket/moderatorAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -182,13 +187,28 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("r0NightStart", async (roomId) => {
-    console.log("r0NightStart 실행 받음");
+    console.log("r0NightStart 수신");
     const { total_user_count } = await getUserCountInRoom(roomId);
     const isDone = await getStatus(roomId, "r0NightStart", total_user_count);
     if (isDone) {
-      console.log("r0NightStart 다음 거 실행");
+      r0TurnAllUserCameraMikeOff(roomId);
     } else {
-      console.log("아직 준비 X");
+      console.log("r0NightStart 준비 X");
+    }
+  });
+
+  socket.on("r0TurnAllUserCameraMikeOff", async (roomId) => {
+    console.log("r0TurnAllUserCameraMikeOff 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r0TurnAllUserCameraMikeOff",
+      total_user_count
+    );
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("준비 X");
     }
   });
 
@@ -232,6 +252,7 @@ const play = (roomId) => {
 };
 
 const r0NightStart = (roomId) => {
+  console.log("r0NightStart 송신");
   showModal(
     mafiaIo,
     roomId,
@@ -242,6 +263,19 @@ const r0NightStart = (roomId) => {
     "닉네임",
     true
   );
+};
+
+const r0TurnAllUserCameraMikeOff = async (roomId) => {
+  console.log("카메라, 마이크 끔");
+
+  const allPlayers = await getUserIdInRoom(roomId);
+  allPlayers.forEach((player) => {
+    turnOffCamera(mafiaIo, roomId, player);
+    turnOffMike(mafiaIo, roomId, player);
+  });
+
+  console.log("r0TurnAllUserCameraMikeOff 송신");
+  mafiaIo.to(roomId).emit("r0TurnAllUserCameraMikeOff");
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {

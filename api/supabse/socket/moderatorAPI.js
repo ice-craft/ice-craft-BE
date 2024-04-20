@@ -11,5 +11,15 @@ export const showModal = (
 ) => {
   mafiaIo
     .to(roomName)
-    .emit(eventName, title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
+    .emit(eventName, title, message, timer, nickname, yesOrNo);
+};
+
+//NOTE - 사회자가 플레이어의 카메라를 끔
+export const turnOffCamera = (mafiaIo, roomName, clientPlayer) => {
+  mafiaIo.to(roomName).emit("setCamera", clientPlayer, false);
+};
+
+//NOTE - 사회자가 플레이어의 마이크를 끔
+export const turnOffMike = (mafiaIo, roomName, clientPlayer) => {
+  mafiaIo.to(roomName).emit("setMike", clientPlayer, false);
 };
