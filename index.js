@@ -337,9 +337,22 @@ mafiaIo.on("connection", (socket) => {
     const isDone = await getStatus(roomId, "r1FindMafia", total_user_count);
 
     if (isDone) {
-      console.log("다음거 실행");
+      r1MetingOver(roomId);
     } else {
       console.log("r1FindMafia 준비 X");
+    }
+  });
+
+  socket.on("r1MetingOver", async (roomId) => {
+    console.log("r1MetingOver 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(roomId, "r1MetingOver", total_user_count);
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1MetingOver 준비 X");
     }
   });
 
@@ -547,6 +560,22 @@ const r1FindMafia = (roomId) => {
     "r1FindMafia",
     "제목",
     "모든 유저는 토론을 통해 마피아를 찾아내세요.",
+    500,
+    "닉네임",
+    true
+  );
+};
+
+const r1MetingOver = (roomId) => {
+  console.log("토론이 끝났습니다.");
+  console.log("r1MetingOver 송신");
+
+  showModal(
+    mafiaIo,
+    roomId,
+    "r1MetingOver",
+    "제목",
+    "토론이 끝났습니다.",
     500,
     "닉네임",
     true
