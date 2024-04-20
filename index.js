@@ -32,6 +32,8 @@ import {
   shufflePlayers,
   turnOffCamera,
   turnOffMike,
+  turnOnCamera,
+  turnOnMike,
 } from "./api/supabse/socket/moderatorAPI.js";
 
 const app = express();
@@ -221,7 +223,7 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("r0SetAllUserRole", async (roomId) => {
-    console.log("r0TurnAllUserCameraMikeOff 수신");
+    console.log("r0SetAllUserRole 수신");
     const { total_user_count } = await getUserCountInRoom(roomId);
     const isDone = await getStatus(
       roomId,
@@ -262,9 +264,41 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음거 실행");
+      r0TurnMafiaUserCameraOn(roomId);
     } else {
       console.log("r0ShowMafiaUserEachOther 준비 X");
+    }
+  });
+
+  socket.on("r0TurnMafiaUserCameraOn", async (roomId) => {
+    console.log("r0TurnMafiaUserCameraOn 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r0TurnMafiaUserCameraOn",
+      total_user_count
+    );
+
+    if (isDone) {
+      r0TurnMafiaUserCameraOff(roomId);
+    } else {
+      console.log("r0TurnMafiaUserCameraOn 준비 X");
+    }
+  });
+
+  socket.on("r0TurnMafiaUserCameraOff", async (roomId) => {
+    console.log("r0TurnMafiaUserCameraOff 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r0TurnMafiaUserCameraOff",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r0TurnMafiaUserCameraOff 준비 X");
     }
   });
 
@@ -422,6 +456,36 @@ const r0ShowMafiaUserEachOther = (roomId) => {
     "닉네임",
     true
   );
+};
+
+const r0TurnMafiaUserCameraOn = async (roomId) => {
+  let mafiaPlayers = await getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
+
+  //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
+  console.log("마피아 유저들의 카메라, 마이크 켬");
+  mafiaPlayers.forEach((clientUserId) =>
+    mafiaPlayers.forEach((playerUserId) => {
+      turnOnCamera(mafiaIo, clientUserId, playerUserId);
+      turnOnMike(mafiaIo, clientUserId, playerUserId);
+    })
+  );
+
+  console.log("r0TurnMafiaUserCameraOn 송신");
+  mafiaIo.to(roomId).emit("r0TurnMafiaUserCameraOn");
+};
+const r0TurnMafiaUserCameraOff = async (roomId) => {
+  mafiaPlayers = await getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
+
+  //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 끔
+  console.log("마피아 유저들의 카메라, 마이크 끔");
+  mafiaPlayers.forEach((clientUserId) =>
+    mafiaPlayers.forEach((playerUserId) => {
+      turnOffCamera(clientUserId, playerUserId);
+      turnOffMike(clientUserId, playerUserId);
+    })
+  );
+  console.log("r0TurnMafiaUserCameraOff 송신");
+  mafiaIo.to(roomId).emit("r0TurnMafiaUserCameraOff");
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
@@ -629,7 +693,7 @@ const playMafia = async (roomId, totalUserCount) => {
     true
   );
 
-  //SECTION - 마피아 유저들의 컴퓨터에는 마피아 유저들의 카메라 켜졌다 꺼짐 : r0TurnMafiaUserCameraOnAndOff
+  //SECTION - 마피아 유저들의 컴퓨터에는 마피아 유저들의 카메라 켜졌다 꺼짐 : r0TurnMafiaUserCameraOn
   mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
@@ -642,7 +706,7 @@ const playMafia = async (roomId, totalUserCount) => {
   );
 
   moderator.waitForMs(500); //NOTE - 시간 재기
-
+  //SECTION - r0TurnMafiaUserCameraOff
   mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 끔
