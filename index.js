@@ -406,9 +406,22 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1LastTalk(roomId);
     } else {
       console.log("r1ShowMostVotedPlayer 준비 X");
+    }
+  });
+
+  socket.on("r1LastTalk", async (roomId) => {
+    console.log("r1LastTalk 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(roomId, "r1LastTalk", total_user_count);
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1LastTalk 준비 X");
     }
   });
 
@@ -685,10 +698,11 @@ const r1ShowMostVotedPlayer = async (roomId) => {
       true
     );
   } else {
+    //FIXME - 우효하지 않은 투표입니다.
     showModal(
       mafiaIo,
       roomId,
-      "r1ShowMostVotedPlayer",
+      "r1InvalidVote",
       "제목",
       `투표가 유효하지 않습니다.`,
       500,
@@ -696,6 +710,25 @@ const r1ShowMostVotedPlayer = async (roomId) => {
       true
     );
   }
+};
+
+const r1LastTalk = async (roomId) => {
+  console.log("r1LastTalk 송신");
+  const voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+  const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+  console.log(
+    `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`
+  );
+  showModal(
+    mafiaIo,
+    roomId,
+    "r1LastTalk",
+    "제목",
+    `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`,
+    500,
+    "닉네임",
+    false
+  );
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
