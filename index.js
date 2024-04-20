@@ -246,9 +246,25 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r0ShowMafiaUserEachOther(roomId);
     } else {
       console.log("r0ShowAllUserRole 준비 X");
+    }
+  });
+
+  socket.on("r0ShowMafiaUserEachOther", async (roomId) => {
+    console.log("r0ShowMafiaUserEachOther 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r0ShowMafiaUserEachOther",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음거 실행");
+    } else {
+      console.log("r0ShowMafiaUserEachOther 준비 X");
     }
   });
 
@@ -392,6 +408,20 @@ const r0ShowAllUserRole = async (roomId) => {
 
   console.log("r0ShowAllUserRole 송신");
   mafiaIo.to(roomId).emit("r0ShowAllUserRole");
+};
+
+const r0ShowMafiaUserEachOther = (roomId) => {
+  console.log("r0ShowMafiaUserEachOther 송신");
+  showModal(
+    mafiaIo,
+    roomId,
+    "r0ShowMafiaUserEachOther",
+    "제목",
+    "마피아들은 고개를 들어 서로를 확인해 주세요.",
+    500,
+    "닉네임",
+    true
+  );
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
