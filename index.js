@@ -314,6 +314,35 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
+  socket.on("r1TurnAllUserCameraMikeOn", async (roomId) => {
+    console.log("r1TurnAllUserCameraMikeOn 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1TurnAllUserCameraMikeOn",
+      total_user_count
+    );
+
+    if (isDone) {
+      r1FindMafia(roomId);
+    } else {
+      console.log("r1TurnAllUserCameraMikeOn 준비 X");
+    }
+  });
+
+  socket.on("r1FindMafia", async (roomId) => {
+    console.log("r1FindMafia 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(roomId, "r1FindMafia", total_user_count);
+
+    if (isDone) {
+      console.log("다음거 실행");
+    } else {
+      console.log("r1FindMafia 준비 X");
+    }
+  });
+
   io.on("disconnection", () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
   });
@@ -507,6 +536,21 @@ const r1TurnAllUserCameraMikeOn = async (roomId) => {
 
   console.log("r1TurnAllUserCameraMikeOn 송신");
   mafiaIo.to(roomId).emit("r1TurnAllUserCameraMikeOn", allPlayers);
+};
+
+const r1FindMafia = (roomId) => {
+  console.log("r1FindMafia 송신");
+
+  showModal(
+    mafiaIo,
+    roomId,
+    "r1FindMafia",
+    "제목",
+    "모든 유저는 토론을 통해 마피아를 찾아내세요.",
+    500,
+    "닉네임",
+    true
+  );
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
