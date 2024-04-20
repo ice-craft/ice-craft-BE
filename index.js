@@ -36,7 +36,7 @@ app.get("/", (req, res) => {
 });
 
 mafiaIo.on("connection", (socket) => {
-  //socket.join("12dc28ad-4764-460f-9a54-58c31fdacd1f");
+  socket.join("0ed9a099-f1b4-46eb-a187-2da752eed29c");
   // playMafia("12dc28ad-4764-460f-9a54-58c31fdacd1f", 5); //NOTE - 테스트 코드
   socket.on("start", () => {
     console.log("client : start");
@@ -190,6 +190,7 @@ httpServer.listen(port, () => {
 const canGameStart = async (roomId, totalUserCount) => {
   console.log("게임 레디 확인");
   totalUserCount = Number(totalUserCount);
+  console.log("총 인원 :", totalUserCount);
 
   const isAllPlayerEnoughCount = await checkPlayerCountEnough(
     roomId,
@@ -197,7 +198,11 @@ const canGameStart = async (roomId, totalUserCount) => {
   ); //NOTE - 플레이어들이 방 정원을 채웠는지
   const isAllPlayersReady = await checkAllPlayersReady(roomId, totalUserCount); //NOTE - 플레이어들이 전부 레디했는지
   const canStart = isAllPlayerEnoughCount && isAllPlayersReady;
-  console.log(isAllPlayerEnoughCount, isAllPlayersReady);
+  console.log(
+    "인원 충분 :",
+    isAllPlayerEnoughCount,
+    " 전부 레디 :" + isAllPlayersReady
+  );
 
   const moderator = new Moderator(totalUserCount, mafiaIo, roomId);
   if (canStart) {
@@ -212,6 +217,7 @@ const play = (moderator) => {
 
   console.log("라운드 시작");
   moderator.showModal(
+    "r0NightStart",
     moderator.roomId,
     "제목",
     "라운드 시작",
@@ -301,7 +307,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
   console.log("마피아 시작");
 
-  const moderator = new Moderator(totalUserCount, mafiaIo); //NOTE - 사회자 생성
+  const moderator = new Moderator(totalUserCount, mafiaIo, roomId); //NOTE - 사회자 생성
 
   maxMafiaCount = moderator.roomComposition.mafiaCount;
   maxDoctorCount = moderator.roomComposition.doctorCount;
@@ -343,11 +349,11 @@ const playMafia = async (roomId, totalUserCount) => {
 
   console.log("라운드 시작"); //NOTE - 테스트 코드
 
-  //SECTION - [UI(모든 유저) : 밤이 되었습니다.] : 0, nightStart
+  //SECTION - [UI(모든 유저) : 밤이 되었습니다.] : r0NightStart
   console.log("밤 시작"); //NOTE - 테스트 코드
   moderator.showModal(roomId, "제목", "밤 시작", 500, "닉네임", true);
 
-  //SECTION - 모든 유저의 화면과 마이크 끔 : 0, turnAllUserCameraMikeOff
+  //SECTION - 모든 유저의 화면과 마이크 끔 : r0TurnAllUserCameraMikeOff
   //NOTE - 모든 플레이어들의 카메라와 마이크 끔
   console.log("카메라, 마이크 끔");
   allPlayers.forEach((player) => {
@@ -355,7 +361,7 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.turnOffMike(roomId, player);
   });
 
-  //SECTION - [UI(모든 유저) : 역할배정을 시작하겠습니다.] : 0, setAllUserRole
+  //SECTION - [UI(모든 유저) : 역할배정을 시작하겠습니다.] : r0SetAllUserRole
   //NOTE - 모든 유저들 작업
   console.log("역할 배정을 시작하겠습니다.");
   moderator.showModal(
@@ -367,7 +373,7 @@ const playMafia = async (roomId, totalUserCount) => {
     true
   );
 
-  //SECTION - 시스템이 마피아 1~3명, 경찰, 의사, 시민들 선택 카드 노출(랜덤) : 0, showAllUserRole
+  //SECTION - 시스템이 마피아 1~3명, 경찰, 의사, 시민들 선택 카드 노출(랜덤) : r0ShowAllUserRole
   //NOTE - 플레이어들을 무작위로 섞음
   allPlayers = moderator.shufflePlayers(allPlayers);
 
@@ -415,7 +421,7 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.openPlayerRole(clientUserId, clientUserId, "시민")
   );
 
-  //SECTION - [UI(모든 유저) : 마피아들은 고개를 들어 서로를 확인해 주세요.] : 0, ShowMafiaUserEachOther
+  //SECTION - [UI(모든 유저) : 마피아들은 고개를 들어 서로를 확인해 주세요.] : r0ShowMafiaUserEachOther
   console.log("마피아들은 고개를 들어 서로를 확인해 주세요.");
   moderator.showModal(
     roomId,
@@ -426,7 +432,7 @@ const playMafia = async (roomId, totalUserCount) => {
     true
   );
 
-  //SECTION - 마피아 유저들의 컴퓨터에는 마피아 유저들의 카메라 켜졌다 꺼짐 : 0, turnMafiaUserCameraOnAndOff
+  //SECTION - 마피아 유저들의 컴퓨터에는 마피아 유저들의 카메라 켜졌다 꺼짐 : r0TurnMafiaUserCameraOnAndOff
   mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
@@ -450,7 +456,7 @@ const playMafia = async (roomId, totalUserCount) => {
       moderator.turnOffMike(clientUserId, playerUserId);
     })
   );
-  //SECTION - [UI : 아침이 되었습니다.] : 1, morningStart
+  //SECTION - [UI : 아침이 되었습니다.] : r1MorningStart
   console.log("아침이 시작되었습니다.");
   moderator.showModal(
     roomId,
@@ -461,7 +467,7 @@ const playMafia = async (roomId, totalUserCount) => {
     false
   );
 
-  //SECTION - 모든 유저 카메라 및 마이크 켬 : 1, turnAllUserCameraMikeOn
+  //SECTION - 모든 유저 카메라 및 마이크 켬 : r1TurnAllUserCameraMikeOn
   //NOTE - 모든 플레이어들의 카메라와 마이크 켬
   console.log("카메라, 마이크 켬");
   allPlayers.forEach((player) => {
@@ -469,7 +475,7 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.turnOnMike(roomId, player);
   });
 
-  //SECTION - [UI(모든 유저) : 모든 유저는 토론을 통해 마피아를 찾아내세요.] : 1, findMafia
+  //SECTION - [UI(모든 유저) : 모든 유저는 토론을 통해 마피아를 찾아내세요.] : r1FindMafia
   console.log("모든 유저는 토론을 통해 마피아를 찾아내세요.");
   moderator.showModal(
     roomId,
@@ -482,7 +488,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
   moderator.waitForMs(500);
 
-  //SECTION - [UI(모든 유저) : 토론이 끝났습니다.] : 1, meetingOver
+  //SECTION - [UI(모든 유저) : 토론이 끝났습니다.] : r1MeetingOver
   console.log("토론이 끝났습니다.");
   moderator.showModal(
     roomId,
@@ -493,7 +499,7 @@ const playMafia = async (roomId, totalUserCount) => {
     false
   );
 
-  //SECTION - [UI(모든 유저) : 마피아일 것 같은 사람의 화면을 클릭하세요] : 1, voteToMafia
+  //SECTION - [UI(모든 유저) : 마피아일 것 같은 사람의 화면을 클릭하세요] : r1VoteToMafia
   console.log("마피아일 것 같은 사람의 화면을 클릭해주세요.");
   moderator.showModal(
     roomId,
@@ -517,7 +523,7 @@ const playMafia = async (roomId, totalUserCount) => {
   */
 
   moderator.waitForMs(500); //NOTE - 시간 재기
-  //SECTION - [UI(모든 유저) : A : 10표, B : 2표 ....  가장 많은 투표를 받은 A가 마피아로 지목되었습니다.(이미지)] : 1, showVoteToResult
+  //SECTION - [UI(모든 유저) : A : 10표, B : 2표 ....  가장 많은 투표를 받은 A가 마피아로 지목되었습니다.(이미지)] : r1ShowVoteToResult
   console.log("투표 개표");
   const voteBoard = await moderator.getPlayersVoteResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
   const mostVoteResult = moderator.getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
@@ -541,7 +547,7 @@ const playMafia = async (roomId, totalUserCount) => {
       false
     );
 
-    //SECTION - [UI(모든 유저) : A는 최후의 변론을 시작하세요.] : 1, lastTalk
+    //SECTION - [UI(모든 유저) : A는 최후의 변론을 시작하세요.] : r1LastTalk
     console.log(
       `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`
     );
@@ -556,7 +562,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
     moderator.waitForMs(500); //NOTE - 시간 재기
 
-    //SECTION - [UI(모든 유저) : 찬성/반대 투표를 해주세요.] : 1, voteYesOrNo
+    //SECTION - [UI(모든 유저) : 찬성/반대 투표를 해주세요.] : r1VoteYesOrNo
     console.log("찬성/반대 투표를 해주세요.");
     moderator.showModal(
       roomId,
@@ -583,14 +589,14 @@ const playMafia = async (roomId, totalUserCount) => {
       moderator.players[7].voteYesOrNo(votes, true); //NOTE - 7번 인덱스 플레이어가 찬성에 투표
   */
 
-    //SECTION - [UI(모든 유저) : 찬성/반대 결과와 찬성 몇 표, 반대 몇 표(이미지)] : 1, showVoteYesOrNoResult
+    //SECTION - [UI(모든 유저) : 찬성/반대 결과와 찬성 몇 표, 반대 몇 표(이미지)] : r1ShowVoteYesOrNoResult
     console.log("트표 결과 나옴");
     const yesOrNoVoteResult = await moderator.getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
     moderator.showVoteYesOrNoResult(roomId, yesOrNoVoteResult.detail); //NOTE - 투표 결과를 방의 유저들에게 보여줌
 
     // await moderator.resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석
 
-    //SECTION - O가 과반수 넘을 시 : 지목된 시민 사망 : 1, killMostVotedPlayer
+    //SECTION - O가 과반수 넘을 시 : 지목된 시민 사망 : r1KillMostVotedPlayer
     //NOTE - 투표 결과가 유효하고(동률이 아님), 찬성이 반대보다 많은 경우
     if (yesOrNoVoteResult.isValid && yesOrNoVoteResult.result) {
       console.log("투표 결과 죽일 플레이어 나옴");
@@ -603,7 +609,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
       isPlayerMafia = await moderator.checkPlayerMafia(killedPlayer); //NOTE - 죽은 플레이어가 마피아인지 확인
 
-      //SECTION - A가 시민(마피아)이라면 : [UI(모든 유저) : 시민(마피아)이 죽었습니다.] : 1, showIsPlayerMafia
+      //SECTION - A가 시민(마피아)이라면 : [UI(모든 유저) : 시민(마피아)이 죽었습니다.] : r1ShowIsPlayerMafia
       //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
       if (isPlayerMafia) {
         console.log("마피아가 죽었습니다.");
@@ -636,16 +642,7 @@ const playMafia = async (roomId, totalUserCount) => {
     }
   }
 
-  console.log("아침이 종료되었습니다.");
-  moderator.showModal(
-    roomId,
-    "제목",
-    "아침이 종료되었습니다.",
-    500,
-    "닉네임",
-    false
-  );
-
+  //SECTION - [UI(모든 유저) : 밤이 되었습니다] : r1NightStart
   console.log("밤이 시작되었습니다.");
   moderator.showModal(
     roomId,
@@ -656,6 +653,7 @@ const playMafia = async (roomId, totalUserCount) => {
     false
   );
 
+  //SECTION - 모든 유저의 카메라와 마이크 끔 : r1TurnAllUserCameraMikeOff
   //NOTE - 모든 플레이어들의 카메라와 마이크 끔
   console.log("카메라, 마이크 끔");
   allPlayers.forEach((player) => {
@@ -663,6 +661,7 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.turnOffMike(roomId, player);
   });
 
+  //SECTION - [UI(모든 유저) : 마피아는 누굴 죽일지 결정해주세요.] : r1DecideMafiaToKillPlayer
   console.log("마피아는 누구를 죽일지 결정해주세요.");
   moderator.showModal(
     roomId,
@@ -673,17 +672,18 @@ const playMafia = async (roomId, totalUserCount) => {
     false
   );
 
+  //SECTION - 마피아 유저 컴퓨터에서 마피아인 유저의 카메라 켬 : r1TurnMafiaUserCameraOn
   mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
 
-  //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
-  console.log("마피아 유저들의 카메라, 마이크 켬");
+  //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라 켬
+  console.log("마피아 유저들의 카메라켬");
   mafiaPlayers.forEach((clientUserId) =>
     mafiaPlayers.forEach((playerUserId) => {
       moderator.turnOnCamera(clientUserId, playerUserId);
-      moderator.turnOnMike(clientUserId, playerUserId);
     })
   );
 
+  //SECTION - [UI(마피아 유저) : 마피아는 제스처를 통해 상의 후 누구를 죽일 지 선택해주세요] : r1GestureToMafiaEachOther
   console.log("누구를 죽일지 제스처를 통해 상의하세요.");
   mafiaPlayers.forEach((mafiaUserId) => {
     moderator.showModal(
@@ -700,15 +700,16 @@ const playMafia = async (roomId, totalUserCount) => {
   console.log("마피아가 누구를 죽일지 지목");
   playerToKill = await moderator.checkChosenPlayer(roomId, "마피아"); //NOTE - 가장 먼저 선택한 마피아의 지시를 따름, 죽일 플레이어 결정
 
-  //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 끔
-  console.log("마피아 유저들의 카메라, 마이크 끔");
+  //SECTION - 마피아 유저의 카메라 끔 : r1TurnMafiaUserCameraOff
+  //NOTE - 마피아 유저들 화면의 마피아 유저 카메라 끔
+  console.log("마피아 유저들의 카메라 끔");
   mafiaPlayers.forEach((clientUserId) =>
     mafiaPlayers.forEach((playerUserId) => {
       moderator.turnOffCamera(clientUserId, playerUserId);
-      moderator.turnOffMike(clientUserId, playerUserId);
     })
   );
 
+  //SECTION - [UI(모든 유저) : 의사는 누구를 살릴 지 결정해주세요.] : r1DecideDoctorToSavePlayer
   //NOTE - 방 구성인원 중 의사가 있을 경우
   console.log("의사 역할이 방에 있다면 실행");
   if (moderator.maxDoctorCount !== 0) {
@@ -731,6 +732,7 @@ const playMafia = async (roomId, totalUserCount) => {
     }
   }
 
+  //SECTION - [UI(모든 유저) : 경찰은 마피아 의심자를 결정해주세요.] : r1DecidePoliceToDoubtPlayer
   //NOTE - 방 구성인원 중 경찰 있을 경우
   console.log("경찰역할이 방에 있다면 실행");
   if (moderator.maxPoliceCount !== 0) {
@@ -743,6 +745,7 @@ const playMafia = async (roomId, totalUserCount) => {
       false
     );
 
+    //SECTION - 마피아가 맞을(아닐) 시 - [UI(경찰 유저) : O(X)] : r1ShowDoubtedPlayer
     //NOTE - 경찰이 살아있을 경우
     policePlayer = await moderator.getPlayerByRole(roomId, "경찰");
     console.log("경찰이 살아있다면 실행");
@@ -794,36 +797,7 @@ const playMafia = async (roomId, totalUserCount) => {
   policePlayer = await moderator.getPlayerByRole(roomId, "경찰");
   citizenPlayers = await moderator.getPlayerByRole(roomId, "시민");
 
-  console.log("밤이 종료되었습니다.");
-  moderator.showModal(
-    roomId,
-    "제목",
-    "밤이 종료되었습니다.",
-    500,
-    "닉네임",
-    false
-  );
-
-  console.log("라운드가 종료되었습니다.");
-  moderator.showModal(
-    roomId,
-    "제목",
-    "라운드가 종료되었습니다.",
-    500,
-    "닉네임",
-    false
-  );
-
-  console.log("라운드가 시작되었습니다.");
-  moderator.showModal(
-    roomId,
-    "제목",
-    "라운드가 시작되었습니다.",
-    500,
-    "닉네임",
-    false
-  );
-
+  //SECTION - [UI : 아침이 되었습니다.] : r2MorningStart
   console.log("아침이 시작되었습니다.");
   moderator.showModal(
     roomId,
@@ -834,6 +808,7 @@ const playMafia = async (roomId, totalUserCount) => {
     false
   );
 
+  //SECTION - 모든 유저 화상카메라 및 마이크 켬 : r2TurnAllUserCameraMikeOn
   //NOTE - 모든 플레이어들의 카메라와 마이크 켬
   console.log("카메라, 마이크 켬");
   allPlayers.forEach((player) => {
@@ -841,7 +816,8 @@ const playMafia = async (roomId, totalUserCount) => {
     moderator.turnOnMike(roomId, player);
   });
 
-  //NOTE - 마피아가 죽일려고한 마피아가 살았는지 죽었는지 확인
+  //SECTION - 의사가 살리는데 성공했는지 : r2ShowIsPlayerLived
+  //NOTE - 마피아가 죽일려고한 플레이어가 살았는지 죽었는지 확인
   isPlayerLived = await moderator.checkPlayerLived(killedPlayer);
 
   if (isPlayerLived) {
@@ -866,7 +842,8 @@ const playMafia = async (roomId, totalUserCount) => {
       false
     );
   }
-
+  //SECTION - [UI(사망한 유저) : 게임을 관전 하시겠습니까. 나가시겠습니까] : r2AskPlayerToExit
+  //FIXME - 본인이 죽었는지 확인하는 코드 추가해야 함
   console.log("게임을 관전 하시겠습니까? 나가시겠습니까?");
   moderator.showModal(
     killedPlayer,
@@ -884,26 +861,7 @@ const playMafia = async (roomId, totalUserCount) => {
     //killedPlayer.exit(); //FIXME - 플레이어는 방을 나감, 중간에 나가는 경우에도 사용할 수 있음, 구현해야 함
   }
 
-  console.log("아침이 종료되었습니다.");
-  moderator.showModal(
-    roomId,
-    "제목",
-    "아침이 종료되었습니다.",
-    500,
-    "닉네임",
-    false
-  );
-
-  console.log("라운드가 종료되었습니다.");
-  moderator.showModal(
-    roomId,
-    "제목",
-    "라운드가 종료되었습니다.",
-    500,
-    "닉네임",
-    false
-  );
-
+  //SECTION - 시민(마피아)이 이긴 경우 : [UI(모든 유저) : 시민(마피아) 승(이미지)] : r2WhoWIns
   if (moderator.whoWins.isValid) {
     //NOTE - 게임 종료 만족하는 지
     console.log(`${moderator.whoWins.result} 팀이 이겼습니다.`);
@@ -911,16 +869,6 @@ const playMafia = async (roomId, totalUserCount) => {
       roomId,
       "제목",
       `${moderator.whoWins.result} 팀이 이겼습니다.`,
-      500,
-      "닉네임",
-      false
-    );
-
-    console.log("게임이 종료되었습니다.");
-    moderator.showModal(
-      roomId,
-      "제목",
-      "게임이 종료되었습니다.",
       500,
       "닉네임",
       false
