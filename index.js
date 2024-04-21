@@ -510,9 +510,26 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1TurnMafiaUserCameraOn(roomId);
     } else {
       console.log("r1DecideMafiaToKillPlayer 준비 X");
+    }
+  });
+
+  socket.on("r1TurnMafiaUserCameraOn", async (roomId) => {
+    console.log("r1TurnMafiaUserCameraOn 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1TurnMafiaUserCameraOn",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1TurnMafiaUserCameraOn 준비 X");
     }
   });
 
@@ -926,6 +943,15 @@ const r1DecideMafiaToKillPlayer = (roomId) => {
     "닉네임",
     false
   );
+};
+
+const r1TurnMafiaUserCameraOn = async (roomId) => {
+  console.log("r1TurnMafiaUserCameraOn 송신");
+  const mafiaPlayers = await getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
+
+  //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라 켬
+  console.log("마피아 유저들의 카메라켬");
+  mafiaIo.to(roomId).emit("r1TurnMafiaUserCameraOn", mafiaPlayers);
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
