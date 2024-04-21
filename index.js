@@ -29,9 +29,11 @@ import {
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
 import {
   getMostVotedPlayer,
+  getYesOrNoVoteResult,
   openPlayerRole,
   showModal,
   showVoteToResult,
+  showVoteYesOrNoResult,
   shufflePlayers,
   turnOffCamera,
   turnOffMike,
@@ -438,9 +440,26 @@ mafiaIo.on("connection", (socket) => {
     }
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1ShowVoteYesOrNoResult(roomId);
     } else {
       console.log("r1VoteYesOrNo 준비 X");
+    }
+  });
+
+  socket.on("r1ShowVoteYesOrNoResult", async (roomId) => {
+    console.log("r1ShowVoteYesOrNoResult 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1ShowVoteYesOrNoResult",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음거 실행");
+    } else {
+      console.log("r1ShowVoteYesOrNoResult 준비 X");
     }
   });
 
@@ -750,7 +769,6 @@ const r1LastTalk = async (roomId) => {
   );
 };
 
-//SECTION - [UI(모든 유저) : 찬성/반대 투표를 해주세요.] : r1VoteYesOrNo
 const r1VoteYesOrNo = (roomId) => {
   console.log("r1VoteYesOrNo 송신");
   console.log("찬성/반대 투표를 해주세요.");
@@ -764,6 +782,18 @@ const r1VoteYesOrNo = (roomId) => {
     "닉네임",
     false
   );
+};
+
+const r1ShowVoteYesOrNoResult = async (roomId) => {
+  console.log("투표 결과 나옴");
+  const yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
+  showVoteYesOrNoResult(
+    mafiaIo,
+    roomId,
+    "r1ShowVoteYesOrNoResult",
+    yesOrNoVoteResult.detail
+  ); //NOTE - 투표 결과를 방의 유저들에게 보여줌
+  // await moderator.resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석};
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {

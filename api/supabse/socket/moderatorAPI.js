@@ -1,3 +1,5 @@
+import { getVoteYesOrNoResult } from "../gamePlayAPI.js";
+
 //NOTE - 클라이언트의 화면에 모달창을 띄움
 export const showModal = (
   mafiaIo,
@@ -60,4 +62,38 @@ export const getMostVotedPlayer = (voteBoard) => {
 //NOTE - 유저들에게 마피아 지목 투표 결과 보여줌
 export const showVoteToResult = (mafiaIo, eventName, roomId, voteBoard) => {
   mafiaIo.to(roomId).emit(eventName, voteBoard);
+};
+
+//NOTE - 찬성 반대 투표 결과
+export const getYesOrNoVoteResult = async (roomId) => {
+  const votes = await getVoteYesOrNoResult(roomId);
+  let yesCount = 0;
+  let noCount = 0;
+  let isValid;
+
+  votes.forEach((vote) => {
+    if (vote === true) {
+      yesCount++;
+    } else if (vote === false) {
+      noCount++;
+    }
+  });
+
+  isValid = yesCount !== noCount;
+
+  return {
+    isValid,
+    result: yesCount > noCount,
+    detail: { yesCount, noCount },
+  };
+};
+
+//NOTE - 유저들에게 찬성/반대 투표 결과 보여줌
+export const showVoteYesOrNoResult = async (
+  mafiaIo,
+  roomId,
+  eventName,
+  voteResult
+) => {
+  mafiaIo.to(roomId).emit(eventName, voteResult);
 };
