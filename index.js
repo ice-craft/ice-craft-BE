@@ -493,9 +493,26 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1DecideMafiaToKillPlayer(roomId);
     } else {
       console.log("r1TurnAllUserCameraMikeOff 준비 X");
+    }
+  });
+
+  socket.on("r1DecideMafiaToKillPlayer", async (roomId) => {
+    console.log("r1DecideMafiaToKillPlayer 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1DecideMafiaToKillPlayer",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1DecideMafiaToKillPlayer 준비 X");
     }
   });
 
@@ -895,6 +912,20 @@ const r1TurnAllUserCameraMikeOff = async (roomId) => {
   console.log("카메라, 마이크 끔");
   const allPlayers = await getUserIdInRoom(roomId);
   mafiaIo.to(roomId).emit("r1TurnAllUserCameraMikeOff", allPlayers);
+};
+const r1DecideMafiaToKillPlayer = (roomId) => {
+  console.log("r1DecideMafiaToKillPlayer 송신");
+  console.log("마피아는 누구를 죽일지 결정해주세요.");
+  showModal(
+    mafiaIo,
+    roomId,
+    "r1DecideMafiaToKillPlayer",
+    "제목",
+    "마피아는 누구를 죽일지 결정해주세요.",
+    500,
+    "닉네임",
+    false
+  );
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
