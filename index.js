@@ -476,9 +476,26 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1TurnAllUserCameraMikeOff(roomId);
     } else {
       console.log("r1KillMostVotedPlayer 준비 X");
+    }
+  });
+
+  socket.on("r1TurnAllUserCameraMikeOff", async (roomId) => {
+    console.log("r1TurnAllUserCameraMikeOff 수신");
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1TurnAllUserCameraMikeOff",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1TurnAllUserCameraMikeOff 준비 X");
     }
   });
 
@@ -576,6 +593,11 @@ const r0ShowAllUserRole = async (roomId) => {
   console.log("최대 의사 인원 수", maxDoctorCount);
   console.log("최대 경찰 인원 수", maxPoliceCount);
 
+  //NOTE - 처음에는 모든 플레이어 시민으로 설정
+  for (let playerIndex = 0; playerIndex < totalUserCount; playerIndex++) {
+    await setPlayerRole(allPlayers[playerIndex], "시민");
+  }
+
   //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
   console.log("마피아 역할 배정");
   for (let playerIndex = 0; playerIndex < maxMafiaCount; playerIndex++) {
@@ -584,40 +606,34 @@ const r0ShowAllUserRole = async (roomId) => {
 
   mafiaPlayers = await getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
 
-  //NOTE - 마피아 유저들에게 자신이 마피아인 것을 알리고 마피아인 유저가 누구인지 공개
-  console.log("마피아 역할 공개");
-  mafiaPlayers.forEach((clientUserId) =>
-    mafiaPlayers.forEach((roleUserId) =>
-      openPlayerRole(mafiaIo, clientUserId, roleUserId, "마피아")
-    )
-  );
-
   console.log("방에 의사가 있다면 실행");
   if (maxDoctorCount !== 0) {
     console.log("의사 뽑음");
-    doctorPlayer = await setPlayerRole(allPlayers[maxMafiaCount], "의사");
-    openPlayerRole(mafiaIo, doctorPlayer, doctorPlayer, "의사"); //NOTE - 의사 플레이어의 화면에서 자신이 의사임을 알림
+    await setPlayerRole(allPlayers[maxMafiaCount], "의사");
+    doctorPlayer = await getPlayerByRole(roomId, "의사");
   }
 
   console.log("경찰이 있다면 실행");
   if (maxPoliceCount !== 0) {
     console.log("경찰 뽑음");
     await setPlayerRole(allPlayers[maxMafiaCount + 1], "경찰");
+    policePlayer = await getPlayerByRole(roomId, "경찰");
   }
-
-  policePlayer = getPlayerByRole(allPlayers[maxMafiaCount + 1], "경찰"); //NOTE - 참가자를 경찰 플레이어로 설정
-  openPlayerRole(mafiaIo, policePlayer, policePlayer, "경찰"); //NOTE - 경찰 플레이어의 화면에서 자신이 경찰임을 알림
 
   citizenPlayers = await getPlayerByRole(roomId, "시민");
 
-  //NOTE - 시민 플레이어의 화면에서 자신이 시민임을 알림
-  console.log("시민들 각자 역할 공개");
-  citizenPlayers.forEach((clientUserId) =>
-    openPlayerRole(mafiaIo, clientUserId, clientUserId, "시민")
-  );
-
+  let role = {};
+  role["마피아"] = mafiaPlayers;
+  if (doctorPlayer) {
+    role["의사"] = doctorPlayer;
+  }
+  if (policePlayer) {
+    role["경찰"] = policePlayer;
+  }
+  role["시민"] = citizenPlayers;
+  console.log("시민 : ", role["시민"]);
   console.log("r0ShowAllUserRole 송신");
-  mafiaIo.to(roomId).emit("r0ShowAllUserRole");
+  mafiaIo.to(roomId).emit("r0ShowAllUserRole", role);
 };
 
 const r0ShowMafiaUserEachOther = (roomId) => {
@@ -871,6 +887,14 @@ const r1KillMostVotedPlayer = async (roomId) => {
       false
     );
   }
+};
+
+const r1TurnAllUserCameraMikeOff = async (roomId) => {
+  console.log("r1TurnAllUserCameraMikeOff 송신");
+  //NOTE - 모든 플레이어들의 카메라와 마이크 끔
+  console.log("카메라, 마이크 끔");
+  const allPlayers = await getUserIdInRoom(roomId);
+  mafiaIo.to(roomId).emit("r1TurnAllUserCameraMikeOff", allPlayers);
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
@@ -1287,17 +1311,6 @@ const playMafia = async (roomId, totalUserCount) => {
       console.log("동률 나옴");
     }
   }
-
-  //SECTION - [UI(모든 유저) : 밤이 되었습니다] : r1NightStart
-  console.log("밤이 시작되었습니다.");
-  moderator.showModal(
-    roomId,
-    "제목",
-    "밤이 시작되었습니다.",
-    500,
-    "닉네임",
-    false
-  );
 
   //SECTION - 모든 유저의 카메라와 마이크 끔 : r1TurnAllUserCameraMikeOff
   //NOTE - 모든 플레이어들의 카메라와 마이크 끔
