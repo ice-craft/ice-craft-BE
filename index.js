@@ -24,6 +24,7 @@ import {
   getStatus,
   getVoteToResult,
   killPlayer,
+  savePlayer,
   setPlayerRole,
   setReady,
   voteTo,
@@ -634,9 +635,25 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1KillPlayerByRole(roomId);
     } else {
       console.log("r1ShowDoubtedPlayer 준비 X");
+    }
+  });
+
+  socket.on("r1KillPlayerByRole", async (roomId) => {
+    console.log("r1KillPlayerByRole 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1KillPlayerByRole",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1KillPlayerByRole 준비 X");
     }
   });
 
@@ -1200,6 +1217,27 @@ const r1ShowDoubtedPlayer = async (roomId) => {
   }
 };
 
+const r1KillPlayerByRole = async (roomId) => {
+  console.log("r1KillPlayerByRole 송신");
+  const mafiaPlayers = await getPlayerByRole(roomId, "마피아");
+  const doctorPlayer = await getPlayerByRole(roomId, "의사");
+  const playerToKill = await checkChosenPlayer(roomId, "마피아");
+  const playerToSave = await checkChosenPlayer(roomId, "의사");
+
+  //NOTE - 죽일 플레이어와 살릴 플레이어 결정하고 생사 결정
+  console.log("죽일 플레어와 살릴 플레이어 결정하고 생사 결정");
+  if (playerToKill !== playerToSave) {
+    if (mafiaPlayers) {
+      await killPlayer(playerToKill);
+    }
+
+    if (doctorPlayer) {
+      await savePlayer(playerToSave);
+    }
+  }
+  mafiaIo.to(roomId).emit("r1KillPlayerByRole");
+};
+
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
 //   mafiaIo.emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
 // };
@@ -1739,6 +1777,7 @@ const playMafia = async (roomId, totalUserCount) => {
     }
   }
 
+  //SECTION - 각 자역할의 수행에 따라 플레이어 죽임 : r1KillPlayerByRole
   mafiaPlayers = await moderator.getPlayerByRole(roomId, "마피아");
   doctorPlayer = await moderator.getPlayerByRole(roomId, "의사");
 
