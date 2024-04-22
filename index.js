@@ -45,6 +45,7 @@ import {
   turnOffMike,
   turnOnCamera,
   turnOnMike,
+  whoWins,
 } from "./api/supabse/socket/moderatorAPI.js";
 
 const app = express();
@@ -697,7 +698,7 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("1라운드 다시 시작");
+      r2WhoWIns(roomId); //NOTE - 테스트 코드, 1라운드 시작이 되어야 함
     } else {
       console.log("r2ShowIsPlayerLived 준비 X");
     }
@@ -712,7 +713,7 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("1라운드 다시 시작");
+      console.log("플레이어 죽음");
     } else {
       console.log("r2AskPlayerToExit 준비 X");
     }
@@ -795,6 +796,7 @@ const r0SetAllUserRole = (roomId) => {
 };
 
 const r0ShowAllUserRole = async (roomId) => {
+  console.log("r0ShowAllUserRole 송신");
   let allPlayers = await getUserIdInRoom(roomId);
   const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
   const maxMafiaCount = await getRoleMaxCount(totalUserCount, "mafia_count");
@@ -851,7 +853,6 @@ const r0ShowAllUserRole = async (roomId) => {
   }
   role["시민"] = citizenPlayers;
   console.log("시민 : ", role["시민"]);
-  console.log("r0ShowAllUserRole 송신");
   mafiaIo.to(roomId).emit("r0ShowAllUserRole", role);
 };
 
@@ -1371,6 +1372,38 @@ const r2AskPlayerToExit = async (roomId) => {
       false,
       playerToKill
     );
+};
+
+const r2WhoWIns = async (roomId) => {
+  console.log("r2WhoWIns 송신");
+  const gameOver = await whoWins(roomId);
+  if (gameOver.isValid) {
+    //NOTE - 게임 종료 만족하는 지
+    console.log(`${gameOver.result}팀이 이겼습니다.`);
+    showModal(
+      mafiaIo,
+      roomId,
+      "r2WhoWIns",
+      "제목",
+      `${gameOver.result}팀이 이겼습니다.`,
+      500,
+      "닉네임",
+      false
+    );
+  } else {
+    //NOTE - 테스트 코드, 게임이 끝나지 않음
+    console.log("게임이 끝나지 않음");
+    showModal(
+      mafiaIo,
+      roomId,
+      "r2WhoWIns",
+      "제목",
+      "게임이 끝나지 않음",
+      500,
+      "닉네임",
+      false
+    );
+  }
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {

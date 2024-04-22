@@ -1,4 +1,4 @@
-import { getVoteYesOrNoResult } from "../gamePlayAPI.js";
+import { getPlayerByRole, getVoteYesOrNoResult } from "../gamePlayAPI.js";
 
 //NOTE - 클라이언트의 화면에 모달창을 띄움
 export const showModal = (
@@ -96,4 +96,33 @@ export const showVoteYesOrNoResult = async (
   voteResult
 ) => {
   mafiaIo.to(roomId).emit(eventName, voteResult);
+};
+
+//NOTE - 어느 팀이 이겼는지 결과 반환
+export const whoWins = async (roomId) => {
+  const mafiaPlayers = await getPlayerByRole(roomId, "마피아");
+  const citizenPlayers = await getPlayerByRole(roomId, "시민");
+  let mafiaCount;
+  let citizenCount;
+
+  if (mafiaPlayers) {
+    mafiaCount = mafiaPlayers.length;
+  } else {
+    mafiaCount = 0;
+  }
+
+  if (citizenPlayers) {
+    citizenCount = citizenPlayers.length;
+  } else {
+    mafiaCount = 0;
+  }
+
+  if (mafiaCount === 0) {
+    return { isValid: true, result: "시민" };
+  }
+  if (mafiaCount > citizenCount || mafiaCount === citizenCount) {
+    return { isValid: true, result: "마피아" };
+  }
+
+  return { isValid: false };
 };
