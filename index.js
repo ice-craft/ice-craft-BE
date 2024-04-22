@@ -697,9 +697,24 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      console.log("1라운드 다시 시작");
     } else {
       console.log("r2ShowIsPlayerLived 준비 X");
+    }
+  });
+
+  socket.on("r2AskPlayerToExit", async (response) => {
+    console.log("r2AskPlayerToExit 수신");
+
+    //FIXME - 코드 보충할 것
+    console.log(
+      "관전하려고 하면 플레이어 죽었다고 처리, 나간다고 하면 exitRoom 실행"
+    );
+
+    if (isDone) {
+      console.log("1라운드 다시 시작");
+    } else {
+      console.log("r2AskPlayerToExit 준비 X");
     }
   });
 
@@ -1298,6 +1313,7 @@ const r2MorningStart = async (roomId) => {
     false
   );
 };
+
 const r2TurnAllUserCameraMikeOn = async (roomId) => {
   console.log("r2TurnAllUserCameraMikeOn 송신");
   //NOTE - 모든 플레이어들의 카메라와 마이크 켬
@@ -1337,6 +1353,24 @@ const r2ShowIsPlayerLived = async (roomId) => {
       false
     );
   }
+};
+
+const r2AskPlayerToExit = async (roomId) => {
+  console.log("r2AskPlayerToExit 송신");
+  const playerToKill = await checkChosenPlayer(roomId, "마피아");
+  console.log("게임을 관전 하시겠습니까? 나가시겠습니까?");
+
+  mafiaIo
+    .to(roomId)
+    .emit(
+      "r2AskPlayerToExit",
+      "제목",
+      "게임을 관전 하시겠습니까? 나가시겠습니까?",
+      500,
+      "닉네임",
+      false,
+      playerToKill
+    );
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
