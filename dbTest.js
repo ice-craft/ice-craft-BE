@@ -1,5 +1,5 @@
-import { getRoleMaxCount } from "./api/supabse/gamePlayAPI.js";
-import { getUserIdInRoom } from "./api/supabse/roomAPI.js";
+import { getRoleMaxCount } from "./api/supabase/gamePlayAPI.js";
+import { getUserIdInRoom } from "./api/supabase/roomAPI.js";
 
 try {
   const result = await getRoleMaxCount(5, "mafia_count");

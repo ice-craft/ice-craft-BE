@@ -12,7 +12,7 @@ import {
   getUserIdInRoom,
   getUserInfoInRoom,
   joinRoom,
-} from "./api/supabse/roomAPI.js";
+} from "./api/supabase/roomAPI.js";
 import {
   checkAllPlayersReady,
   checkPlayerCountEnough,
@@ -27,7 +27,7 @@ import {
   setReady,
   voteTo,
   voteYesOrNo,
-} from "./api/supabse/gamePlayAPI.js";
+} from "./api/supabase/gamePlayAPI.js";
 import { Moderator } from "./mafia-algorithm/class/moderatorClass.js";
 import {
   getMostVotedPlayer,
@@ -41,7 +41,7 @@ import {
   turnOffMike,
   turnOnCamera,
   turnOnMike,
-} from "./api/supabse/socket/moderatorAPI.js";
+} from "./api/supabase/socket/moderatorAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
