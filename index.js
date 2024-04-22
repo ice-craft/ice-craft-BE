@@ -17,9 +17,11 @@ import {
   checkAllPlayersReady,
   checkChosenPlayer,
   checkPlayerCountEnough,
+  checkPlayerLived,
   checkPlayerMafia,
   choosePlayer,
   getPlayerByRole,
+  getPlayerNickname,
   getRoleMaxCount,
   getStatus,
   getVoteToResult,
@@ -679,9 +681,25 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r2ShowIsPlayerLived(roomId);
     } else {
       console.log("r2TurnAllUserCameraMikeOn 준비 X");
+    }
+  });
+
+  socket.on("r2ShowIsPlayerLived", async (roomId) => {
+    console.log("r2ShowIsPlayerLived 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r2ShowIsPlayerLived",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r2ShowIsPlayerLived 준비 X");
     }
   });
 
@@ -1288,6 +1306,39 @@ const r2TurnAllUserCameraMikeOn = async (roomId) => {
   mafiaIo.to(roomId).emit("r2TurnAllUserCameraMikeOn", allPlayers);
 };
 
+const r2ShowIsPlayerLived = async (roomId) => {
+  console.log("r2ShowIsPlayerLived 송신");
+  const playerToKill = await checkChosenPlayer(roomId, "마피아");
+  const isPlayerLived = await checkPlayerLived(playerToKill);
+
+  if (isPlayerLived) {
+    console.log("의사의 활약으로 아무도 죽지 않았습니다.");
+    showModal(
+      mafiaIo,
+      roomId,
+      "r2ShowIsPlayerLived",
+      "제목",
+      "의사의 활약으로 아무도 죽지 않았습니다.",
+      500,
+      "닉네임",
+      false
+    );
+  } else {
+    const killedPlayerNickname = await getPlayerNickname(playerToKill);
+    console.log(`${killedPlayerNickname}님이 죽었습니다.`);
+    showModal(
+      mafiaIo,
+      roomId,
+      "r2ShowIsPlayerLived",
+      "제목",
+      `${killedPlayerNickname}님이 죽었습니다.`,
+      500,
+      "닉네임",
+      false
+    );
+  }
+};
+
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
 //   mafiaIo.emit("showModal", title, message, timer, nickname, yesOrNo); //NOTE - 테스트 코드라서 .to(roomName) 제외
 // };
@@ -1869,7 +1920,7 @@ const playMafia = async (roomId, totalUserCount) => {
 
   //SECTION - 의사가 살리는데 성공했는지 : r2ShowIsPlayerLived
   //NOTE - 마피아가 죽일려고한 플레이어가 살았는지 죽었는지 확인
-  isPlayerLived = await moderator.checkPlayerLived(killedPlayer);
+  isPlayerLived = await moderator.checkPlayerLived(playerToKill);
 
   if (isPlayerLived) {
     console.log("의사의 활약으로 아무도 죽지 않았습니다.");
