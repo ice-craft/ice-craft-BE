@@ -42,6 +42,7 @@ import {
   turnOnCamera,
   turnOnMike,
 } from "./api/supabse/socket/moderatorAPI.js";
+import { mainModule } from "process";
 
 const app = express();
 const httpServer = createServer(app);
@@ -567,9 +568,31 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1DecideDoctorToSavePlayer(roomId);
     } else {
       console.log("r1TurnMafiaUserCameraOff 준비 X");
+    }
+  });
+
+  socket.on("r1DecideDoctorToSavePlayer", async (roomId, userId) => {
+    console.log("r1DecideDoctorToSavePlayer 수신");
+    try {
+      await choosePlayer(userId, "의사");
+    } catch (error) {
+      console.log("의사가 살릴 사람 지목 실패");
+    }
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1DecideDoctorToSavePlayer",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1DecideDoctorToSavePlayer 준비 X");
     }
   });
 
@@ -1019,6 +1042,38 @@ const r1TurnMafiaUserCameraOff = async (roomId) => {
   console.log("마피아 유저들의 카메라 끔");
   const mafiaPlayers = await getPlayerByRole(roomId, "마피아");
   mafiaIo.to(roomId).emit("r1TurnMafiaUserCameraOff", mafiaPlayers);
+};
+
+const r1DecideDoctorToSavePlayer = async (roomId) => {
+  console.log("r1DecideDoctorToSavePlayer 송신");
+
+  //NOTE - 방 구성인원 중 의사가 있을 경우
+  console.log("의사 역할이 방에 있다면 실행");
+  const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
+  const maxDoctorCount = await getRoleMaxCount(totalUserCount, "의사");
+  if (maxDoctorCount !== 0) {
+    showModal(
+      mafiaIo,
+      roomId,
+      "r1DecideDoctorToSavePlayer",
+      "제목",
+      "의사는 누구를 살릴 지 결정하세요.",
+      500,
+      "닉네임",
+      false
+    );
+  } else {
+    showModal(
+      mafiaIo,
+      roomId,
+      "r1DecideDoctorToSavePlayer",
+      "제목",
+      "의사가 없습니다.",
+      500,
+      "닉네임",
+      false
+    );
+  }
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
