@@ -42,7 +42,6 @@ import {
   turnOnCamera,
   turnOnMike,
 } from "./api/supabse/socket/moderatorAPI.js";
-import { mainModule } from "process";
 
 const app = express();
 const httpServer = createServer(app);
@@ -576,8 +575,11 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r1DecideDoctorToSavePlayer", async (roomId, userId) => {
     console.log("r1DecideDoctorToSavePlayer 수신");
+
     try {
-      await choosePlayer(userId, "의사");
+      if (userId) {
+        await choosePlayer(userId, "의사");
+      }
     } catch (error) {
       console.log("의사가 살릴 사람 지목 실패");
     }
@@ -590,9 +592,34 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1DecidePoliceToDoubtPlayer(roomId);
     } else {
       console.log("r1DecideDoctorToSavePlayer 준비 X");
+    }
+  });
+
+  socket.on("r1DecidePoliceToDoubtPlayer", async (roomId, userId) => {
+    console.log("r1DecidePoliceToDoubtPlayer 수신");
+
+    try {
+      if (userId) {
+        await choosePlayer(userId, "경찰");
+      }
+    } catch (error) {
+      console.log("경찰의 지목 실패");
+    }
+
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1DecidePoliceToDoubtPlayer",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1DecidePoliceToDoubtPlayer 준비 X");
     }
   });
 
@@ -1050,7 +1077,7 @@ const r1DecideDoctorToSavePlayer = async (roomId) => {
   //NOTE - 방 구성인원 중 의사가 있을 경우
   console.log("의사 역할이 방에 있다면 실행");
   const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
-  const maxDoctorCount = await getRoleMaxCount(totalUserCount, "의사");
+  const maxDoctorCount = await getRoleMaxCount(totalUserCount, "doctor_count");
   if (maxDoctorCount !== 0) {
     showModal(
       mafiaIo,
@@ -1069,6 +1096,36 @@ const r1DecideDoctorToSavePlayer = async (roomId) => {
       "r1DecideDoctorToSavePlayer",
       "제목",
       "의사가 없습니다.",
+      500,
+      "닉네임",
+      false
+    );
+  }
+};
+
+const r1DecidePoliceToDoubtPlayer = async (roomId) => {
+  //NOTE - 방 구성인원 중 경찰 있을 경우
+  console.log("경찰역할이 방에 있다면 실행");
+  const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
+  const maxPoliceCount = await getRoleMaxCount(totalUserCount, "police_count");
+  if (maxPoliceCount !== 0) {
+    showModal(
+      mafiaIo,
+      roomId,
+      "r1DecidePoliceToDoubtPlayer",
+      "제목",
+      "경찰은 마피아 의심자를 결정해주세요.",
+      500,
+      "닉네임",
+      false
+    );
+  } else {
+    showModal(
+      mafiaIo,
+      roomId,
+      "r1DecidePoliceToDoubtPlayer",
+      "제목",
+      "경찰이 없습니다.",
       500,
       "닉네임",
       false
