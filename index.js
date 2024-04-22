@@ -651,9 +651,21 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r2MorningStart(roomId);
     } else {
       console.log("r1KillPlayerByRole 준비 X");
+    }
+  });
+
+  socket.on("r2MorningStart", async (roomId) => {
+    console.log("r2MorningStart 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(roomId, "r2MorningStart", total_user_count);
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r2MorningStart 준비 X");
     }
   });
 
@@ -1236,6 +1248,21 @@ const r1KillPlayerByRole = async (roomId) => {
     }
   }
   mafiaIo.to(roomId).emit("r1KillPlayerByRole");
+};
+
+const r2MorningStart = async (roomId) => {
+  console.log("r2MorningStart 송신");
+  console.log("아침이 시작되었습니다.");
+  showModal(
+    mafiaIo,
+    roomId,
+    "r2MorningStart",
+    "제목",
+    "아침이 시작되었습니다.",
+    500,
+    "닉네임",
+    false
+  );
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
