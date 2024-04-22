@@ -663,9 +663,25 @@ mafiaIo.on("connection", (socket) => {
     const isDone = await getStatus(roomId, "r2MorningStart", total_user_count);
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r2TurnAllUserCameraMikeOn(roomId);
     } else {
       console.log("r2MorningStart 준비 X");
+    }
+  });
+
+  socket.on("r2TurnAllUserCameraMikeOn", async (roomId) => {
+    console.log("r2TurnAllUserCameraMikeOn 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r2TurnAllUserCameraMikeOn",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r2TurnAllUserCameraMikeOn 준비 X");
     }
   });
 
@@ -1263,6 +1279,13 @@ const r2MorningStart = async (roomId) => {
     "닉네임",
     false
   );
+};
+const r2TurnAllUserCameraMikeOn = async (roomId) => {
+  console.log("r2TurnAllUserCameraMikeOn 송신");
+  //NOTE - 모든 플레이어들의 카메라와 마이크 켬
+  console.log("카메라, 마이크 켬");
+  const allPlayers = await getUserIdInRoom(roomId);
+  mafiaIo.to(roomId).emit("r2TurnAllUserCameraMikeOn", allPlayers);
 };
 
 // const showModal = (roomName, title, message, timer, nickname, yesOrNo) => {
