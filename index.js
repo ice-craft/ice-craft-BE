@@ -15,6 +15,7 @@ import {
 } from "./api/supabse/roomAPI.js";
 import {
   checkAllPlayersReady,
+  checkChosenPlayer,
   checkPlayerCountEnough,
   checkPlayerMafia,
   choosePlayer,
@@ -617,9 +618,25 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      console.log("다음 거 실행");
+      r1ShowDoubtedPlayer(roomId);
     } else {
       console.log("r1DecidePoliceToDoubtPlayer 준비 X");
+    }
+  });
+
+  socket.on("r1ShowDoubtedPlayer", async (roomId) => {
+    console.log("r1ShowDoubtedPlayer 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(
+      roomId,
+      "r1ShowDoubtedPlayer",
+      total_user_count
+    );
+
+    if (isDone) {
+      console.log("다음 거 실행");
+    } else {
+      console.log("r1ShowDoubtedPlayer 준비 X");
     }
   });
 
@@ -1130,6 +1147,56 @@ const r1DecidePoliceToDoubtPlayer = async (roomId) => {
       "닉네임",
       false
     );
+  }
+};
+const r1ShowDoubtedPlayer = async (roomId) => {
+  console.log("r1ShowDoubtedPlayer 송신");
+  //NOTE - 경찰이 살아있을 경우
+  const policePlayer = await getPlayerByRole(roomId, "경찰");
+  console.log("경찰이 살아있다면 실행");
+  if (policePlayer) {
+    const playerDoubted = await checkChosenPlayer(roomId, "경찰"); //NOTE - 0번 인덱스 플레이어가 마피아인지 의심
+    const isPlayerMafia = await checkPlayerMafia(playerDoubted);
+
+    if (isPlayerMafia) {
+      console.log("해당 플레이어는 마피아가 맞습니다.");
+      mafiaIo.to(roomId),
+        emit(
+          "r1ShowDoubtedPlayer",
+          "제목",
+          "해당 플레이어는 마피아가 맞습니다.",
+          500,
+          "닉네임",
+          false,
+          policePlayer
+        );
+    } else {
+      console.log("해당 플레이어는 마피아가 아닙니다.");
+      mafiaIo
+        .to(roomId)
+        .emit(
+          "r1ShowDoubtedPlayer",
+          "제목",
+          "해당 플레이어는 마피아가 아닙니다.",
+          500,
+          "닉네임",
+          false,
+          policePlayer
+        );
+    }
+  } else {
+    console.log("경찰이 없습니다.");
+    mafiaIo
+      .to(roomId)
+      .emit(
+        "r1ShowDoubtedPlayer",
+        "제목",
+        "경찰이 없습니다.",
+        500,
+        "닉네임",
+        false,
+        policePlayer
+      );
   }
 };
 
