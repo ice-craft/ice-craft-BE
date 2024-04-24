@@ -58,7 +58,6 @@ app.get("/", (req, res) => {
 
 mafiaIo.on("connection", (socket) => {
   socket.join("0ed9a099-f1b4-46eb-a187-2da752eed29c");
-  socket.join("11111111-f1b4-46eb-a187-2da752eed29c");
 
   socket.on("enterMafia", async (rowStart, rowEnd) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
@@ -140,8 +139,8 @@ mafiaIo.on("connection", (socket) => {
       if (result.length === 0) {
         throw new Error();
       }
-      socket.emit("setReady", "레디를 설정하는데 성공했습니다.");
-      socket.emit("updateUserReady", userId, ready);
+      console.log("ready하는데 성공했습니다.");
+      mafiaIo.to(roomId).emit("updateUserReady", userId, ready);
       canGameStart(roomId);
     } catch (error) {
       console.log("[setReadyError] 레디를 설정하는데 실패했습니다.");
@@ -395,7 +394,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1ShowMostVotedPlayer", async (roomId) => {
+  socket.on("r1ShowMostVotedPlayer", async (roomId, isValid) => {
     console.log("r1ShowMostVotedPlayer 수신");
 
     const { total_user_count } = await getUserCountInRoom(roomId);
@@ -405,8 +404,12 @@ mafiaIo.on("connection", (socket) => {
       total_user_count
     );
 
-    if (isDone) {
+    if (isDone && isValid) {
+      console.log("유효한 투표");
       r1LastTalk(roomId);
+    } else if (isDone && !isValid) {
+      console.log("유효하지 않은 투표");
+      r1TurnAllUserCameraMikeOff(roomId);
     } else {
       console.log("r1ShowMostVotedPlayer 준비 X");
     }
@@ -964,34 +967,36 @@ const r1ShowMostVotedPlayer = async (roomId) => {
   console.log("r1ShowMostVotedPlayer 송신");
   const voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
   const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+
   if (mostVoteResult.isValid) {
     console.log("투표 성공");
     //NOTE - 투표 성공
     console.log(
       `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`
     );
-    showModal(
-      mafiaIo,
-      roomId,
-      "r1ShowMostVotedPlayer",
-      "제목",
-      `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`,
-      500,
-      "닉네임",
-      true
-    );
+    mafiaIo
+      .to(roomId)
+      .emit(
+        "r1ShowMostVotedPlayer",
+        "제목",
+        `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`,
+        500,
+        "닉네임",
+        true,
+        true
+      );
   } else {
-    //FIXME - 우효하지 않은 투표입니다.
-    showModal(
-      mafiaIo,
-      roomId,
-      "r1InvalidVote",
-      "제목",
-      `투표가 유효하지 않습니다.`,
-      500,
-      "닉네임",
-      true
-    );
+    mafiaIo
+      .to(roomId)
+      .emit(
+        "r1ShowMostVotedPlayer",
+        "제목",
+        "투표가 유효하지 않습니다.",
+        500,
+        "닉네임",
+        true,
+        false
+      );
   }
 };
 
