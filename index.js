@@ -1395,3 +1395,13 @@ const r2WhoWIns = async (roomId) => {
     );
   }
 };
+
+const updateUserInRoom = async (roomId) => {
+  console.log("updateUserInRoom 송신");
+  try {
+    const playerInfo = await getCurrentUserDisplay(roomId);
+    mafiaIo.to(roomId).emit("updateUserInRoom", playerInfo);
+  } catch (error) {
+    console.log("updateUserInRoom 에러 발생");
+  }
+};
