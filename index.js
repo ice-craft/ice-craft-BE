@@ -1070,6 +1070,7 @@ const r1KillMostVotedPlayer = async (roomId) => {
           500,
           "닉네임",
           false,
+          true,
           killedPlayer,
           "마피아"
         );
@@ -1084,6 +1085,7 @@ const r1KillMostVotedPlayer = async (roomId) => {
           500,
           "닉네임",
           false,
+          true,
           killedPlayer,
           "시민"
         );
@@ -1094,12 +1096,15 @@ const r1KillMostVotedPlayer = async (roomId) => {
     showModal(
       mafiaIo,
       roomId,
-      r1KillMostVotedPlayer,
+      "r1KillMostVotedPlayer",
       "제목",
       "동률 나옴",
       500,
       "닉네임",
-      false
+      false,
+      false,
+      null,
+      null
     );
   }
 };
