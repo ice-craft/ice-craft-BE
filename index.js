@@ -1057,6 +1057,7 @@ const r1KillMostVotedPlayer = async (roomId) => {
     console.log("투표 결과 죽일 플레이어 나옴");
     const killedPlayer = await killPlayer(mostVoteResult.result.user_id); //NOTE - 투표를 가장 많이 받은 플레이어 사망
     const isPlayerMafia = await checkPlayerMafia(killedPlayer); //NOTE - 죽은 플레이어가 마피아인지 확인
+    await updateUserInRoom(roomId);
 
     //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
     if (isPlayerMafia) {
