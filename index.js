@@ -141,6 +141,7 @@ mafiaIo.on("connection", (socket) => {
         throw new Error();
       }
       socket.emit("setReady", "레디를 설정하는데 성공했습니다.");
+      socket.emit("updateUserReady", userId, ready);
       canGameStart(roomId);
     } catch (error) {
       console.log("[setReadyError] 레디를 설정하는데 실패했습니다.");
