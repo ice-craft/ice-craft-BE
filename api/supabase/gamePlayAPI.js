@@ -380,7 +380,6 @@ export const resetRoundR2 = async (room_id) => {
       r2MorningStart: false,
       r2TurnAllUserCameraMikeOn: false,
       r2ShowIsPlayerLived: false,
-      gameOver: false,
     })
     .eq("room_id", room_id);
 
