@@ -27,6 +27,7 @@ import {
   getStatus,
   getVoteToResult,
   killPlayer,
+  resetPlayerStatus,
   savePlayer,
   setPlayerRole,
   setReady,
@@ -723,7 +724,7 @@ mafiaIo.on("connection", (socket) => {
     const isDone = await getStatus(roomId, "gameOver", total_user_count);
 
     if (isDone) {
-      r2WhoWIns(roomId); //FIXME - 테스트 코드, 1라운드 시작이 되어야 함
+      WhoWIns(roomId); //FIXME - 테스트 코드, 1라운드 시작이 되어야 함
     } else {
       console.log("r2ShowIsPlayerLived 준비 X");
     }
@@ -781,9 +782,12 @@ const canGameStart = async (roomId) => {
   }
 };
 
-const play = (roomId) => {
+const play = async (roomId) => {
   console.log("게임 시작");
-  //FIXME - 게임 상태 리셋
+  // await resetRoundR0(roomId); //NOTE - 테스트에 불필요해서 주석처리
+  // await resetRoundR1(roomId); //NOTE - 테스트에 불필요해서 주석처리
+  // await resetRoundR2(roomId); //NOTE - 테스트에 불필요해서 주석처리
+  // await resetPlayerStatus(roomId); //NOTE - 테스트에 불필요해서 주석처리
   r0NightStart(roomId);
 };
 

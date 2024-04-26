@@ -321,3 +321,89 @@ export const getCurrentUserDisplay = async (room_id) => {
   }
   return data;
 };
+
+export const resetRoundR0 = async (room_id) => {
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({
+      r0NightStart: false,
+      r0TurnAllUserCameraMikeOff: false,
+      r0SetAllUserRole: false,
+      r0ShowAllUserRole: false,
+      r0ShowMafiaUserEachOther: false,
+      r0TurnMafiaUserCameraOn: false,
+      r0TurnMafiaUserCameraOff: false,
+    })
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error();
+  }
+};
+
+export const resetRoundR1 = async (room_id) => {
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({
+      r1MorningStart: false,
+      r1TurnAllUserCameraMikeOn: false,
+      r1FindMafia: false,
+      r1MetingOver: false,
+      r1VoteToMafia: false,
+      r1ShowVoteToResult: false,
+      r1ShowMostVotedPlayer: false,
+      r1LastTalk: false,
+      r1VoteYesOrNo: false,
+      r1ShowVoteYesOrNoResult: false,
+      r1KillMostVotedPlayer: false,
+      r1TurnAllUserCameraMikeOff: false,
+      r1DecideMafiaToKillPlayer: false,
+      r1TurnMafiaUserCameraOn: false,
+      r1GestureToMafiaEachOther: false,
+      r1TurnMafiaUserCameraOff: false,
+      r1DecideDoctorToSavePlayer: false,
+      r1DecidePoliceToDoubtPlayer: false,
+      r1ShowDoubtedPlayer: false,
+      r1KillPlayerByRole: false,
+    })
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error();
+  }
+};
+
+export const resetRoundR2 = async (room_id) => {
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({
+      r2MorningStart: false,
+      r2TurnAllUserCameraMikeOn: false,
+      r2ShowIsPlayerLived: false,
+      gameOver: false,
+    })
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error();
+  }
+};
+
+export const resetPlayerStatus = async (room_id) => {
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({
+      is_ready: false,
+      role: "시민",
+      is_lived: true,
+      vote_to: null,
+      voted_count: 0,
+      chosen_by: null,
+      choose_time: null,
+    })
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error();
+  }
+};
