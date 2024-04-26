@@ -718,18 +718,6 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("gameOver", async (roomId) => {
-    console.log("gameOver 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(roomId, "gameOver", total_user_count);
-
-    if (isDone) {
-      WhoWIns(roomId); //FIXME - 테스트 코드, 1라운드 시작이 되어야 함
-    } else {
-      console.log("r2ShowIsPlayerLived 준비 X");
-    }
-  });
-
   socket.on("showWhoWins", async () => {
     console.log("showWhoWins 수신");
   });
