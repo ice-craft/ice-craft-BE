@@ -126,7 +126,7 @@ mafiaIo.on("connection", (socket) => {
     console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
     try {
       await exitRoom(roomId, userId);
-      await updateUserInRoom(roomId);
+      await updateUserInRoom(mafiaIo, roomId);
 
       mafiaIo.to(roomId).emit("exitRoom");
     } catch (error) {
@@ -480,12 +480,10 @@ mafiaIo.on("connection", (socket) => {
       total_user_count
     );
 
-    //NOTE - 테스트 용이라서 주석
-    // if (gameOver.isValid.isValid) {
-    //   return await showWhoWins(gameOver);
-    // }
-
-    if (isDone) {
+    if (isDone && gameOver.isValid) {
+      // await showWhoWins(gameOver); //NOTE - 테스트 용이라서 주석 처리
+      r1TurnAllUserCameraMikeOff(roomId);
+    } else if (isDone && !gameOver.isValid) {
       r1TurnAllUserCameraMikeOff(roomId);
     } else {
       console.log("r1KillMostVotedPlayer 준비 X");
@@ -695,16 +693,21 @@ mafiaIo.on("connection", (socket) => {
   socket.on("r2ShowIsPlayerLived", async (roomId) => {
     console.log("r2ShowIsPlayerLived 수신");
     const { total_user_count } = await getUserCountInRoom(roomId);
+    const gameOver = await whoWins(roomId);
     const isDone = await getStatus(
       roomId,
       "r2ShowIsPlayerLived",
       total_user_count
     );
 
-    if (isDone) {
-      r2WhoWIns(roomId); //FIXME - 테스트 코드, 1라운드 시작이 되어야 함
+    if (isDone && gameOver.isValid) {
+      // await showWhoWins(gameOver); //NOTE - 테스트 용이라 주석처리 함
+      console.log("테스트 끝 isDone : true");
+    } else if (isDone && !gameOver.isValid) {
+      console.log("1 라운드 다시 시작");
+      // r1MorningStart(roomId); //NOTE - 테스트 용이라 주석처리 함
     } else {
-      console.log("r2ShowIsPlayerLived 준비 X");
+      console.log("테스트 끝 isDone : false");
     }
   });
 
@@ -716,7 +719,7 @@ mafiaIo.on("connection", (socket) => {
       const gameOver = await whoWins(roomId);
 
       await exitRoom(roomId, userId);
-      await updateUserInRoom(roomId);
+      await updateUserInRoom(mafiaIo, roomId);
 
       if (gameOver.isValid) {
         showWhoWins(gameOver);
@@ -1072,7 +1075,7 @@ const r1KillMostVotedPlayer = async (roomId) => {
     console.log("투표 결과 죽일 플레이어 나옴");
     const killedPlayer = await killPlayer(mostVoteResult.result.user_id); //NOTE - 투표를 가장 많이 받은 플레이어 사망
     const isPlayerMafia = await checkPlayerMafia(killedPlayer); //NOTE - 죽은 플레이어가 마피아인지 확인
-    await updateUserInRoom(roomId);
+    await updateUserInRoom(mafiaIo, roomId);
 
     //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
     if (isPlayerMafia) {
@@ -1319,14 +1322,12 @@ const r1KillPlayerByRole = async (roomId) => {
   console.log("죽일 플레어와 살릴 플레이어 결정하고 생사 결정");
   if (playerToKill !== playerToSave) {
     if (mafiaPlayers) {
-      await killPlayer(playerToKill);
     }
 
     if (doctorPlayer) {
       await savePlayer(playerToSave);
     }
   }
-  await updateUserInRoom(roomId);
   mafiaIo.to(roomId).emit("r1KillPlayerByRole");
 };
 
@@ -1372,7 +1373,7 @@ const r2ShowIsPlayerLived = async (roomId) => {
     );
   } else {
     const killedPlayerNickname = await getPlayerNickname(playerToKill);
-    await updateUserInRoom(roomId);
+    await updateUserInRoom(mafiaIo, roomId);
     console.log(`${killedPlayerNickname}님이 죽었습니다.`);
     showModal(
       mafiaIo,
@@ -1385,22 +1386,4 @@ const r2ShowIsPlayerLived = async (roomId) => {
       false
     );
   }
-};
-
-const r2AskPlayerToExit = async (roomId) => {
-  console.log("r2AskPlayerToExit 송신");
-  const playerToKill = await checkChosenPlayer(roomId, "마피아");
-  console.log("게임을 관전 하시겠습니까? 나가시겠습니까?");
-
-  mafiaIo
-    .to(roomId)
-    .emit(
-      "r2AskPlayerToExit",
-      "제목",
-      "게임을 관전 하시겠습니까? 나가시겠습니까?",
-      500,
-      "닉네임",
-      false,
-      playerToKill
-    );
 };

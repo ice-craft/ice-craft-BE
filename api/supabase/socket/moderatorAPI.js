@@ -1,4 +1,8 @@
-import { getPlayerByRole, getVoteYesOrNoResult } from "../gamePlayAPI.js";
+import {
+  getCurrentUserDisplay,
+  getPlayerByRole,
+  getVoteYesOrNoResult,
+} from "../gamePlayAPI.js";
 
 //NOTE - 클라이언트의 화면에 모달창을 띄움
 export const showModal = (
@@ -124,7 +128,7 @@ export const showWhoWins = async (gameOver) => {
   );
 };
 
-export const updateUserInRoom = async (roomId) => {
+export const updateUserInRoom = async (mafiaIo, roomId) => {
   const playerInfo = await getCurrentUserDisplay(roomId);
   mafiaIo.to(roomId).emit("updateUserInRoom", playerInfo);
 };
