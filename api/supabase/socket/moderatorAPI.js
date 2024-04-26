@@ -106,3 +106,30 @@ export const whoWins = async (roomId) => {
 
   return { isValid: false };
 };
+
+export const showWhoWins = async (gameOver) => {
+  console.log("showWhoWins 송신");
+
+  //NOTE - 게임 종료 만족하는 지
+  console.log(`${gameOver.result}팀이 이겼습니다.`);
+  showModal(
+    mafiaIo,
+    roomId,
+    "gameOver",
+    "제목",
+    `${gameOver.result}팀이 이겼습니다.`,
+    500,
+    "닉네임",
+    false
+  );
+};
+
+export const updateUserInRoom = async (roomId) => {
+  console.log("updateUserInRoom 송신");
+  try {
+    const playerInfo = await getCurrentUserDisplay(roomId);
+    mafiaIo.to(roomId).emit("updateUserInRoom", playerInfo);
+  } catch (error) {
+    console.log("updateUserInRoom 에러 발생");
+  }
+};

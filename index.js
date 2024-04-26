@@ -20,6 +20,7 @@ import {
   checkPlayerLived,
   checkPlayerMafia,
   choosePlayer,
+  getCurrentUserDisplay,
   getPlayerByRole,
   getPlayerNickname,
   getRoleMaxCount,
@@ -38,7 +39,9 @@ import {
   showModal,
   showVoteToResult,
   showVoteYesOrNoResult,
+  showWhoWins,
   shufflePlayers,
+  updateUserInRoom,
   whoWins,
 } from "./api/supabase/socket/moderatorAPI.js";
 
@@ -87,6 +90,8 @@ mafiaIo.on("connection", (socket) => {
     console.log(
       `[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`
     );
+    socket.data.userId = userId;
+    socket.data.roomId = roomId;
     try {
       socket.join(roomId);
       socket.join(userId);
@@ -691,7 +696,7 @@ mafiaIo.on("connection", (socket) => {
     );
 
     if (isDone) {
-      r2WhoWIns(roomId); //NOTE - 테스트 코드, 1라운드 시작이 되어야 함
+      r2WhoWIns(roomId); //FIXME - 테스트 코드, 1라운드 시작이 되어야 함
     } else {
       console.log("r2ShowIsPlayerLived 준비 X");
     }
@@ -712,8 +717,38 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  io.on("disconnection", () => {
+  socket.on("gameOver", async (roomId) => {
+    console.log("gameOver 수신");
+    const { total_user_count } = await getUserCountInRoom(roomId);
+    const isDone = await getStatus(roomId, "gameOver", total_user_count);
+
+    if (isDone) {
+      r2WhoWIns(roomId); //FIXME - 테스트 코드, 1라운드 시작이 되어야 함
+    } else {
+      console.log("r2ShowIsPlayerLived 준비 X");
+    }
+  });
+
+  socket.on("showWhoWins", async () => {
+    console.log("showWhoWins 수신");
+  });
+
+  socket.on("disconnect", async () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
+    try {
+      const roomId = socket.data.roomId;
+      const userId = socket.data.userId;
+      const gameOver = await whoWins(roomId);
+
+      await exitRoom(roomId, userId);
+      await updateUserInRoom(roomId);
+
+      if (gameOver.isValid) {
+        showWhoWins(gameOver);
+      }
+    } catch (error) {
+      console.log("방에서 나가기에 실패했습니다.");
+    }
   });
 });
 
@@ -748,6 +783,7 @@ const canGameStart = async (roomId) => {
 
 const play = (roomId) => {
   console.log("게임 시작");
+  //FIXME - 게임 상태 리셋
   r0NightStart(roomId);
 };
 
@@ -774,6 +810,7 @@ const r0TurnAllUserCameraMikeOff = async (roomId) => {
   mafiaIo.to(roomId).emit("r0TurnAllUserCameraMikeOff", allPlayers);
 };
 
+//FIXME - 지울 수 있음
 const r0SetAllUserRole = (roomId) => {
   console.log("r0SetAllUserRole 송신");
   showModal(
@@ -1153,7 +1190,7 @@ const r1GestureToMafiaEachOther = async (roomId) => {
       "r1GestureToMafiaEachOther",
       "제목",
       "누구를 죽일지 제스처를 통해 상의하세요.",
-      0,
+      500,
       "닉네임",
       false,
       mafiaPlayers
@@ -1229,6 +1266,7 @@ const r1DecidePoliceToDoubtPlayer = async (roomId) => {
     );
   }
 };
+
 const r1ShowDoubtedPlayer = async (roomId) => {
   console.log("r1ShowDoubtedPlayer 송신");
   //NOTE - 경찰이 살아있을 경우
@@ -1343,6 +1381,7 @@ const r2ShowIsPlayerLived = async (roomId) => {
     );
   } else {
     const killedPlayerNickname = await getPlayerNickname(playerToKill);
+    await updateUserInRoom(roomId);
     console.log(`${killedPlayerNickname}님이 죽었습니다.`);
     showModal(
       mafiaIo,
@@ -1373,46 +1412,4 @@ const r2AskPlayerToExit = async (roomId) => {
       false,
       playerToKill
     );
-};
-
-const r2WhoWIns = async (roomId) => {
-  console.log("r2WhoWIns 송신");
-  const gameOver = await whoWins(roomId);
-  if (gameOver.isValid) {
-    //NOTE - 게임 종료 만족하는 지
-    console.log(`${gameOver.result}팀이 이겼습니다.`);
-    showModal(
-      mafiaIo,
-      roomId,
-      "r2WhoWIns",
-      "제목",
-      `${gameOver.result}팀이 이겼습니다.`,
-      500,
-      "닉네임",
-      false
-    );
-  } else {
-    //NOTE - 테스트 코드, 게임이 끝나지 않음
-    console.log("게임이 끝나지 않음");
-    showModal(
-      mafiaIo,
-      roomId,
-      "r2WhoWIns",
-      "제목",
-      "게임이 끝나지 않음",
-      500,
-      "닉네임",
-      false
-    );
-  }
-};
-
-const updateUserInRoom = async (roomId) => {
-  console.log("updateUserInRoom 송신");
-  try {
-    const playerInfo = await getCurrentUserDisplay(roomId);
-    mafiaIo.to(roomId).emit("updateUserInRoom", playerInfo);
-  } catch (error) {
-    console.log("updateUserInRoom 에러 발생");
-  }
 };
