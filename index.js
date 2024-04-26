@@ -126,10 +126,9 @@ mafiaIo.on("connection", (socket) => {
     console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
     try {
       await exitRoom(roomId, userId);
+      await updateUserInRoom(roomId);
 
-      const userInfo = await getUserInfoInRoom(roomId);
-
-      mafiaIo.to(roomId).emit("exitRoom", userInfo);
+      mafiaIo.to(roomId).emit("exitRoom");
     } catch (error) {
       console.log("[exitRoomError] 방에서 나가기에 실패했습니다.");
       socket.emit("exitRoomError", "방에서 나가기에 실패했습니다.");
@@ -701,25 +700,6 @@ mafiaIo.on("connection", (socket) => {
     } else {
       console.log("r2ShowIsPlayerLived 준비 X");
     }
-  });
-
-  socket.on("r2AskPlayerToExit", async (response) => {
-    console.log("r2AskPlayerToExit 수신");
-
-    //FIXME - 코드 보충할 것
-    console.log(
-      "관전하려고 하면 플레이어 죽었다고 처리, 나간다고 하면 exitRoom 실행"
-    );
-
-    if (isDone) {
-      console.log("플레이어 죽음");
-    } else {
-      console.log("r2AskPlayerToExit 준비 X");
-    }
-  });
-
-  socket.on("showWhoWins", async () => {
-    console.log("showWhoWins 수신");
   });
 
   socket.on("disconnect", async () => {
