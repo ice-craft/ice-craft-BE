@@ -1326,6 +1326,7 @@ const r1KillPlayerByRole = async (roomId) => {
       await savePlayer(playerToSave);
     }
   }
+  await updateUserInRoom(roomId);
   mafiaIo.to(roomId).emit("r1KillPlayerByRole");
 };
 
