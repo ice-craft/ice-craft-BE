@@ -246,12 +246,22 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r0ShowMafiaUserEachOther", async (roomId) => {
     console.log("r0ShowMafiaUserEachOther 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r0ShowMafiaUserEachOther",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r0ShowMafiaUserEachOther: true });
+      isDone = await getStatus(
+        roomId,
+        "r0ShowMafiaUserEachOther",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r0ShowMafiaUserEachOtherError]");
+      socket.emit("r0ShowMafiaUserEachOtherError");
+    }
 
     if (isDone) {
       r0TurnMafiaUserCameraOn(roomId);
