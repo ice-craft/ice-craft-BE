@@ -44,7 +44,7 @@ export const getMostVotedPlayer = (voteBoard) => {
 };
 
 //NOTE - 유저들에게 마피아 지목 투표 결과 보여줌
-export const showVoteToResult = (mafiaIo, eventName, roomId, voteBoard) => {
+export const showVoteToResult = (mafiaIo, roomId, eventName, voteBoard) => {
   mafiaIo.to(roomId).emit(eventName, voteBoard);
 };
 

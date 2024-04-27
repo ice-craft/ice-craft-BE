@@ -589,15 +589,24 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1TurnAllUserCameraMikeOff", async (roomId) => {
+  socket.on("r1TurnAllUserCameraMikeOff", async () => {
     console.log("r1TurnAllUserCameraMikeOff 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1TurnAllUserCameraMikeOff",
-      total_user_count
-    );
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1TurnAllUserCameraMikeOff: true });
+      isDone = await getStatus(
+        roomId,
+        "r1TurnAllUserCameraMikeOff",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r1TurnAllUserCameraMikeOffError]");
+      socket.emit("r1TurnAllUserCameraMikeOffError");
+    }
 
     if (isDone) {
       r1DecideMafiaToKillPlayer(roomId);
@@ -1027,7 +1036,7 @@ const r1ShowVoteToResult = async (roomId) => {
   //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
   console.log("투표 결과 전송");
-  showVoteToResult(mafiaIo, "r1ShowVoteToResult", voteBoard);
+  showVoteToResult(mafiaIo, roomId, "r1ShowVoteToResult", voteBoard);
 };
 
 const r1ShowMostVotedPlayer = async (roomId) => {
@@ -1127,10 +1136,9 @@ const r1KillMostVotedPlayer = async (roomId) => {
 
 const r1TurnAllUserCameraMikeOff = async (roomId) => {
   console.log("r1TurnAllUserCameraMikeOff 송신");
-  //NOTE - 모든 플레이어들의 카메라와 마이크 끔
-  console.log("카메라, 마이크 끔");
-  const allPlayers = await getUserIdInRoom(roomId);
-  mafiaIo.to(roomId).emit("r1TurnAllUserCameraMikeOff", allPlayers);
+
+  console.log("모든 플레이어의 카메라와 마이크 끔");
+  mafiaIo.to(roomId).emit("r1TurnAllUserCameraMikeOff");
 };
 
 const r1DecideMafiaToKillPlayer = (roomId) => {
