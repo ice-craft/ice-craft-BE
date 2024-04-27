@@ -31,6 +31,7 @@ import {
   savePlayer,
   setPlayerRole,
   setReady,
+  setStatus,
   voteTo,
   voteYesOrNo,
 } from "./api/supabase/gamePlayAPI.js";
@@ -136,21 +137,19 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("setReady", async (userId, ready, roomId) => {
-    console.log(
-      `[setReady] userId : ${userId}, ready : ${ready}, roomId : ${roomId}`
-    );
+    console.log("setReady 수신");
+
+    socket.data.userId = userId; //NOTE - 테스트용 코드
+    socket.data.roomId = roomId; //NOTE - 테스트용 코드
+
     try {
-      const result = await setReady(userId, ready);
-      if (result.length === 0) {
-        throw new Error();
-      }
-      console.log("ready하는데 성공했습니다.");
-      mafiaIo.to(roomId).emit("updateUserReady", userId, ready);
-      canGameStart(roomId);
+      await setStatus(userId, { is_ready: ready });
     } catch (error) {
       console.log("[setReadyError] 레디를 설정하는데 실패했습니다.");
       socket.emit("setReadyError", "레디를  설정하는데 실패했습니다.");
     }
+    mafiaIo.to(roomId).emit("updateUserReady", userId, ready);
+    canGameStart(roomId);
   });
 
   socket.on("voteTo", async (userId) => {
@@ -201,10 +200,19 @@ mafiaIo.on("connection", (socket) => {
     socket.broadcast.emit("server", `${nickname}님이 나가셨습니다.`);
   });
 
-  socket.on("r0NightStart", async (roomId) => {
+  socket.on("r0NightStart", async () => {
     console.log("r0NightStart 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(roomId, "r0NightStart", total_user_count);
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = null;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r0NightStart: true });
+      isDone = await getStatus(roomId, "r0NightStart", total_user_count);
+    } catch (error) {
+      socket.emit("r0NightStartError");
+    }
 
     if (isDone) {
       r0TurnAllUserCameraMikeOff(roomId);
@@ -770,25 +778,14 @@ const play = async (roomId) => {
 
 const r0NightStart = (roomId) => {
   console.log("r0NightStart 송신");
-  showModal(
-    mafiaIo,
-    roomId,
-    "r0NightStart",
-    "제목",
-    "밤이 시작되었습니다.",
-    500,
-    "닉네임",
-    true
-  );
+  mafiaIo.to(roomId).emit("r0NightStart");
 };
 
 const r0TurnAllUserCameraMikeOff = async (roomId) => {
-  console.log("카메라, 마이크 끔");
-
-  const allPlayers = await getUserIdInRoom(roomId);
-
   console.log("r0TurnAllUserCameraMikeOff 송신");
-  mafiaIo.to(roomId).emit("r0TurnAllUserCameraMikeOff", allPlayers);
+  console.log("모든 유저 카메라, 마이크 끔");
+
+  mafiaIo.to(roomId).emit("r0TurnAllUserCameraMikeOff");
 };
 
 //FIXME - 지울 수 있음

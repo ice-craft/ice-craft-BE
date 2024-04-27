@@ -1,18 +1,5 @@
 import { supabase } from "./client.js";
 
-export const setReady = async (user_id, is_ready) => {
-  const { data, error } = await supabase
-    .from("room_user_match_table")
-    .update({ is_ready })
-    .eq("user_id", user_id)
-    .select();
-
-  if (error) {
-    throw new Error();
-  }
-  return data;
-};
-
 export const checkPlayerCountEnough = async (room_id, total_user_count) => {
   const { count, error } = await supabase
     .from("room_user_match_table")
@@ -293,6 +280,19 @@ export const getStatus = async (room_id, status, total_user_count) => {
     throw new Error();
   }
   return total_user_count === count;
+};
+
+export const setStatus = async (user_id, status) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .update(status)
+    .eq("user_id", user_id)
+    .select();
+
+  if (error) {
+    throw new Error();
+  }
+  return data;
 };
 
 export const getRoleMaxCount = async (total_user_count, role) => {
