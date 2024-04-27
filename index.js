@@ -460,15 +460,24 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1ShowMostVotedPlayer", async (roomId, isValid) => {
+  socket.on("r1ShowMostVotedPlayer", async (isValid) => {
     console.log("r1ShowMostVotedPlayer 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1ShowMostVotedPlayer",
-      total_user_count
-    );
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1ShowMostVotedPlayer: true });
+      isDone = await getStatus(
+        roomId,
+        "r1ShowMostVotedPlayer",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r1ShowMostVotedPlayerError]");
+      socket.emit("r1ShowMostVotedPlayerError");
+    }
 
     if (isDone && isValid) {
       console.log("유효한 투표");
@@ -1006,25 +1015,13 @@ const r1ShowMostVotedPlayer = async (roomId) => {
       .to(roomId)
       .emit(
         "r1ShowMostVotedPlayer",
-        "제목",
         `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`,
-        500,
-        "닉네임",
-        true,
         true
       );
   } else {
     mafiaIo
       .to(roomId)
-      .emit(
-        "r1ShowMostVotedPlayer",
-        "제목",
-        "투표가 유효하지 않습니다.",
-        500,
-        "닉네임",
-        true,
-        false
-      );
+      .emit("r1ShowMostVotedPlayer", "투표가 유효하지 않습니다.", false);
   }
 };
 
