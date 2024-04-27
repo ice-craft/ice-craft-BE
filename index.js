@@ -156,7 +156,7 @@ mafiaIo.on("connection", (socket) => {
     console.log("r0NightStart 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
-    let isDone = null;
+    let isDone = false;
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
@@ -178,7 +178,7 @@ mafiaIo.on("connection", (socket) => {
     console.log("r0TurnAllUserCameraMikeOff 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
-    let isDone = null;
+    let isDone = false;
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
@@ -202,12 +202,18 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r0SetAllUserRole", async (roomId) => {
     console.log("r0SetAllUserRole 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r0SetAllUserRole",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r0SetAllUserRole: true });
+      isDone = await getStatus(roomId, "r0SetAllUserRole", total_user_count);
+    } catch (error) {
+      console.log("[r0SetAllUserRoleError]");
+      socket.emit("r0SetAllUserRoleError");
+    }
 
     if (isDone) {
       r0ShowAllUserRole(roomId);
@@ -762,19 +768,8 @@ const r0TurnAllUserCameraMikeOff = async (roomId) => {
   mafiaIo.to(roomId).emit("r0TurnAllUserCameraMikeOff");
 };
 
-//FIXME - 지울 수 있음
 const r0SetAllUserRole = (roomId) => {
-  console.log("r0SetAllUserRole 송신");
-  showModal(
-    mafiaIo,
-    roomId,
-    "r0SetAllUserRole",
-    "제목",
-    "역할 배정을 시작하겠습니다.",
-    500,
-    "닉네임",
-    true
-  );
+  mafiaIo.to(roomId).emit("r0SetAllUserRole");
 };
 
 const r0ShowAllUserRole = async (roomId) => {
