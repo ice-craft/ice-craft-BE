@@ -615,15 +615,24 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1DecideMafiaToKillPlayer", async (roomId) => {
+  socket.on("r1DecideMafiaToKillPlayer", async () => {
     console.log("r1DecideMafiaToKillPlayer 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1DecideMafiaToKillPlayer",
-      total_user_count
-    );
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1DecideMafiaToKillPlayer: true });
+      isDone = await getStatus(
+        roomId,
+        "r1DecideMafiaToKillPlayer",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r1DecideMafiaToKillPlayerError]");
+      socket.emit("r1DecideMafiaToKillPlayerError");
+    }
 
     if (isDone) {
       r1TurnMafiaUserCameraOn(roomId);
@@ -1143,17 +1152,9 @@ const r1TurnAllUserCameraMikeOff = async (roomId) => {
 
 const r1DecideMafiaToKillPlayer = (roomId) => {
   console.log("r1DecideMafiaToKillPlayer 송신");
+
   console.log("마피아는 누구를 죽일지 결정해주세요.");
-  showModal(
-    mafiaIo,
-    roomId,
-    "r1DecideMafiaToKillPlayer",
-    "제목",
-    "마피아는 누구를 죽일지 결정해주세요.",
-    500,
-    "닉네임",
-    false
-  );
+  mafiaIo.to(roomId).emit("r1DecideMafiaToKillPlayer");
 };
 
 const r1TurnMafiaUserCameraOn = async (roomId) => {
