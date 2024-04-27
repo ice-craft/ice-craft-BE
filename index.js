@@ -749,23 +749,27 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1DecidePoliceToDoubtPlayer", async (roomId, userId) => {
+  socket.on("r1DecidePoliceToDoubtPlayer", async (userId) => {
     console.log("r1DecidePoliceToDoubtPlayer 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
     try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1DecidePoliceToDoubtPlayer: true });
+      isDone = await getStatus(
+        roomId,
+        "r1DecidePoliceToDoubtPlayer",
+        total_user_count
+      );
       if (userId) {
-        await choosePlayer(userId, "경찰");
+        choosePlayer(userId, "경찰", new Date());
       }
     } catch (error) {
-      console.log("경찰의 지목 실패");
+      console.log("[r1DecidePoliceToDoubtPlayerError]");
+      socket.emit("r1DecidePoliceToDoubtPlayerError");
     }
-
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1DecidePoliceToDoubtPlayer",
-      total_user_count
-    );
 
     if (isDone) {
       r1ShowDoubtedPlayer(roomId);
@@ -1239,7 +1243,8 @@ const r1DecideDoctorToSavePlayer = async (roomId) => {
 };
 
 const r1DecidePoliceToDoubtPlayer = async (roomId) => {
-  //NOTE - 방 구성인원 중 경찰 있을 경우
+  console.log("r1DecidePoliceToDoubtPlayer");
+
   console.log("경찰역할이 방에 있다면 실행");
   const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
   const maxPoliceCount = await getRoleMaxCount(totalUserCount, "police_count");
@@ -1250,27 +1255,14 @@ const r1DecidePoliceToDoubtPlayer = async (roomId) => {
       .to(roomId)
       .emit(
         "r1DecidePoliceToDoubtPlayer",
-        "제목",
         "경찰은 마피아 의심자를 결정해주세요.",
-        500,
-        "닉네임",
-        false,
         true,
         policePlayer
       );
   } else {
     mafiaIo
       .to(roomId)
-      .emit(
-        "r1DecidePoliceToDoubtPlayer",
-        "제목",
-        "경찰이 없습니다.",
-        500,
-        "닉네임",
-        false,
-        false,
-        null
-      );
+      .emit("r1DecidePoliceToDoubtPlayer", "경찰이 없습니다.", false, null);
   }
 };
 
