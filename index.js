@@ -512,16 +512,21 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1VoteYesOrNo", async (roomId, userId, yesOrNo) => {
+  socket.on("r1VoteYesOrNo", async (userId, yesOrNo) => {
     console.log("r1VoteYesOrNo 수신");
-
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(roomId, "r1VoteYesOrNo", total_user_count);
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
     try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1VoteYesOrNo: true });
+      isDone = await getStatus(roomId, "r1VoteYesOrNo", total_user_count);
       await voteYesOrNo(userId, yesOrNo);
+      console.log(`${userId}가 ${yesOrNo} 투표를 함`);
     } catch (error) {
-      console.log("[r1VoteYesOrNo] 찬성/반대 투표하는데 실패했습니다.");
+      console.log("[r1LastTalkError]");
+      socket.emit("r1LastTalkError");
     }
 
     if (isDone) {
@@ -1053,16 +1058,7 @@ const r1LastTalk = async (roomId) => {
 const r1VoteYesOrNo = (roomId) => {
   console.log("r1VoteYesOrNo 송신");
   console.log("찬성/반대 투표를 해주세요.");
-  showModal(
-    mafiaIo,
-    roomId,
-    "r1VoteYesOrNo",
-    "제목",
-    "찬성/반대 투표를 해주세요.",
-    500,
-    "닉네임",
-    false
-  );
+  mafiaIo.to(roomId).emit("r1VoteYesOrNo", "찬성/반대 투표를 해주세요.");
 };
 
 const r1ShowVoteYesOrNoResult = async (roomId) => {
