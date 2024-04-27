@@ -492,9 +492,18 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r1LastTalk", async (roomId) => {
     console.log("r1LastTalk 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(roomId, "r1LastTalk", total_user_count);
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1LastTalk: true });
+      isDone = await getStatus(roomId, "r1LastTalk", total_user_count);
+    } catch (error) {
+      console.log("[r1LastTalkError]");
+      socket.emit("r1LastTalkError");
+    }
 
     if (isDone) {
       r1VoteYesOrNo(roomId);
@@ -1032,16 +1041,13 @@ const r1LastTalk = async (roomId) => {
   console.log(
     `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`
   );
-  showModal(
-    mafiaIo,
-    roomId,
-    "r1LastTalk",
-    "제목",
-    `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`,
-    500,
-    "닉네임",
-    false
-  );
+
+  mafiaIo
+    .to(roomId)
+    .emit(
+      "r1LastTalk",
+      `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`
+    );
 };
 
 const r1VoteYesOrNo = (roomId) => {
