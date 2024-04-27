@@ -667,21 +667,25 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1GestureToMafiaEachOther", async (roomId, userId) => {
+  socket.on("r1GestureToMafiaEachOther", async (userId, date) => {
     console.log("r1GestureToMafiaEachOther 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
     try {
-      await choosePlayer(userId, "마피아");
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1GestureToMafiaEachOther: true });
+      isDone = await getStatus(
+        roomId,
+        "r1GestureToMafiaEachOther",
+        total_user_count
+      );
+      await choosePlayer(userId, "마피아", date);
     } catch (error) {
-      console.log("마피아의 지목이 실했습니다.");
+      console.log("[r1GestureToMafiaEachOtherError]");
+      socket.emit("r1GestureToMafiaEachOtherError");
     }
-
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1GestureToMafiaEachOther",
-      total_user_count
-    );
 
     if (isDone) {
       r1TurnMafiaUserCameraOff(roomId);
@@ -1184,12 +1188,7 @@ const r1GestureToMafiaEachOther = async (roomId) => {
     .to(roomId)
     .emit(
       "r1GestureToMafiaEachOther",
-      "제목",
-      "누구를 죽일지 제스처를 통해 상의하세요.",
-      500,
-      "닉네임",
-      false,
-      mafiaPlayers
+      "누구를 죽일지 제스처를 통해 상의하세요."
     );
 };
 
