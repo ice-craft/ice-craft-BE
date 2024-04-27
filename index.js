@@ -224,12 +224,18 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r0ShowAllUserRole", async (roomId) => {
     console.log("r0ShowAllUserRole 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r0ShowAllUserRole",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r0ShowAllUserRole: true });
+      isDone = await getStatus(roomId, "r0ShowAllUserRole", total_user_count);
+    } catch (error) {
+      console.log("[r0ShowAllUserRoleError]");
+      socket.emit("r0ShowAllUserRoleError");
+    }
 
     if (isDone) {
       r0ShowMafiaUserEachOther(roomId);
@@ -769,6 +775,7 @@ const r0TurnAllUserCameraMikeOff = async (roomId) => {
 };
 
 const r0SetAllUserRole = (roomId) => {
+  console.log("r0SetAllUserRole 송신");
   mafiaIo.to(roomId).emit("r0SetAllUserRole");
 };
 
@@ -802,7 +809,7 @@ const r0ShowAllUserRole = async (roomId) => {
     await setPlayerRole(allPlayers[playerIndex], "마피아");
   }
 
-  mafiaPlayers = await getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
+  mafiaPlayers = await getPlayerByRole(roomId, "마피아");
 
   console.log("방에 의사가 있다면 실행");
   if (maxDoctorCount !== 0) {
@@ -829,22 +836,13 @@ const r0ShowAllUserRole = async (roomId) => {
     role["경찰"] = policePlayer;
   }
   role["시민"] = citizenPlayers;
-  console.log("시민 : ", role["시민"]);
+
   mafiaIo.to(roomId).emit("r0ShowAllUserRole", role);
 };
 
 const r0ShowMafiaUserEachOther = (roomId) => {
   console.log("r0ShowMafiaUserEachOther 송신");
-  showModal(
-    mafiaIo,
-    roomId,
-    "r0ShowMafiaUserEachOther",
-    "제목",
-    "마피아들은 고개를 들어 서로를 확인해 주세요.",
-    500,
-    "닉네임",
-    true
-  );
+  mafiaIo.to(roomId).emit("r0ShowMafiaUserEachOther");
 };
 
 const r0TurnMafiaUserCameraOn = async (roomId) => {
