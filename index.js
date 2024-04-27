@@ -272,12 +272,22 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r0TurnMafiaUserCameraOn", async (roomId) => {
     console.log("r0TurnMafiaUserCameraOn 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r0TurnMafiaUserCameraOn",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r0TurnMafiaUserCameraOn: true });
+      isDone = await getStatus(
+        roomId,
+        "r0TurnMafiaUserCameraOn",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r0TurnMafiaUserCameraOnError]");
+      socket.emit("r0TurnMafiaUserCameraOnError");
+    }
 
     if (isDone) {
       r0TurnMafiaUserCameraOff(roomId);
@@ -856,12 +866,12 @@ const r0ShowMafiaUserEachOther = (roomId) => {
 };
 
 const r0TurnMafiaUserCameraOn = async (roomId) => {
-  let mafiaPlayers = await getPlayerByRole(roomId, "마피아"); //NOTE - 마피아 플레이어 참조 전에 실행
+  console.log("r0TurnMafiaUserCameraOn 송신");
+  let mafiaPlayers = await getPlayerByRole(roomId, "마피아");
 
   //NOTE - 마피아 유저들 화면의 마피아 유저 화상 카메라와 마이크만 켬
-  console.log("마피아 유저들의 카메라, 마이크 켬");
+  console.log("마피아 유저들의 카메라 켬");
 
-  console.log("r0TurnMafiaUserCameraOn 송신");
   mafiaIo.to(roomId).emit("r0TurnMafiaUserCameraOn", mafiaPlayers);
 };
 const r0TurnMafiaUserCameraOff = async (roomId) => {
