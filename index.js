@@ -538,13 +538,22 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r1ShowVoteYesOrNoResult", async (roomId) => {
     console.log("r1ShowVoteYesOrNoResult 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1ShowVoteYesOrNoResult",
-      total_user_count
-    );
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1ShowVoteYesOrNoResult: true });
+      isDone = await getStatus(
+        roomId,
+        "r1ShowVoteYesOrNoResult",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r1ShowVoteYesOrNoResultError]");
+      socket.emit("r1ShowVoteYesOrNoResultError");
+    }
 
     if (isDone) {
       r1KillMostVotedPlayer(roomId);
@@ -1062,8 +1071,10 @@ const r1VoteYesOrNo = (roomId) => {
 };
 
 const r1ShowVoteYesOrNoResult = async (roomId) => {
+  console.log("r1ShowVoteYesOrNoResult 송신");
   console.log("투표 결과 나옴");
   const yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
+
   showVoteYesOrNoResult(
     mafiaIo,
     roomId,
