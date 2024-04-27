@@ -414,17 +414,22 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1VoteToMafia", async (roomId, votedPlayer) => {
+  socket.on("r1VoteToMafia", async (votedPlayer) => {
     console.log("r1VoteToMafia 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
     try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1VoteToMafia: true });
+      isDone = await getStatus(roomId, "r1VoteToMafia", total_user_count);
       await voteTo(votedPlayer);
+      console.log(`${userId}는 ${votedPlayer}에게 투표`);
     } catch (error) {
-      console.log("[r1VoteToMafia] 투표하는데 실패했습니다.");
+      console.log("[r1VoteToMafiaError]");
+      socket.emit("r1VoteToMafiaError");
     }
-
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(roomId, "r1VoteToMafia", total_user_count);
 
     if (isDone) {
       r1ShowVoteToResult(roomId);
@@ -764,20 +769,20 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("disconnect", async () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
-    try {
-      const roomId = socket.data.roomId;
-      const userId = socket.data.userId;
-      const gameOver = await whoWins(roomId);
+    // try {
+    //   const roomId = socket.data.roomId;
+    //   const userId = socket.data.userId;
+    //   const gameOver = await whoWins(roomId);
 
-      await exitRoom(roomId, userId);
-      await updateUserInRoom(mafiaIo, roomId);
+    //   await exitRoom(roomId, userId); //NOTE - 테스트 중이라서 주석 처리
+    //   await updateUserInRoom(mafiaIo, roomId); //NOTE - 테스트 중이라서 주석 처리
 
-      if (gameOver.isValid) {
-        showWhoWins(gameOver);
-      }
-    } catch (error) {
-      console.log("방에서 나가기에 실패했습니다.");
-    }
+    //   if (gameOver.isValid) {
+    //     showWhoWins(gameOver); //NOTE - 테스트 중이라서 주석 처리
+    //   }
+    // } catch (error) {
+    //   console.log("방에서 나가기에 실패했습니다.");
+    // }
   });
 });
 
@@ -817,7 +822,7 @@ const canGameStart = async (roomId) => {
   if (canStart) {
     play(roomId);
   } else {
-    console.log("준비X");
+    console.log("게임 준비X");
   }
 };
 
@@ -966,19 +971,9 @@ const r1MeetingOver = (roomId) => {
 };
 
 const r1VoteToMafia = (roomId) => {
-  console.log("마피아일 것 같은 사람의 화면을 클릭해주세요.");
   console.log("r1VoteToMafia 송신");
-
-  showModal(
-    mafiaIo,
-    roomId,
-    "r1VoteToMafia",
-    "제목",
-    "마피아일 것 같은 사람의 화면을 클릭해주세요.",
-    500,
-    "닉네임",
-    true
-  );
+  console.log("마피아일 것 같은 사람의 화면을 클릭해주세요.");
+  mafiaIo.to(roomId).emit("r1VoteToMafia");
 };
 
 const r1ShowVoteToResult = async (roomId) => {
