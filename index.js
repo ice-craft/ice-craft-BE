@@ -780,12 +780,18 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r1ShowDoubtedPlayer", async (roomId) => {
     console.log("r1ShowDoubtedPlayer 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1ShowDoubtedPlayer",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1ShowDoubtedPlayer: true });
+      isDone = await getStatus(roomId, "r1ShowDoubtedPlayer", total_user_count);
+    } catch (error) {
+      console.log("[r1ShowDoubtedPlayerError]");
+      socket.emit("r1ShowDoubtedPlayerError");
+    }
 
     if (isDone) {
       r1KillPlayerByRole(roomId);
@@ -1268,36 +1274,41 @@ const r1DecidePoliceToDoubtPlayer = async (roomId) => {
 
 const r1ShowDoubtedPlayer = async (roomId) => {
   console.log("r1ShowDoubtedPlayer 송신");
-  //NOTE - 경찰이 살아있을 경우
+
   const policePlayer = await getPlayerByRole(roomId, "경찰");
+
   console.log("경찰이 살아있다면 실행");
   if (policePlayer) {
-    const playerDoubted = await checkChosenPlayer(roomId, "경찰"); //NOTE - 0번 인덱스 플레이어가 마피아인지 의심
+    const playerDoubted = await checkChosenPlayer(roomId, "경찰");
     const isPlayerMafia = await checkPlayerMafia(playerDoubted);
 
-    if (isPlayerMafia) {
+    if (isPlayerMafia === true) {
       console.log("해당 플레이어는 마피아가 맞습니다.");
       mafiaIo.to(roomId),
         emit(
           "r1ShowDoubtedPlayer",
-          "제목",
           "해당 플레이어는 마피아가 맞습니다.",
-          500,
-          "닉네임",
-          false,
+          true,
           policePlayer
         );
-    } else {
+    } else if (isPlayerMafia === false) {
       console.log("해당 플레이어는 마피아가 아닙니다.");
       mafiaIo
         .to(roomId)
         .emit(
           "r1ShowDoubtedPlayer",
-          "제목",
           "해당 플레이어는 마피아가 아닙니다.",
-          500,
-          "닉네임",
           false,
+          policePlayer
+        );
+    } else {
+      console.log("경찰이 지목하지 않았습니다.");
+      mafiaIo
+        .to(roomId)
+        .emit(
+          "r1ShowDoubtedPlayer",
+          "경찰이 지목하지 않았습니다.",
+          null,
           policePlayer
         );
     }

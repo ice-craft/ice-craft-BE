@@ -201,7 +201,6 @@ export const checkChosenPlayer = async (room_id, role) => {
     .order("choose_time", { ascending: true });
 
   if (error) {
-    console.log(error);
     throw new Error();
   }
 
@@ -213,6 +212,10 @@ export const checkChosenPlayer = async (room_id, role) => {
 };
 
 export const checkPlayerMafia = async (user_id) => {
+  if (!user_id) {
+    return null;
+  }
+
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id")
