@@ -370,7 +370,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1FindMafia", async (roomId) => {
+  socket.on("r1FindMafia", async () => {
     console.log("r1FindMafia 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -386,22 +386,31 @@ mafiaIo.on("connection", (socket) => {
     }
 
     if (isDone) {
-      r1FindMafia(roomId);
+      r1MeetingOver(roomId);
     } else {
       console.log("r1FindMafia 준비 X");
     }
   });
 
-  socket.on("r1MetingOver", async (roomId) => {
+  socket.on("r1MeetingOver", async () => {
     console.log("r1MetingOver 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(roomId, "r1MetingOver", total_user_count);
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1MeetingOver: true });
+      isDone = await getStatus(roomId, "r1MeetingOver", total_user_count);
+    } catch (error) {
+      console.log("[r1MeetingOverError]");
+      socket.emit("r1MeetingOverError");
+    }
 
     if (isDone) {
       r1VoteToMafia(roomId);
     } else {
-      console.log("r1MetingOver 준비 X");
+      console.log("r1MeetingOver 준비 X");
     }
   });
 
@@ -949,20 +958,11 @@ const r1FindMafia = (roomId) => {
   mafiaIo.to(roomId).emit("r1FindMafia");
 };
 
-const r1MetingOver = (roomId) => {
+const r1MeetingOver = (roomId) => {
+  console.log("r1MetingOver 수신");
   console.log("토론이 끝났습니다.");
-  console.log("r1MetingOver 송신");
 
-  showModal(
-    mafiaIo,
-    roomId,
-    "r1MetingOver",
-    "제목",
-    "토론이 끝났습니다.",
-    500,
-    "닉네임",
-    true
-  );
+  mafiaIo.to(roomId).emit("r1MeetingOver");
 };
 
 const r1VoteToMafia = (roomId) => {
