@@ -28,6 +28,7 @@ import {
   getVoteToResult,
   killPlayer,
   resetPlayerStatus,
+  resetVote,
   savePlayer,
   setPlayerRole,
   setStatus,
@@ -490,7 +491,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1LastTalk", async (roomId) => {
+  socket.on("r1LastTalk", async () => {
     console.log("r1LastTalk 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -512,7 +513,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1VoteYesOrNo", async (userId, yesOrNo) => {
+  socket.on("r1VoteYesOrNo", async (yesOrNo) => {
     console.log("r1VoteYesOrNo 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -536,7 +537,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1ShowVoteYesOrNoResult", async (roomId) => {
+  socket.on("r1ShowVoteYesOrNoResult", async () => {
     console.log("r1ShowVoteYesOrNoResult 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -562,21 +563,26 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1KillMostVotedPlayer", async (roomId) => {
+  socket.on("r1KillMostVotedPlayer", async () => {
     console.log("r1KillMostVotedPlayer 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const gameOver = await whoWins(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1KillMostVotedPlayer",
-      total_user_count
-    );
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1KillMostVotedPlayer: true });
+      isDone = await getStatus(
+        roomId,
+        "r1KillMostVotedPlayer",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r1KillMostVotedPlayerError]");
+      socket.emit("r1KillMostVotedPlayerError");
+    }
 
-    if (isDone && gameOver.isValid) {
-      // await showWhoWins(gameOver); //NOTE - 테스트 용이라서 주석 처리
-      r1TurnAllUserCameraMikeOff(roomId);
-    } else if (isDone && !gameOver.isValid) {
+    if (isDone) {
       r1TurnAllUserCameraMikeOff(roomId);
     } else {
       console.log("r1KillMostVotedPlayer 준비 X");
@@ -972,6 +978,7 @@ const r0TurnMafiaUserCameraOn = async (roomId) => {
 
   mafiaIo.to(roomId).emit("r0TurnMafiaUserCameraOn", mafiaPlayers);
 };
+
 const r0TurnMafiaUserCameraOff = async (roomId) => {
   console.log("r0TurnMafiaUserCameraOff 송신");
   let mafiaPlayers = await getPlayerByRole(roomId, "마피아");
@@ -1017,7 +1024,7 @@ const r1ShowVoteToResult = async (roomId) => {
   console.log("r1ShowVoteToResult 송신");
   console.log("투표 개표");
   const voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-  //await moderator.resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+  //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
   console.log("투표 결과 전송");
   showVoteToResult(mafiaIo, "r1ShowVoteToResult", voteBoard);
@@ -1081,7 +1088,7 @@ const r1ShowVoteYesOrNoResult = async (roomId) => {
     "r1ShowVoteYesOrNoResult",
     yesOrNoVoteResult.detail
   ); //NOTE - 투표 결과를 방의 유저들에게 보여줌
-  // await moderator.resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석};
+  // await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
 };
 
 const r1KillMostVotedPlayer = async (roomId) => {
@@ -1102,49 +1109,19 @@ const r1KillMostVotedPlayer = async (roomId) => {
       console.log("마피아가 죽었습니다.");
       mafiaIo
         .to(roomId)
-        .emit(
-          "r1KillMostVotedPlayer",
-          "제목",
-          "마피아가 죽었습니다.",
-          500,
-          "닉네임",
-          false,
-          true,
-          killedPlayer,
-          "마피아"
-        );
+        .emit("r1KillMostVotedPlayer", "마피아가 죽었습니다.", killedPlayer);
     } else {
       console.log("시민이 죽었습니다.");
       mafiaIo
         .to(roomId)
-        .emit(
-          "r1KillMostVotedPlayer",
-          "제목",
-          "시민이 죽었습니다.",
-          500,
-          "닉네임",
-          false,
-          true,
-          killedPlayer,
-          "시민"
-        );
+        .emit("r1KillMostVotedPlayer", "시민이 죽었습니다.", killedPlayer);
     }
   } else {
     //NOTE - 투표 실패, 동률이 나옴
     console.log("동률 나옴");
-    showModal(
-      mafiaIo,
-      roomId,
-      "r1KillMostVotedPlayer",
-      "제목",
-      "동률 나옴",
-      500,
-      "닉네임",
-      false,
-      false,
-      null,
-      null
-    );
+    mafiaIo
+      .to(roomId)
+      .emit("r1KillMostVotedPlayer", "동률이 나왔습니다.", null);
   }
 };
 
@@ -1155,6 +1132,7 @@ const r1TurnAllUserCameraMikeOff = async (roomId) => {
   const allPlayers = await getUserIdInRoom(roomId);
   mafiaIo.to(roomId).emit("r1TurnAllUserCameraMikeOff", allPlayers);
 };
+
 const r1DecideMafiaToKillPlayer = (roomId) => {
   console.log("r1DecideMafiaToKillPlayer 송신");
   console.log("마피아는 누구를 죽일지 결정해주세요.");
