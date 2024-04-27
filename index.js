@@ -438,15 +438,20 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1ShowVoteToResult", async (roomId) => {
+  socket.on("r1ShowVoteToResult", async () => {
     console.log("r1ShowVoteToResult 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1ShowVoteToResult",
-      total_user_count
-    );
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1ShowVoteToResult: true });
+      isDone = await getStatus(roomId, "r1ShowVoteToResult", total_user_count);
+    } catch (error) {
+      console.log("[r1ShowVoteToResultError]");
+      socket.emit("r1ShowVoteToResultError");
+    }
 
     if (isDone) {
       r1ShowMostVotedPlayer(roomId);
@@ -983,7 +988,7 @@ const r1ShowVoteToResult = async (roomId) => {
   //await moderator.resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
   console.log("투표 결과 전송");
-  showVoteToResult(mafiaIo, "r1ShowVoteToResult", roomId, voteBoard);
+  showVoteToResult(mafiaIo, "r1ShowVoteToResult", voteBoard);
 };
 
 const r1ShowMostVotedPlayer = async (roomId) => {
