@@ -145,59 +145,11 @@ mafiaIo.on("connection", (socket) => {
     try {
       await setStatus(userId, { is_ready: ready });
     } catch (error) {
-      console.log("[setReadyError] 레디를 설정하는데 실패했습니다.");
+      console.log("[setReadyError]");
       socket.emit("setReadyError", "레디를  설정하는데 실패했습니다.");
     }
     mafiaIo.to(roomId).emit("updateUserReady", userId, ready);
     canGameStart(roomId);
-  });
-
-  socket.on("voteTo", async (userId) => {
-    console.log(`[voteTo] UserId : ${userId}`);
-
-    try {
-      await voteTo(userId);
-      socket.emit("voteTo", "투표하는데 성공했습니다.");
-    } catch (error) {
-      console.log("[voteToError] 투표하는데 실패했습니다.");
-      socket.emit("voteToError", "투표하는데 실패했습니다.");
-    }
-  });
-
-  socket.on("voteYesOrNo", async (userId, yesOrNo) => {
-    console.log(`[voteYesOrNo] userId : ${userId}, yesOrNo : ${yesOrNo}`);
-
-    try {
-      await voteYesOrNo(userId, yesOrNo);
-      socket.emit("voteYesOrNo", "찬성/반대 투표하는데 성공했습니다.");
-    } catch (error) {
-      console.log("[voteYesOrNoError] 찬성/반대 투표하는데 실패했습니다.");
-      socket.emit("voteYesOrNoError", "찬성/반대 투표하는데 실패했습니다.");
-    }
-  });
-
-  socket.on("choosePlayer", async (userId, role) => {
-    console.log(`[choosePlayer] userId : ${userId}, role : ${role} `);
-
-    try {
-      await choosePlayer(userId, role);
-      socket.emit(
-        "choosePlayer",
-        "역할을 수행할 대상을 정하는데 성공했습니다."
-      );
-    } catch (error) {
-      console.log(
-        "[choosePlayerError] 역할을 수행할 대상을 정하는데 실패했습니다."
-      );
-      socket.emit(
-        "choosePlayerError",
-        "역할을 수행할 대상을 정하는데 실패했습니다."
-      );
-    }
-  });
-
-  socket.on("exit", (nickname) => {
-    socket.broadcast.emit("server", `${nickname}님이 나가셨습니다.`);
   });
 
   socket.on("r0NightStart", async () => {
@@ -211,6 +163,7 @@ mafiaIo.on("connection", (socket) => {
       await setStatus(userId, { r0NightStart: true });
       isDone = await getStatus(roomId, "r0NightStart", total_user_count);
     } catch (error) {
+      console.log("[r0NightStartError]");
       socket.emit("r0NightStartError");
     }
 
@@ -221,14 +174,24 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r0TurnAllUserCameraMikeOff", async (roomId) => {
+  socket.on("r0TurnAllUserCameraMikeOff", async () => {
     console.log("r0TurnAllUserCameraMikeOff 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r0TurnAllUserCameraMikeOff",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = null;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r0TurnAllUserCameraMikeOff: true });
+      isDone = await getStatus(
+        roomId,
+        "r0TurnAllUserCameraMikeOff",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r0TurnAllUserCameraMikeOffError]");
+      socket.emit("r0TurnAllUserCameraMikeOffError");
+    }
 
     if (isDone) {
       r0SetAllUserRole(roomId);
@@ -743,22 +706,33 @@ httpServer.listen(port, () => {
 });
 
 const canGameStart = async (roomId) => {
-  console.log("게임 레디 확인");
-  const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
-  console.log("총 인원 :", totalUserCount);
-  console.log("룸 아이디", roomId);
+  console.log("게임 진행 가능 확인");
+  let canStart = false;
+  try {
+    const { total_user_count: totalUserCount } = await getUserCountInRoom(
+      roomId
+    );
+    console.log("총 인원 :", totalUserCount);
+    console.log("룸 아이디", roomId);
 
-  const isAllPlayerEnoughCount = await checkPlayerCountEnough(
-    roomId,
-    totalUserCount
-  ); //NOTE - 플레이어들이 방 정원을 채웠는지
-  const isAllPlayersReady = await checkAllPlayersReady(roomId, totalUserCount); //NOTE - 플레이어들이 전부 레디했는지
-  const canStart = isAllPlayerEnoughCount && isAllPlayersReady;
-  console.log(
-    "인원 충분 :",
-    isAllPlayerEnoughCount,
-    " 전부 레디 :" + isAllPlayersReady
-  );
+    const isAllPlayerEnoughCount = await checkPlayerCountEnough(
+      roomId,
+      totalUserCount
+    ); //NOTE - 플레이어들이 방 정원을 채웠는지
+    const isAllPlayersReady = await checkAllPlayersReady(
+      roomId,
+      totalUserCount
+    ); //NOTE - 플레이어들이 전부 레디했는지
+    canStart = isAllPlayerEnoughCount && isAllPlayersReady;
+    console.log(
+      "인원 충분 :",
+      isAllPlayerEnoughCount,
+      " 전부 레디 :" + isAllPlayersReady
+    );
+  } catch (error) {
+    console.log("[canGameStartError]");
+    mafiaIo.to(roomId).emit("canGameStartError");
+  }
 
   if (canStart) {
     play(roomId);
