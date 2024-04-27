@@ -694,14 +694,24 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1TurnMafiaUserCameraOff", async (roomId) => {
+  socket.on("r1TurnMafiaUserCameraOff", async () => {
     console.log("r1TurnMafiaUserCameraOff 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1TurnMafiaUserCameraOff",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1TurnMafiaUserCameraOff: true });
+      isDone = await getStatus(
+        roomId,
+        "r1TurnMafiaUserCameraOff",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r1TurnMafiaUserCameraOffError]");
+      socket.emit("r1TurnMafiaUserCameraOffError");
+    }
 
     if (isDone) {
       r1DecideDoctorToSavePlayer(roomId);
@@ -1193,8 +1203,8 @@ const r1GestureToMafiaEachOther = async (roomId) => {
 };
 
 const r1TurnMafiaUserCameraOff = async (roomId) => {
-  //NOTE - 마피아 유저들 화면의 마피아 유저 카메라 끔
   console.log("r1TurnMafiaUserCameraOff 송신");
+
   console.log("마피아 유저들의 카메라 끔");
   const mafiaPlayers = await getPlayerByRole(roomId, "마피아");
   mafiaIo.to(roomId).emit("r1TurnMafiaUserCameraOff", mafiaPlayers);
