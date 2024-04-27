@@ -30,7 +30,6 @@ import {
   resetPlayerStatus,
   savePlayer,
   setPlayerRole,
-  setReady,
   setStatus,
   voteTo,
   voteYesOrNo,
@@ -200,7 +199,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r0SetAllUserRole", async (roomId) => {
+  socket.on("r0SetAllUserRole", async () => {
     console.log("r0SetAllUserRole 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -222,7 +221,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r0ShowAllUserRole", async (roomId) => {
+  socket.on("r0ShowAllUserRole", async () => {
     console.log("r0ShowAllUserRole 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -244,7 +243,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r0ShowMafiaUserEachOther", async (roomId) => {
+  socket.on("r0ShowMafiaUserEachOther", async () => {
     console.log("r0ShowMafiaUserEachOther 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -270,7 +269,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r0TurnMafiaUserCameraOn", async (roomId) => {
+  socket.on("r0TurnMafiaUserCameraOn", async () => {
     console.log("r0TurnMafiaUserCameraOn 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -296,7 +295,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r0TurnMafiaUserCameraOff", async (roomId) => {
+  socket.on("r0TurnMafiaUserCameraOff", async () => {
     console.log("r0TurnMafiaUserCameraOff 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -322,10 +321,21 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1MorningStart", async (roomId) => {
+  socket.on("r1MorningStart", async () => {
     console.log("r1MorningStart 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(roomId, "r1MorningStart", total_user_count);
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1MorningStart: true });
+      isDone = await getStatus(roomId, "r1MorningStart", total_user_count);
+      // await resetRoundR0(roomId);//NOTE - 테스트 중이라 주석 처리
+    } catch (error) {
+      console.log("[r1MorningStartError]");
+      socket.emit("r1MorningStartError");
+    }
 
     if (isDone) {
       r1TurnAllUserCameraMikeOn(roomId);
@@ -858,13 +868,21 @@ const r0ShowAllUserRole = async (roomId) => {
   citizenPlayers = await getPlayerByRole(roomId, "시민");
 
   let role = {};
+
   role["마피아"] = mafiaPlayers;
+
   if (doctorPlayer) {
     role["의사"] = doctorPlayer;
+  } else {
+    role["의사"] = null;
   }
+
   if (policePlayer) {
     role["경찰"] = policePlayer;
+  } else {
+    role["경찰"] = null;
   }
+
   role["시민"] = citizenPlayers;
 
   mafiaIo.to(roomId).emit("r0ShowAllUserRole", role);
@@ -896,16 +914,7 @@ const r0TurnMafiaUserCameraOff = async (roomId) => {
 
 const r1MorningStart = (roomId) => {
   console.log("r1MorningStart 송신");
-  showModal(
-    mafiaIo,
-    roomId,
-    "r1MorningStart",
-    "제목",
-    "아침이 시작되었습니다.",
-    500,
-    "닉네임",
-    false
-  );
+  mafiaIo.to(roomId).emit("r1MorningStart");
 };
 
 const r1TurnAllUserCameraMikeOn = async (roomId) => {
