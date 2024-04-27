@@ -344,14 +344,24 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1TurnAllUserCameraMikeOn", async (roomId) => {
+  socket.on("r1TurnAllUserCameraMikeOn", async () => {
     console.log("r1TurnAllUserCameraMikeOn 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1TurnAllUserCameraMikeOn",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1TurnAllUserCameraMikeOn: true });
+      isDone = await getStatus(
+        roomId,
+        "r1TurnAllUserCameraMikeOn",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r1TurnAllUserCameraMikeOnError]");
+      socket.emit("r1TurnAllUserCameraMikeOnError");
+    }
 
     if (isDone) {
       r1FindMafia(roomId);
@@ -920,11 +930,9 @@ const r1MorningStart = (roomId) => {
 const r1TurnAllUserCameraMikeOn = async (roomId) => {
   console.log("r1TurnAllUserCameraMikeOn 송신");
 
-  console.log("카메라, 마이크 켬");
-  const allPlayers = await getUserIdInRoom(roomId);
+  console.log("모든 플레이어들 카메라와 마이크 켬");
 
-  console.log("r1TurnAllUserCameraMikeOn 송신");
-  mafiaIo.to(roomId).emit("r1TurnAllUserCameraMikeOn", allPlayers);
+  mafiaIo.to(roomId).emit("r1TurnAllUserCameraMikeOn");
 };
 
 const r1FindMafia = (roomId) => {
