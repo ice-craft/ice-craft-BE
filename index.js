@@ -720,23 +720,27 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1DecideDoctorToSavePlayer", async (roomId, userId) => {
+  socket.on("r1DecideDoctorToSavePlayer", async (userId) => {
     console.log("r1DecideDoctorToSavePlayer 수신");
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
 
     try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1DecideDoctorToSavePlayer: true });
+      isDone = await getStatus(
+        roomId,
+        "r1DecideDoctorToSavePlayer",
+        total_user_count
+      );
       if (userId) {
-        await choosePlayer(userId, "의사");
+        choosePlayer(userId, "의사", new Date());
       }
     } catch (error) {
-      console.log("의사가 살릴 사람 지목 실패");
+      console.log("[r1DecideDoctorToSavePlayerError]");
+      socket.emit("r1DecideDoctorToSavePlayerError");
     }
-
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1DecideDoctorToSavePlayer",
-      total_user_count
-    );
 
     if (isDone) {
       r1DecidePoliceToDoubtPlayer(roomId);
@@ -1213,7 +1217,6 @@ const r1TurnMafiaUserCameraOff = async (roomId) => {
 const r1DecideDoctorToSavePlayer = async (roomId) => {
   console.log("r1DecideDoctorToSavePlayer 송신");
 
-  //NOTE - 방 구성인원 중 의사가 있을 경우
   console.log("의사 역할이 방에 있다면 실행");
   const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
   const maxDoctorCount = await getRoleMaxCount(totalUserCount, "doctor_count");
@@ -1224,27 +1227,14 @@ const r1DecideDoctorToSavePlayer = async (roomId) => {
       .to(roomId)
       .emit(
         "r1DecideDoctorToSavePlayer",
-        "제목",
         "의사는 누구를 살릴 지 결정하세요.",
-        500,
-        "닉네임",
-        false,
         true,
         doctorPlayer
       );
   } else {
     mafiaIo
       .to(roomId)
-      .emit(
-        "r1DecideDoctorToSavePlayer",
-        "제목",
-        "의사는 누구를 살릴 지 결정하세요.",
-        500,
-        "닉네임",
-        false,
-        false,
-        null
-      );
+      .emit("r1DecideDoctorToSavePlayer", "의사 없음", false, null);
   }
 };
 
