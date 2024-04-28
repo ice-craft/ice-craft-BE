@@ -802,12 +802,20 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r1KillPlayerByRole", async (roomId) => {
     console.log("r1KillPlayerByRole 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r1KillPlayerByRole",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r1KillPlayerByRole: true });
+      isDone = await getStatus(roomId, "r1KillPlayerByRole", total_user_count);
+      await updateUserInRoom(roomId);
+      // await resetRoundR1(roomId); //NOTE - 테스트 용이라 주석처리
+    } catch (error) {
+      console.log("[r1KillPlayerByRoleError]");
+      socket.emit("r1KillPlayerByRoleError");
+    }
 
     if (isDone) {
       r2MorningStart(roomId);
@@ -1298,7 +1306,7 @@ const r1ShowDoubtedPlayer = async (roomId) => {
         .emit(
           "r1ShowDoubtedPlayer",
           "해당 플레이어는 마피아가 아닙니다.",
-          false,
+          true,
           policePlayer
         );
     } else {
@@ -1323,7 +1331,7 @@ const r1ShowDoubtedPlayer = async (roomId) => {
         500,
         "닉네임",
         false,
-        policePlayer
+        null
       );
   }
 };
@@ -1335,10 +1343,10 @@ const r1KillPlayerByRole = async (roomId) => {
   const playerToKill = await checkChosenPlayer(roomId, "마피아");
   const playerToSave = await checkChosenPlayer(roomId, "의사");
 
-  //NOTE - 죽일 플레이어와 살릴 플레이어 결정하고 생사 결정
   console.log("죽일 플레어와 살릴 플레이어 결정하고 생사 결정");
   if (playerToKill !== playerToSave) {
     if (mafiaPlayers) {
+      await killPlayer(playerToKill);
     }
 
     if (doctorPlayer) {
