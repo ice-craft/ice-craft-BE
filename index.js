@@ -333,6 +333,7 @@ mafiaIo.on("connection", (socket) => {
       await setStatus(userId, { r1MorningStart: true });
       isDone = await getStatus(roomId, "r1MorningStart", total_user_count);
       // await resetRoundR0(roomId);//NOTE - 테스트 중이라 주석 처리
+      // await resetRoundR2(roomId); //NOTE - 테스트 중이라 주석 처리
     } catch (error) {
       console.log("[r1MorningStartError]");
       socket.emit("r1MorningStartError");
@@ -667,7 +668,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1GestureToMafiaEachOther", async (userId, date) => {
+  socket.on("r1GestureToMafiaEachOther", async (player, date) => {
     console.log("r1GestureToMafiaEachOther 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -681,7 +682,7 @@ mafiaIo.on("connection", (socket) => {
         "r1GestureToMafiaEachOther",
         total_user_count
       );
-      await choosePlayer(userId, "마피아", date);
+      await choosePlayer(player, "마피아", date);
     } catch (error) {
       console.log("[r1GestureToMafiaEachOtherError]");
       socket.emit("r1GestureToMafiaEachOtherError");
@@ -720,7 +721,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1DecideDoctorToSavePlayer", async (userId) => {
+  socket.on("r1DecideDoctorToSavePlayer", async (player) => {
     console.log("r1DecideDoctorToSavePlayer 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -735,7 +736,7 @@ mafiaIo.on("connection", (socket) => {
         total_user_count
       );
       if (userId) {
-        choosePlayer(userId, "의사", new Date());
+        choosePlayer(player, "의사", new Date());
       }
     } catch (error) {
       console.log("[r1DecideDoctorToSavePlayerError]");
@@ -749,7 +750,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1DecidePoliceToDoubtPlayer", async (userId) => {
+  socket.on("r1DecidePoliceToDoubtPlayer", async (player) => {
     console.log("r1DecidePoliceToDoubtPlayer 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -764,7 +765,7 @@ mafiaIo.on("connection", (socket) => {
         total_user_count
       );
       if (userId) {
-        choosePlayer(userId, "경찰", new Date());
+        choosePlayer(player, "경찰", new Date());
       }
     } catch (error) {
       console.log("[r1DecidePoliceToDoubtPlayerError]");
@@ -810,7 +811,6 @@ mafiaIo.on("connection", (socket) => {
       const { total_user_count } = await getUserCountInRoom(roomId);
       await setStatus(userId, { r1KillPlayerByRole: true });
       isDone = await getStatus(roomId, "r1KillPlayerByRole", total_user_count);
-      await updateUserInRoom(roomId);
       // await resetRoundR1(roomId); //NOTE - 테스트 용이라 주석처리
     } catch (error) {
       console.log("[r1KillPlayerByRoleError]");
@@ -824,7 +824,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r2MorningStart", async (roomId) => {
+  socket.on("r2MorningStart", async () => {
     console.log("r2MorningStart 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -846,7 +846,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r2TurnAllUserCameraMikeOn", async (roomId) => {
+  socket.on("r2TurnAllUserCameraMikeOn", async () => {
     console.log("r2TurnAllUserCameraMikeOn 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -872,15 +872,23 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r2ShowIsPlayerLived", async (roomId) => {
+  socket.on("r2ShowIsPlayerLived", async (isKilled) => {
     console.log("r2ShowIsPlayerLived 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const gameOver = await whoWins(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r2ShowIsPlayerLived",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r2ShowIsPlayerLived: true });
+      isDone = await getStatus(roomId, "r2ShowIsPlayerLived", total_user_count);
+      if (isKilled) {
+        await updateUserInRoom(roomId);
+      }
+    } catch (error) {
+      console.log("[r2ShowIsPlayerLivedError]");
+      socket.emit("r2ShowIsPlayerLivedError");
+    }
 
     if (isDone && gameOver.isValid) {
       // await showWhoWins(gameOver); //NOTE - 테스트 용이라 주석처리 함
@@ -889,7 +897,7 @@ mafiaIo.on("connection", (socket) => {
       console.log("1 라운드 다시 시작");
       // r1MorningStart(roomId); //NOTE - 테스트 용이라 주석처리 함
     } else {
-      console.log("테스트 끝 isDone : false");
+      console.log("r2ShowIsPlayerLived 준비X");
     }
   });
 
@@ -1397,29 +1405,22 @@ const r2ShowIsPlayerLived = async (roomId) => {
 
   if (isPlayerLived) {
     console.log("의사의 활약으로 아무도 죽지 않았습니다.");
-    showModal(
-      mafiaIo,
-      roomId,
-      "r2ShowIsPlayerLived",
-      "제목",
-      "의사의 활약으로 아무도 죽지 않았습니다.",
-      500,
-      "닉네임",
-      false
-    );
+    mafiaIo
+      .to(roomId)
+      .emit(
+        "r2ShowIsPlayerLived",
+        "의사의 활약으로 아무도 죽지 않았습니다.",
+        true
+      );
   } else {
     const killedPlayerNickname = await getPlayerNickname(playerToKill);
-    await updateUserInRoom(mafiaIo, roomId);
     console.log(`${killedPlayerNickname}님이 죽었습니다.`);
-    showModal(
-      mafiaIo,
-      roomId,
-      "r2ShowIsPlayerLived",
-      "제목",
-      `${killedPlayerNickname}님이 죽었습니다.`,
-      500,
-      "닉네임",
-      false
-    );
+    mafiaIo
+      .to(roomId)
+      .emit(
+        "r2ShowIsPlayerLived",
+        `${killedPlayerNickname}님이 죽었습니다.`,
+        false
+      );
   }
 };
