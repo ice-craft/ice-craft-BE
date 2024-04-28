@@ -826,8 +826,18 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r2MorningStart", async (roomId) => {
     console.log("r2MorningStart 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(roomId, "r2MorningStart", total_user_count);
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r2MorningStart: true });
+      isDone = await getStatus(roomId, "r2MorningStart", total_user_count);
+    } catch (error) {
+      console.log("[r2MorningStartError]");
+      socket.emit("r2MorningStartError");
+    }
 
     if (isDone) {
       r2TurnAllUserCameraMikeOn(roomId);
@@ -1358,17 +1368,9 @@ const r1KillPlayerByRole = async (roomId) => {
 
 const r2MorningStart = async (roomId) => {
   console.log("r2MorningStart 송신");
+
   console.log("아침이 시작되었습니다.");
-  showModal(
-    mafiaIo,
-    roomId,
-    "r2MorningStart",
-    "제목",
-    "아침이 시작되었습니다.",
-    500,
-    "닉네임",
-    false
-  );
+  mafiaIo.to(roomId).emit("r2MorningStart");
 };
 
 const r2TurnAllUserCameraMikeOn = async (roomId) => {
