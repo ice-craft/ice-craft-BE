@@ -778,7 +778,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1ShowDoubtedPlayer", async (roomId) => {
+  socket.on("r1ShowDoubtedPlayer", async () => {
     console.log("r1ShowDoubtedPlayer 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -800,7 +800,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
-  socket.on("r1KillPlayerByRole", async (roomId) => {
+  socket.on("r1KillPlayerByRole", async () => {
     console.log("r1KillPlayerByRole 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
@@ -848,12 +848,22 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("r2TurnAllUserCameraMikeOn", async (roomId) => {
     console.log("r2TurnAllUserCameraMikeOn 수신");
-    const { total_user_count } = await getUserCountInRoom(roomId);
-    const isDone = await getStatus(
-      roomId,
-      "r2TurnAllUserCameraMikeOn",
-      total_user_count
-    );
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+    let isDone = false;
+
+    try {
+      const { total_user_count } = await getUserCountInRoom(roomId);
+      await setStatus(userId, { r2TurnAllUserCameraMikeOn: true });
+      isDone = await getStatus(
+        roomId,
+        "r2TurnAllUserCameraMikeOn",
+        total_user_count
+      );
+    } catch (error) {
+      console.log("[r2TurnAllUserCameraMikeOnError]");
+      socket.emit("r2TurnAllUserCameraMikeOnError");
+    }
 
     if (isDone) {
       r2ShowIsPlayerLived(roomId);
@@ -1375,10 +1385,9 @@ const r2MorningStart = async (roomId) => {
 
 const r2TurnAllUserCameraMikeOn = async (roomId) => {
   console.log("r2TurnAllUserCameraMikeOn 송신");
-  //NOTE - 모든 플레이어들의 카메라와 마이크 켬
-  console.log("카메라, 마이크 켬");
-  const allPlayers = await getUserIdInRoom(roomId);
-  mafiaIo.to(roomId).emit("r2TurnAllUserCameraMikeOn", allPlayers);
+
+  console.log("모든 플레이어의 카메라와 마이크 켬");
+  mafiaIo.to(roomId).emit("r2TurnAllUserCameraMikeOn");
 };
 
 const r2ShowIsPlayerLived = async (roomId) => {
