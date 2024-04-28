@@ -182,6 +182,7 @@ export const savePlayer = async (user_id) => {
 };
 
 export const choosePlayer = async (user_id, role, date) => {
+  console.log(user_id, role, date);
   const { error } = await supabase
     .from("room_user_match_table")
     .update({ chosen_by: role, choose_time: date })

@@ -38,7 +38,6 @@ import {
 import {
   getMostVotedPlayer,
   getYesOrNoVoteResult,
-  showModal,
   showVoteToResult,
   showVoteYesOrNoResult,
   showWhoWins,
@@ -735,8 +734,8 @@ mafiaIo.on("connection", (socket) => {
         "r1DecideDoctorToSavePlayer",
         total_user_count
       );
-      if (userId) {
-        choosePlayer(player, "의사", new Date());
+      if (player) {
+        await choosePlayer(player, "의사", new Date());
       }
     } catch (error) {
       console.log("[r1DecideDoctorToSavePlayerError]");
@@ -764,8 +763,8 @@ mafiaIo.on("connection", (socket) => {
         "r1DecidePoliceToDoubtPlayer",
         total_user_count
       );
-      if (userId) {
-        choosePlayer(player, "경찰", new Date());
+      if (player) {
+        await choosePlayer(player, "경찰", new Date());
       }
     } catch (error) {
       console.log("[r1DecidePoliceToDoubtPlayerError]");
@@ -1285,7 +1284,7 @@ const r1DecideDoctorToSavePlayer = async (roomId) => {
 };
 
 const r1DecidePoliceToDoubtPlayer = async (roomId) => {
-  console.log("r1DecidePoliceToDoubtPlayer");
+  console.log("r1DecidePoliceToDoubtPlayer 송신");
 
   console.log("경찰역할이 방에 있다면 실행");
   const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
