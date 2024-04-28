@@ -875,6 +875,7 @@ mafiaIo.on("connection", (socket) => {
     console.log("r2ShowIsPlayerLived 수신");
     const roomId = socket.data.roomId;
     const userId = socket.data.userId;
+    const gameOver = await whoWins(roomId);
     let isDone = false;
 
     try {
@@ -1409,7 +1410,8 @@ const r2ShowIsPlayerLived = async (roomId) => {
       .emit(
         "r2ShowIsPlayerLived",
         "의사의 활약으로 아무도 죽지 않았습니다.",
-        true
+        true,
+        playerToKill
       );
   } else {
     const killedPlayerNickname = await getPlayerNickname(playerToKill);
@@ -1419,7 +1421,8 @@ const r2ShowIsPlayerLived = async (roomId) => {
       .emit(
         "r2ShowIsPlayerLived",
         `${killedPlayerNickname}님이 죽었습니다.`,
-        false
+        false,
+        playerToKill
       );
   }
 };
