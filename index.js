@@ -159,7 +159,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, { r0NightStart: true });
+      await setStatus(userId, roomId, "r0NightStart", true);
       isDone = await getStatus(roomId, "r0NightStart", total_user_count); //NOTE - 테이블 락
     } catch (error) {
       console.log("[r0NightStartError]");
