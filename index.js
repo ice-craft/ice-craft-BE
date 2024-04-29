@@ -521,7 +521,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, { r1VoteYesOrNo: true });
+      await setStatus(userId, roomId, "r1VoteYesOrNo", true);
       isDone = await getStatus(roomId, "r1VoteYesOrNo", total_user_count);
       await voteYesOrNo(userId, yesOrNo);
       console.log(`${userId}가 ${yesOrNo} 투표를 함`);
