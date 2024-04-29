@@ -116,16 +116,8 @@ export const showWhoWins = async (gameOver) => {
 
   //NOTE - 게임 종료 만족하는 지
   console.log(`${gameOver.result}팀이 이겼습니다.`);
-  showModal(
-    mafiaIo,
-    roomId,
-    "gameOver",
-    "제목",
-    `${gameOver.result}팀이 이겼습니다.`,
-    500,
-    "닉네임",
-    false
-  );
+
+  mafiaIo.to(roomId).emit("gameOver", `${gameOver.result}팀이 이겼습니다.`);
 };
 
 export const updateUserInRoom = async (mafiaIo, roomId) => {
