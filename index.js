@@ -447,7 +447,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, { r1ShowVoteToResult: true });
+      await setStatus(userId, roomId, "r1ShowVoteToResult", true);
       isDone = await getStatus(roomId, "r1ShowVoteToResult", total_user_count);
     } catch (error) {
       console.log("[r1ShowVoteToResultError]");
