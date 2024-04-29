@@ -286,17 +286,59 @@ export const getStatus = async (room_id, status, total_user_count) => {
   return total_user_count === count;
 };
 
-export const setStatus = async (user_id, status) => {
-  const { data, error } = await supabase
+export const setStatus = async (user_id, room_id, status) => {
+  const updateObj = {};
+  updateObj[status] = true;
+  console.log(`userId : ${user_id}, roomId : ${room_id}, status : ${status}`);
+  // 업데이트 하기 직전, room_user_match_table의 상태 확인(true로 체크한 개수 : ex=> 현재 3개)
+  const { count: beforeCount, error: beforeCountError } = await supabase
     .from("room_user_match_table")
-    .update(status)
+    .select("*", { count: "exact", head: true })
+    .eq("room_id", room_id)
+    .eq(status, true);
+
+  if (beforeCountError) {
+    throw new Error();
+  }
+
+  const { error: setError } = await supabase
+    .from("room_user_match_table")
+    .update(updateObj)
     .eq("user_id", user_id)
     .select();
 
-  if (error) {
+  // commit, rollback
+
+  // 업데이트 하고 나서, room_user_match_table의 상태 확인(true로 체크한 개수 : ex => 현재 4개)
+  // 근데, 만약 4개가 아님??? -> rollback(원래대로 돌려)
+
+  if (setError) {
     throw new Error();
   }
-  return data;
+
+  const { count: afterCount, afterCountError } = await supabase
+    .from("room_user_match_table")
+    .select("*", { count: "exact", head: true })
+    .eq("room_id", room_id)
+    .eq(status, true);
+
+  if (afterCountError) {
+    throw new Error();
+  }
+
+  if (afterCount !== beforeCount + 1) {
+    console.log(beforeCount, afterCount);
+    const { error: setRollbackError } = await supabase
+      .from("room_user_match_table")
+      .update(updateObj)
+      .eq("user_id", user_id)
+      .select();
+
+    if (setRollbackError) {
+      console.log(setRollbackError);
+      throw new Error();
+    }
+  }
 };
 
 export const getRoleMaxCount = async (total_user_count, role) => {
