@@ -853,7 +853,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, { r2TurnAllUserCameraMikeOn: true });
+      await setStatus(userId, roomId, "r2TurnAllUserCameraMikeOn", true);
       isDone = await getStatus(
         roomId,
         "r2TurnAllUserCameraMikeOn",
