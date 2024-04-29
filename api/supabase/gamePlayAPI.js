@@ -326,8 +326,9 @@ export const setStatus = async (user_id, room_id, status, statusValue) => {
     throw new Error();
   }
 
-  if (Math.abs(afterCount - beforeCount) !== 1) {
+  if (Math.abs(afterCount - beforeCount) > 1) {
     console.log(beforeCount, afterCount);
+    updateObj[status] = !statusValue;
     const { error: setRollbackError } = await supabase
       .from("room_user_match_table")
       .update(updateObj)
