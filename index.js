@@ -251,7 +251,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, { r0ShowMafiaUserEachOther: true });
+      await setStatus(userId, roomId, "r0ShowMafiaUserEachOther", true);
       isDone = await getStatus(
         roomId,
         "r0ShowMafiaUserEachOther",
