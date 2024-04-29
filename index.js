@@ -401,7 +401,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, { r1MeetingOver: true });
+      await setStatus(userId, roomId, "r1MeetingOver", true);
       isDone = await getStatus(roomId, "r1MeetingOver", total_user_count);
     } catch (error) {
       console.log("[r1MeetingOverError]");
