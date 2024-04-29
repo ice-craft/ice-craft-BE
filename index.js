@@ -880,7 +880,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, { r2ShowIsPlayerLived: true });
+      await setStatus(userId, roomId, "r2ShowIsPlayerLived", true);
       isDone = await getStatus(roomId, "r2ShowIsPlayerLived", total_user_count);
       if (isKilled) {
         await updateUserInRoom(roomId);
