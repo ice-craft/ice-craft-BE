@@ -329,7 +329,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, { r1MorningStart: true });
+      await setStatus(userId, roomId, "r1MorningStart", true);
       isDone = await getStatus(roomId, "r1MorningStart", total_user_count);
       // await resetRoundR0(roomId);//NOTE - 테스트 중이라 주석 처리
       // await resetRoundR2(roomId); //NOTE - 테스트 중이라 주석 처리
@@ -353,7 +353,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, { r1TurnAllUserCameraMikeOn: true });
+      await setStatus(userId, roomId, "r1TurnAllUserCameraMikeOn", true);
       isDone = await getStatus(
         roomId,
         "r1TurnAllUserCameraMikeOn",
