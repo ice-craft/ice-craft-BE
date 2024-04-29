@@ -13,7 +13,8 @@ try {
   await setStatus(
     "11111111-f1b4-46eb-a187-2da752eed29c",
     "0ed9a099-f1b4-46eb-a187-2da752eed29c",
-    "r0NightStart"
+    "r0NightStart",
+    false
   );
 } catch (error) {
   console.log(error);

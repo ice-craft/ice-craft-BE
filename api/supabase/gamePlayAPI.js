@@ -286,9 +286,9 @@ export const getStatus = async (room_id, status, total_user_count) => {
   return total_user_count === count;
 };
 
-export const setStatus = async (user_id, room_id, status) => {
+export const setStatus = async (user_id, room_id, status, statusValue) => {
   const updateObj = {};
-  updateObj[status] = true;
+  updateObj[status] = statusValue;
   console.log(`userId : ${user_id}, roomId : ${room_id}, status : ${status}`);
   // 업데이트 하기 직전, room_user_match_table의 상태 확인(true로 체크한 개수 : ex=> 현재 3개)
   const { count: beforeCount, error: beforeCountError } = await supabase
@@ -326,7 +326,7 @@ export const setStatus = async (user_id, room_id, status) => {
     throw new Error();
   }
 
-  if (afterCount !== beforeCount + 1) {
+  if (Math.abs(afterCount - beforeCount) !== 1) {
     console.log(beforeCount, afterCount);
     const { error: setRollbackError } = await supabase
       .from("room_user_match_table")
