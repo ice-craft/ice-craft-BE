@@ -1559,7 +1559,7 @@ const r1DecidePoliceToDoubtPlayer = async (roomId) => {
         "r1DecidePoliceToDoubtPlayer",
         "경찰은 마피아 의심자를 결정해주세요.",
         true,
-        policePlayer
+        [policePlayer]
       );
   } else {
     mafiaIo
