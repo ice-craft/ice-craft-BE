@@ -1535,7 +1535,7 @@ const r1DecideDoctorToSavePlayer = async (roomId) => {
         "r1DecideDoctorToSavePlayer",
         "의사는 누구를 살릴 지 결정하세요.",
         true,
-        doctorPlayer
+        [doctorPlayer]
       );
   } else {
     mafiaIo
