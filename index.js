@@ -501,10 +501,14 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r1VoteToMafia", true);
+      const isValid = await setStatus(userId, roomId, "r1VoteToMafia", true);
       isDone = await getStatus(roomId, "r1VoteToMafia", total_user_count);
       await voteTo(votedPlayer);
       console.log(`${userId}는 ${votedPlayer}에게 투표`);
+
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[r1VoteToMafiaError]");
       socket.emit("r1VoteToMafiaError");
