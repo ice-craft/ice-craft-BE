@@ -333,6 +333,7 @@ mafiaIo.on("connection", (socket) => {
         "r0TurnMafiaUserCameraOff",
         total_user_count
       );
+
       if (!isValid) {
         throw new Error();
       }
@@ -360,6 +361,10 @@ mafiaIo.on("connection", (socket) => {
       isDone = await getStatus(roomId, "r1MorningStart", total_user_count);
       // await resetRoundR0(roomId);//NOTE - 테스트 중이라 주석 처리
       // await resetRoundR2(roomId); //NOTE - 테스트 중이라 주석 처리
+
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[r1MorningStartError]");
       socket.emit("r1MorningStartError");
