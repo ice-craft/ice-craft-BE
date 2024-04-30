@@ -243,6 +243,10 @@ mafiaIo.on("connection", (socket) => {
       const { total_user_count } = await getUserCountInRoom(roomId);
       await setStatus(userId, roomId, "r0ShowAllUserRole", true);
       isDone = await getStatus(roomId, "r0ShowAllUserRole", total_user_count);
+
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[r0ShowAllUserRoleError]");
       socket.emit("r0ShowAllUserRoleError");
