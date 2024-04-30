@@ -339,6 +339,9 @@ export const setStatus = async (user_id, room_id, status, statusValue) => {
       console.log(setRollbackError);
       throw new Error();
     }
+    return false;
+  } else {
+    return true;
   }
 };
 

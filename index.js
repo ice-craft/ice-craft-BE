@@ -159,8 +159,12 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r0NightStart", true);
-      isDone = await getStatus(roomId, "r0NightStart", total_user_count); //NOTE - 테이블 락
+      const isValid = await setStatus(userId, roomId, "r0NightStart", true);
+      isDone = await getStatus(roomId, "r0NightStart", total_user_count);
+
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[r0NightStartError]");
       socket.emit("r0NightStartError");
