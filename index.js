@@ -185,7 +185,12 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r0TurnAllUserCameraMikeOff", true);
+      const isValid = await setStatus(
+        userId,
+        roomId,
+        "r0TurnAllUserCameraMikeOff",
+        true
+      );
       isDone = await getStatus(
         roomId,
         "r0TurnAllUserCameraMikeOff",
@@ -215,7 +220,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r0SetAllUserRole", true);
+      const isValid = await setStatus(userId, roomId, "r0SetAllUserRole", true);
       isDone = await getStatus(roomId, "r0SetAllUserRole", total_user_count);
 
       if (!isValid) {
@@ -241,7 +246,12 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r0ShowAllUserRole", true);
+      const isValid = await setStatus(
+        userId,
+        roomId,
+        "r0ShowAllUserRole",
+        true
+      );
       isDone = await getStatus(roomId, "r0ShowAllUserRole", total_user_count);
 
       if (!isValid) {
@@ -267,7 +277,12 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r0ShowMafiaUserEachOther", true);
+      const isValid = await setStatus(
+        userId,
+        roomId,
+        "r0ShowMafiaUserEachOther",
+        true
+      );
       isDone = await getStatus(
         roomId,
         "r0ShowMafiaUserEachOther",
@@ -297,7 +312,12 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r0TurnMafiaUserCameraOn", true);
+      const isValid = await setStatus(
+        userId,
+        roomId,
+        "r0TurnMafiaUserCameraOn",
+        true
+      );
       isDone = await getStatus(
         roomId,
         "r0TurnMafiaUserCameraOn",
@@ -327,7 +347,12 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r0TurnMafiaUserCameraOff", true);
+      const isValid = await setStatus(
+        userId,
+        roomId,
+        "r0TurnMafiaUserCameraOff",
+        true
+      );
       isDone = await getStatus(
         roomId,
         "r0TurnMafiaUserCameraOff",
@@ -358,7 +383,11 @@ mafiaIo.on("connection", (socket) => {
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
       await setStatus(userId, roomId, "r1MorningStart", true);
-      isDone = await getStatus(roomId, "r1MorningStart", total_user_count);
+      const isValid = (isDone = await getStatus(
+        roomId,
+        "r1MorningStart",
+        total_user_count
+      ));
       // await resetRoundR0(roomId);//NOTE - 테스트 중이라 주석 처리
       // await resetRoundR2(roomId); //NOTE - 테스트 중이라 주석 처리
 
@@ -385,7 +414,12 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r1TurnAllUserCameraMikeOn", true);
+      const isValid = await setStatus(
+        userId,
+        roomId,
+        "r1TurnAllUserCameraMikeOn",
+        true
+      );
       isDone = await getStatus(
         roomId,
         "r1TurnAllUserCameraMikeOn",
@@ -415,7 +449,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r1FindMafia", true);
+      const isValid = await setStatus(userId, roomId, "r1FindMafia", true);
       isDone = await getStatus(roomId, "r1FindMafia", total_user_count);
 
       if (!isValid) {
@@ -441,8 +475,12 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r1MeetingOver", true);
+      const isValid = await setStatus(userId, roomId, "r1MeetingOver", true);
       isDone = await getStatus(roomId, "r1MeetingOver", total_user_count);
+
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[r1MeetingOverError]");
       socket.emit("r1MeetingOverError");
