@@ -333,6 +333,9 @@ mafiaIo.on("connection", (socket) => {
         "r0TurnMafiaUserCameraOff",
         total_user_count
       );
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[r0TurnMafiaUserCameraOffError]");
       socket.emit("r0TurnMafiaUserCameraOffError");
