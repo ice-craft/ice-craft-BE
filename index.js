@@ -1419,7 +1419,8 @@ const r1LastTalk = async (roomId) => {
     .to(roomId)
     .emit(
       "r1LastTalk",
-      `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`
+      `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`,
+      [mostVoteResult.result.user_id]
     );
 };
 
@@ -1461,12 +1462,12 @@ const r1KillMostVotedPlayer = async (roomId) => {
       console.log("마피아가 죽었습니다.");
       mafiaIo
         .to(roomId)
-        .emit("r1KillMostVotedPlayer", "마피아가 죽었습니다.", killedPlayer);
+        .emit("r1KillMostVotedPlayer", "마피아가 죽었습니다.", [killedPlayer]);
     } else {
       console.log("시민이 죽었습니다.");
       mafiaIo
         .to(roomId)
-        .emit("r1KillMostVotedPlayer", "시민이 죽었습니다.", killedPlayer);
+        .emit("r1KillMostVotedPlayer", "시민이 죽었습니다.", [killedPlayer]);
     }
   } else {
     //NOTE - 투표 실패, 동률이 나옴
