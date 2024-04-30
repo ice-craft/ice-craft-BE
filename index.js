@@ -599,8 +599,12 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r1LastTalk", true);
+      const isValid = await setStatus(userId, roomId, "r1LastTalk", true);
       isDone = await getStatus(roomId, "r1LastTalk", total_user_count);
+
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[r1LastTalkError]");
       socket.emit("r1LastTalkError");
