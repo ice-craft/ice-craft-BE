@@ -149,6 +149,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[setReadyError]");
       socket.emit("setReadyError", "레디를  설정하는데 실패했습니다.");
+      return;
     }
     mafiaIo.to(roomId).emit("updateUserReady", userId, ready);
     canGameStart(roomId);
@@ -172,6 +173,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r0NightStartError]");
       socket.emit("r0NightStartError");
+      return;
     }
 
     if (isDone) {
@@ -208,6 +210,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r0TurnAllUserCameraMikeOffError]");
       socket.emit("r0TurnAllUserCameraMikeOffError");
+      return;
     }
 
     if (isDone) {
@@ -235,6 +238,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r0SetAllUserRoleError]");
       socket.emit("r0SetAllUserRoleError");
+      return;
     }
 
     if (isDone) {
@@ -267,6 +271,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r0ShowAllUserRoleError]");
       socket.emit("r0ShowAllUserRoleError");
+      return;
     }
 
     if (isDone) {
@@ -303,6 +308,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r0ShowMafiaUserEachOtherError]");
       socket.emit("r0ShowMafiaUserEachOtherError");
+      return;
     }
 
     if (isDone) {
@@ -339,6 +345,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r0TurnMafiaUserCameraOnError]");
       socket.emit("r0TurnMafiaUserCameraOnError");
+      return;
     }
 
     if (isDone) {
@@ -375,6 +382,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r0TurnMafiaUserCameraOffError]");
       socket.emit("r0TurnMafiaUserCameraOffError");
+      return;
     }
 
     if (isDone) {
@@ -404,6 +412,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1MorningStartError]");
       socket.emit("r1MorningStartError");
+      return;
     }
 
     if (isDone) {
@@ -440,6 +449,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1TurnAllUserCameraMikeOnError]");
       socket.emit("r1TurnAllUserCameraMikeOnError");
+      return;
     }
 
     if (isDone) {
@@ -467,6 +477,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1FindMafiaError]");
       socket.emit("r1FindMafiaError");
+      return;
     }
 
     if (isDone) {
@@ -494,6 +505,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1MeetingOverError]");
       socket.emit("r1MeetingOverError");
+      return;
     }
 
     if (isDone) {
@@ -524,6 +536,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1VoteToMafiaError]");
       socket.emit("r1VoteToMafiaError");
+      return;
     }
 
     if (isDone) {
@@ -556,6 +569,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1ShowVoteToResultError]");
       socket.emit("r1ShowVoteToResultError");
+      return;
     }
 
     if (isDone) {
@@ -592,6 +606,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1ShowMostVotedPlayerError]");
       socket.emit("r1ShowMostVotedPlayerError");
+      return;
     }
 
     if (isDone && isValid) {
@@ -623,6 +638,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1LastTalkError]");
       socket.emit("r1LastTalkError");
+      return;
     }
 
     if (isDone) {
@@ -652,6 +668,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1LastTalkError]");
       socket.emit("r1LastTalkError");
+      return;
     }
 
     if (isDone) {
@@ -688,6 +705,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1ShowVoteYesOrNoResultError]");
       socket.emit("r1ShowVoteYesOrNoResultError");
+      return;
     }
 
     if (isDone) {
@@ -724,6 +742,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1KillMostVotedPlayerError]");
       socket.emit("r1KillMostVotedPlayerError");
+      return;
     }
 
     if (isDone) {
@@ -760,6 +779,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1TurnAllUserCameraMikeOffError]");
       socket.emit("r1TurnAllUserCameraMikeOffError");
+      return;
     }
 
     if (isDone) {
@@ -796,6 +816,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1DecideMafiaToKillPlayerError]");
       socket.emit("r1DecideMafiaToKillPlayerError");
+      return;
     }
 
     if (isDone) {
@@ -832,6 +853,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1TurnMafiaUserCameraOnError]");
       socket.emit("r1TurnMafiaUserCameraOnError");
+      return;
     }
 
     if (isDone) {
@@ -870,6 +892,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1GestureToMafiaEachOtherError]");
       socket.emit("r1GestureToMafiaEachOtherError");
+      return;
     }
 
     if (isDone) {
@@ -906,6 +929,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1TurnMafiaUserCameraOffError]");
       socket.emit("r1TurnMafiaUserCameraOffError");
+      return;
     }
 
     if (isDone) {
@@ -946,6 +970,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1DecideDoctorToSavePlayerError]");
       socket.emit("r1DecideDoctorToSavePlayerError");
+      return;
     }
 
     if (isDone) {
@@ -985,6 +1010,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1DecidePoliceToDoubtPlayerError]");
       socket.emit("r1DecidePoliceToDoubtPlayerError");
+      return;
     }
 
     if (isDone) {
@@ -1017,6 +1043,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1ShowDoubtedPlayerError]");
       socket.emit("r1ShowDoubtedPlayerError");
+      return;
     }
 
     if (isDone) {
@@ -1050,6 +1077,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r1KillPlayerByRoleError]");
       socket.emit("r1KillPlayerByRoleError");
+      return;
     }
 
     if (isDone) {
@@ -1077,6 +1105,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r2MorningStartError]");
       socket.emit("r2MorningStartError");
+      return;
     }
 
     if (isDone) {
@@ -1113,6 +1142,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r2TurnAllUserCameraMikeOnError]");
       socket.emit("r2TurnAllUserCameraMikeOnError");
+      return;
     }
 
     if (isDone) {
@@ -1149,6 +1179,7 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log("[r2ShowIsPlayerLivedError]");
       socket.emit("r2ShowIsPlayerLivedError");
+      return;
     }
 
     if (isDone && gameOver.isValid) {
