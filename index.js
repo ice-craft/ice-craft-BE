@@ -793,12 +793,21 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r1TurnMafiaUserCameraOn", true);
+      const isValid = await setStatus(
+        userId,
+        roomId,
+        "r1TurnMafiaUserCameraOn",
+        true
+      );
       isDone = await getStatus(
         roomId,
         "r1TurnMafiaUserCameraOn",
         total_user_count
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[r1TurnMafiaUserCameraOnError]");
       socket.emit("r1TurnMafiaUserCameraOnError");
