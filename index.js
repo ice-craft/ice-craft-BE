@@ -960,7 +960,17 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r1DecidePoliceToDoubtPlayer", true);
+      const isValid = await setStatus(
+        userId,
+        roomId,
+        "r1DecidePoliceToDoubtPlayer",
+        true
+      );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r1DecidePoliceToDoubtPlayer",
