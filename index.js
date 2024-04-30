@@ -142,7 +142,10 @@ mafiaIo.on("connection", (socket) => {
     socket.data.roomId = roomId; //NOTE - 테스트용 코드
 
     try {
-      await setStatus(userId, roomId, "is_ready", ready);
+      const isValid = await setStatus(userId, roomId, "is_ready", ready);
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[setReadyError]");
       socket.emit("setReadyError", "레디를  설정하는데 실패했습니다.");
