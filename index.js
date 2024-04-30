@@ -273,6 +273,10 @@ mafiaIo.on("connection", (socket) => {
         "r0ShowMafiaUserEachOther",
         total_user_count
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
     } catch (error) {
       console.log("[r0ShowMafiaUserEachOtherError]");
       socket.emit("r0ShowMafiaUserEachOtherError");
