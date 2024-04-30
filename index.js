@@ -1504,8 +1504,6 @@ const r1GestureToMafiaEachOther = async (roomId) => {
   console.log("r1GestureToMafiaEachOther 송신");
   console.log("누구를 죽일지 제스처를 통해 상의하세요.");
 
-  const mafiaPlayers = await getPlayerByRole(roomId, "마피아");
-
   mafiaIo
     .to(roomId)
     .emit(
