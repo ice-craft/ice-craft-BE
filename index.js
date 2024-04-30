@@ -160,11 +160,12 @@ mafiaIo.on("connection", (socket) => {
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
       const isValid = await setStatus(userId, roomId, "r0NightStart", true);
-      isDone = await getStatus(roomId, "r0NightStart", total_user_count);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r0NightStart", total_user_count);
     } catch (error) {
       console.log("[r0NightStartError]");
       socket.emit("r0NightStartError");
@@ -191,15 +192,16 @@ mafiaIo.on("connection", (socket) => {
         "r0TurnAllUserCameraMikeOff",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r0TurnAllUserCameraMikeOff",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r0TurnAllUserCameraMikeOffError]");
       socket.emit("r0TurnAllUserCameraMikeOffError");
@@ -221,11 +223,12 @@ mafiaIo.on("connection", (socket) => {
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
       const isValid = await setStatus(userId, roomId, "r0SetAllUserRole", true);
-      isDone = await getStatus(roomId, "r0SetAllUserRole", total_user_count);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r0SetAllUserRole", total_user_count);
     } catch (error) {
       console.log("[r0SetAllUserRoleError]");
       socket.emit("r0SetAllUserRoleError");
@@ -252,11 +255,12 @@ mafiaIo.on("connection", (socket) => {
         "r0ShowAllUserRole",
         true
       );
-      isDone = await getStatus(roomId, "r0ShowAllUserRole", total_user_count);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r0ShowAllUserRole", total_user_count);
     } catch (error) {
       console.log("[r0ShowAllUserRoleError]");
       socket.emit("r0ShowAllUserRoleError");
@@ -283,15 +287,16 @@ mafiaIo.on("connection", (socket) => {
         "r0ShowMafiaUserEachOther",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r0ShowMafiaUserEachOther",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r0ShowMafiaUserEachOtherError]");
       socket.emit("r0ShowMafiaUserEachOtherError");
@@ -318,15 +323,16 @@ mafiaIo.on("connection", (socket) => {
         "r0TurnMafiaUserCameraOn",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r0TurnMafiaUserCameraOn",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r0TurnMafiaUserCameraOnError]");
       socket.emit("r0TurnMafiaUserCameraOnError");
@@ -353,15 +359,16 @@ mafiaIo.on("connection", (socket) => {
         "r0TurnMafiaUserCameraOff",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r0TurnMafiaUserCameraOff",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r0TurnMafiaUserCameraOffError]");
       socket.emit("r0TurnMafiaUserCameraOffError");
@@ -382,18 +389,15 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r1MorningStart", true);
-      const isValid = (isDone = await getStatus(
-        roomId,
-        "r1MorningStart",
-        total_user_count
-      ));
-      // await resetRoundR0(roomId);//NOTE - 테스트 중이라 주석 처리
-      // await resetRoundR2(roomId); //NOTE - 테스트 중이라 주석 처리
+      const isValid = await setStatus(userId, roomId, "r1MorningStart", true);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r1MorningStart", total_user_count);
+      // await resetRoundR0(roomId);//NOTE - 테스트 중이라 주석 처리
+      // await resetRoundR2(roomId); //NOTE - 테스트 중이라 주석 처리
     } catch (error) {
       console.log("[r1MorningStartError]");
       socket.emit("r1MorningStartError");
@@ -420,15 +424,16 @@ mafiaIo.on("connection", (socket) => {
         "r1TurnAllUserCameraMikeOn",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r1TurnAllUserCameraMikeOn",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r1TurnAllUserCameraMikeOnError]");
       socket.emit("r1TurnAllUserCameraMikeOnError");
@@ -450,11 +455,12 @@ mafiaIo.on("connection", (socket) => {
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
       const isValid = await setStatus(userId, roomId, "r1FindMafia", true);
-      isDone = await getStatus(roomId, "r1FindMafia", total_user_count);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r1FindMafia", total_user_count);
     } catch (error) {
       console.log("[r1FindMafiaError]");
       socket.emit("r1FindMafiaError");
@@ -476,11 +482,12 @@ mafiaIo.on("connection", (socket) => {
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
       const isValid = await setStatus(userId, roomId, "r1MeetingOver", true);
-      isDone = await getStatus(roomId, "r1MeetingOver", total_user_count);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r1MeetingOver", total_user_count);
     } catch (error) {
       console.log("[r1MeetingOverError]");
       socket.emit("r1MeetingOverError");
@@ -502,13 +509,15 @@ mafiaIo.on("connection", (socket) => {
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
       const isValid = await setStatus(userId, roomId, "r1VoteToMafia", true);
-      isDone = await getStatus(roomId, "r1VoteToMafia", total_user_count);
-      await voteTo(votedPlayer);
-      console.log(`${userId}는 ${votedPlayer}에게 투표`);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r1VoteToMafia", total_user_count);
+
+      await voteTo(votedPlayer);
+      console.log(`${userId}는 ${votedPlayer}에게 투표`);
     } catch (error) {
       console.log("[r1VoteToMafiaError]");
       socket.emit("r1VoteToMafiaError");
@@ -535,11 +544,12 @@ mafiaIo.on("connection", (socket) => {
         "r1ShowVoteToResult",
         true
       );
-      isDone = await getStatus(roomId, "r1ShowVoteToResult", total_user_count);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r1ShowVoteToResult", total_user_count);
     } catch (error) {
       console.log("[r1ShowVoteToResultError]");
       socket.emit("r1ShowVoteToResultError");
@@ -566,15 +576,16 @@ mafiaIo.on("connection", (socket) => {
         "r1ShowMostVotedPlayer",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r1ShowMostVotedPlayer",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r1ShowMostVotedPlayerError]");
       socket.emit("r1ShowMostVotedPlayerError");
@@ -600,11 +611,12 @@ mafiaIo.on("connection", (socket) => {
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
       const isValid = await setStatus(userId, roomId, "r1LastTalk", true);
-      isDone = await getStatus(roomId, "r1LastTalk", total_user_count);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r1LastTalk", total_user_count);
     } catch (error) {
       console.log("[r1LastTalkError]");
       socket.emit("r1LastTalkError");
@@ -626,13 +638,14 @@ mafiaIo.on("connection", (socket) => {
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
       const isValid = await setStatus(userId, roomId, "r1VoteYesOrNo", true);
-      isDone = await getStatus(roomId, "r1VoteYesOrNo", total_user_count);
-      await voteYesOrNo(userId, yesOrNo);
-      console.log(`${userId}가 ${yesOrNo} 투표를 함`);
 
       if (!isValid) {
         throw new Error();
       }
+
+      isDone = await getStatus(roomId, "r1VoteYesOrNo", total_user_count);
+      await voteYesOrNo(userId, yesOrNo);
+      console.log(`${userId}가 ${yesOrNo} 투표를 함`);
     } catch (error) {
       console.log("[r1LastTalkError]");
       socket.emit("r1LastTalkError");
@@ -659,15 +672,16 @@ mafiaIo.on("connection", (socket) => {
         "r1ShowVoteYesOrNoResult",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r1ShowVoteYesOrNoResult",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r1ShowVoteYesOrNoResultError]");
       socket.emit("r1ShowVoteYesOrNoResultError");
@@ -694,15 +708,16 @@ mafiaIo.on("connection", (socket) => {
         "r1KillMostVotedPlayer",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r1KillMostVotedPlayer",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r1KillMostVotedPlayerError]");
       socket.emit("r1KillMostVotedPlayerError");
@@ -729,15 +744,16 @@ mafiaIo.on("connection", (socket) => {
         "r1TurnAllUserCameraMikeOff",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r1TurnAllUserCameraMikeOff",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r1TurnAllUserCameraMikeOffError]");
       socket.emit("r1TurnAllUserCameraMikeOffError");
@@ -764,15 +780,16 @@ mafiaIo.on("connection", (socket) => {
         "r1DecideMafiaToKillPlayer",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r1DecideMafiaToKillPlayer",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r1DecideMafiaToKillPlayerError]");
       socket.emit("r1DecideMafiaToKillPlayerError");
@@ -799,15 +816,16 @@ mafiaIo.on("connection", (socket) => {
         "r1TurnMafiaUserCameraOn",
         true
       );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r1TurnMafiaUserCameraOn",
         total_user_count
       );
-
-      if (!isValid) {
-        throw new Error();
-      }
     } catch (error) {
       console.log("[r1TurnMafiaUserCameraOnError]");
       socket.emit("r1TurnMafiaUserCameraOnError");
@@ -838,11 +856,13 @@ mafiaIo.on("connection", (socket) => {
       if (!isValid) {
         throw new Error();
       }
+
       isDone = await getStatus(
         roomId,
         "r1GestureToMafiaEachOther",
         total_user_count
       );
+
       await choosePlayer(player, "마피아", date);
     } catch (error) {
       console.log("[r1GestureToMafiaEachOtherError]");
@@ -864,7 +884,17 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      await setStatus(userId, roomId, "r1TurnMafiaUserCameraOff", true);
+      const isValid = await setStatus(
+        userId,
+        roomId,
+        "r1TurnMafiaUserCameraOff",
+        true
+      );
+
+      if (!isValid) {
+        throw new Error();
+      }
+
       isDone = await getStatus(
         roomId,
         "r1TurnMafiaUserCameraOff",
