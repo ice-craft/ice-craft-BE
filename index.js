@@ -1535,7 +1535,7 @@ const r1DecideDoctorToSavePlayer = async (roomId) => {
         "r1DecideDoctorToSavePlayer",
         "의사는 누구를 살릴 지 결정하세요.",
         true,
-        [doctorPlayer]
+        doctorPlayer
       );
   } else {
     mafiaIo
@@ -1559,7 +1559,7 @@ const r1DecidePoliceToDoubtPlayer = async (roomId) => {
         "r1DecidePoliceToDoubtPlayer",
         "경찰은 마피아 의심자를 결정해주세요.",
         true,
-        [policePlayer]
+        policePlayer
       );
   } else {
     mafiaIo
@@ -1671,7 +1671,7 @@ const r2ShowIsPlayerLived = async (roomId) => {
         "r2ShowIsPlayerLived",
         "의사의 활약으로 아무도 죽지 않았습니다.",
         true,
-        playerToKill
+        [playerToKill]
       );
   } else {
     const killedPlayerNickname = await getPlayerNickname(playerToKill);
@@ -1682,7 +1682,7 @@ const r2ShowIsPlayerLived = async (roomId) => {
         "r2ShowIsPlayerLived",
         `${killedPlayerNickname}님이 죽었습니다.`,
         false,
-        playerToKill
+        [playerToKill]
       );
   }
 };
