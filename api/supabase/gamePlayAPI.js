@@ -456,3 +456,32 @@ export const resetPlayerStatus = async (room_id) => {
     throw new Error();
   }
 };
+
+export const getRound = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_table")
+    .select("round")
+    .eq("room_id", room_id)
+    .single();
+
+  if (error) {
+    throw new Error();
+  }
+
+  return data.round;
+};
+
+export const updateRound = async (room_id, round) => {
+  const { error } = await supabase
+    .from("room_table")
+    .update({
+      round,
+    })
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error();
+  }
+
+  return round;
+};
