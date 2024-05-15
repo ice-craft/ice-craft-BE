@@ -24,6 +24,7 @@ import {
   getPlayerByRole,
   getPlayerNickname,
   getRoleMaxCount,
+  getRound,
   getStatus,
   getVoteToResult,
   killPlayer,
@@ -1213,25 +1214,57 @@ mafiaIo.on("connection", (socket) => {
     // }
   });
 
-  socket.on("testStart", (msg) => {
-    console.log(`testStart : ${msg}`);
-    const roomId = "0ed9a099-f1b4-46eb-a187-2da752eed29c";
+  socket.on("testStart", async (roomId) => {
+    console.log(`[testStart 수신] ${roomId}`);
 
-    let count = 2;
-    let roundCount = 0;
+    let time = 2;
+    let roundCount = 1;
+    await updateRound(roomId, "round" + roundCount);
+
     const start = setInterval(async () => {
-      count--;
-      if (count < 0) {
-        roundCount++;
-        const roundName = await updateRound(roomId, "round" + roundCount);
-        if (roundName === "round10") {
+      time--;
+      console.log(time);
+      if (time <= 0) {
+        let roundName = await getRound(roomId);
+
+        if (roundName === "round1") {
+          console.log(`[test 송신] ${roundName}`);
+          mafiaIo.to(roomId).emit("test", roundName);
+          roundCount++;
+          await updateRound(roomId, "round" + roundCount);
+          time = 2;
+        }
+
+        if (roundName === "round2") {
+          console.log(`[test 송신] ${roundName}`);
+          mafiaIo.to(roomId).emit("test", roundName);
+          roundCount++;
+          await updateRound(roomId, "round" + roundCount);
+          time = 4;
+        }
+
+        if (roundName === "round3") {
+          console.log(`[test 송신] ${roundName}`);
+          mafiaIo.to(roomId).emit("test", roundName);
+          roundCount++;
+          await updateRound(roomId, "round" + roundCount);
+          time = 6;
+        }
+
+        if (roundName === "round4") {
+          console.log(`[test 송신] ${roundName}`);
+          mafiaIo.to(roomId).emit("test", roundName);
+          roundCount++;
+          await updateRound(roomId, "round" + roundCount);
+          time = 8;
+        }
+
+        if (roundName === "round5") {
+          console.log("[test 송신] 게임종료");
+          mafiaIo.to(roomId).emit("test", "게임종료");
           console.log("게임 종료");
           clearInterval(start);
         }
-        console.log("roundName", roundName);
-        console.log("test 송신");
-        socket.emit("test", roundName);
-        count = 2;
       }
     }, 500);
   });
