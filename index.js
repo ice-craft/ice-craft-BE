@@ -1040,6 +1040,20 @@ mafiaIo.on("connection", (socket) => {
     //   console.log("방에서 나가기에 실패했습니다.");
     // }
   });
+
+  socket.on("testStart", (msg) => {
+    console.log(msg);
+
+    let count = 2;
+    const start = setInterval(() => {
+      count--;
+      if (count < 0) {
+        console.log("test 송신");
+        socket.emit("test");
+        count = 2;
+      }
+    }, 500);
+  });
 });
 
 httpServer.listen(port, () => {
