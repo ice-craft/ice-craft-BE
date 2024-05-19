@@ -1485,6 +1485,15 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 종료`);
           roundName = "r1-5";
           time = 1;
+        } else if (roundName == "r1-5") {
+          console.log(`${roundName} 시작`);
+
+          console.log(`[${roundName}] inVote`);
+          mafiaIo.to(roomId).emit("inVote");
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-6";
+          time = 1;
         }
       }
     }, 500);
