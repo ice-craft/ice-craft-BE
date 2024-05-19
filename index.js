@@ -24,7 +24,6 @@ import {
   getPlayerByRole,
   getPlayerNickname,
   getPlayersInRoom,
-  getRoleMaxCount,
   getRound,
   getStatus,
   getVoteToResult,
@@ -40,6 +39,7 @@ import {
 } from "./api/supabase/gamePlayAPI.js";
 import {
   getMostVotedPlayer,
+  getRoleMaxCount,
   getYesOrNoVoteResult,
   showVoteToResult,
   showVoteYesOrNoResult,
@@ -47,7 +47,7 @@ import {
   shufflePlayers,
   updateUserInRoom,
   whoWins,
-} from "./api/supabase/socket/moderatorAPI.js";
+} from "./api/socket/moderatorAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -1215,10 +1215,16 @@ mafiaIo.on("connection", (socket) => {
     // }
   });
 
-  socket.on("testStart", async (roomId) => {
-    console.log(`[testStart 수신] roomId : ${roomId}`);
+  socket.on("testStart", async (roomId, playersMaxCount) => {
+    console.log(
+      `[testStart 수신] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`
+    );
 
     let allPlayers = null;
+    let citizenMaxCount = null;
+    let mafiaMaxCount = null;
+    let doctorMaxCount = null;
+    let policeMaxCount = null;
 
     let time = 1;
     await updateRound(roomId, "r0-0");
@@ -1263,37 +1269,25 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
 
           let playersUserId = allPlayers.map((player) => player.user_id);
-          const { total_user_count: totalUserCount } = await getUserCountInRoom(
-            roomId
-          );
-          const maxMafiaCount = await getRoleMaxCount(
-            totalUserCount,
-            "mafia_count"
-          );
-          const maxDoctorCount = await getRoleMaxCount(
-            totalUserCount,
-            "doctor_count"
-          );
-          const maxPoliceCount = await getRoleMaxCount(
-            totalUserCount,
-            "police_count"
-          );
-          let mafiaPlayers;
-          let doctorPlayer;
-          let policePlayer;
-          let citizenPlayers;
+          [citizenMaxCount, mafiaMaxCount, doctorMaxCount, policeMaxCount] =
+            getRoleMaxCount(playersMaxCount);
+
+          let mafiaPlayers = null;
+          let doctorPlayer = null;
+          let policePlayer = null;
+          let citizenPlayers = null;
 
           playersUserId = shufflePlayers(playersUserId);
 
           console.log("총 멤버", playersUserId);
-          console.log("최대 마피아 인원 수", maxMafiaCount);
-          console.log("최대 의사 인원 수", maxDoctorCount);
-          console.log("최대 경찰 인원 수", maxPoliceCount);
+          console.log("최대 마피아 인원 수", mafiaMaxCount);
+          console.log("최대 의사 인원 수", doctorMaxCount);
+          console.log("최대 경찰 인원 수", policeMaxCount);
 
           //NOTE - 처음에는 모든 플레이어 시민으로 설정
           for (
             let playerIndex = 0;
-            playerIndex < totalUserCount;
+            playerIndex < playersMaxCount;
             playerIndex++
           ) {
             await setPlayerRole(playersUserId[playerIndex], "시민");
@@ -1303,22 +1297,22 @@ mafiaIo.on("connection", (socket) => {
           console.log("마피아 역할 배정");
           for (
             let playerIndex = 0;
-            playerIndex < maxMafiaCount;
+            playerIndex < mafiaMaxCount;
             playerIndex++
           ) {
             await setPlayerRole(playersUserId[playerIndex], "마피아");
           }
 
           console.log("방에 의사가 있다면 실행");
-          if (maxDoctorCount !== 0) {
+          if (doctorMaxCount !== 0) {
             console.log("의사 뽑음");
-            await setPlayerRole(playersUserId[maxMafiaCount], "의사");
+            await setPlayerRole(playersUserId[mafiaMaxCount], "의사");
           }
 
           console.log("경찰이 있다면 실행");
-          if (maxPoliceCount !== 0) {
+          if (policeMaxCount !== 0) {
             console.log("경찰 뽑음");
-            await setPlayerRole(playersUserId[maxMafiaCount + 1], "경찰");
+            await setPlayerRole(playersUserId[mafiaMaxCount + 1], "경찰");
           }
 
           allPlayers = await getPlayersInRoom(roomId);
@@ -1326,13 +1320,13 @@ mafiaIo.on("connection", (socket) => {
             .filter((player) => player.role == "마피아")
             .map((player) => player.user_id);
 
-          if (maxDoctorCount > 0) {
+          if (doctorMaxCount > 0) {
             doctorPlayer = allPlayers
               .find((player) => player.role == "의사")
               .map((player) => player.user_id);
           }
 
-          if (maxPoliceCount) {
+          if (policeMaxCount) {
             policePlayer = allPlayers
               .find((player) => player.role == "경찰")
               .map((player) => player.user_id);
