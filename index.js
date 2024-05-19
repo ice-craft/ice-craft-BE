@@ -1404,9 +1404,30 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
-          roundName = "r0-6";
+          roundName = "r1-0";
           time = 1;
-          clearInterval(start);
+        } else if (roundName == "r1-0") {
+          console.log(`${roundName} 시작`);
+
+          console.log(
+            `[${roundName}] showModal : 아침이 되었습니다. 모든 유저는 토론을 통해 마피아를 찾아내세요.`
+          );
+          mafiaIo
+            .to(roomId)
+            .emit(
+              "showModal",
+              "아침이 되었습니다. 모든 유저는 토론을 통해 마피아를 찾아내세요."
+            );
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-1";
+          time = 1;
+        } else if (roundName == "r1-1") {
+          console.log(`${roundName} 시작`);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-1";
+          time = 1;
         }
       }
     }, 1000);
