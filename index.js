@@ -1287,7 +1287,7 @@ mafiaIo.on("connection", (socket) => {
             playerIndex < playersMaxCount;
             playerIndex++
           ) {
-            await setPlayerRole(playersUserId[playerIndex], "시민");
+            await setPlayerRole(playersUserId[playerIndex], "시민"); //NOTE - 초기 설정이 시민이라 필요한지 생각해보기
           }
 
           //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
@@ -1375,6 +1375,7 @@ mafiaIo.on("connection", (socket) => {
 
           let media = {};
           allPlayers
+            .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
             .forEach(
               (player) =>
@@ -1393,6 +1394,7 @@ mafiaIo.on("connection", (socket) => {
 
           let media = {};
           allPlayers
+            .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
             .forEach(
               (player) =>
@@ -1449,9 +1451,27 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 종료`);
           roundName = "r1-3";
           time = 1;
+        } else if (roundName == "r1-3") {
+          console.log(`${roundName} 시작`);
+
+          let media = {};
+          allPlayers
+            .filter((player) => player.is_lived == true)
+            .forEach((player) => {
+              media[player.user_id] = { camera: false, mike: false };
+            });
+
+          console.log(
+            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`
+          );
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-4";
+          time = 1;
         }
       }
-    }, 1000);
+    }, 500);
   });
 });
 
