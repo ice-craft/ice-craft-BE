@@ -1469,6 +1469,22 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 종료`);
           roundName = "r1-4";
           time = 1;
+        } else if (roundName == "r1-4") {
+          console.log(`${roundName} 시작`);
+
+          console.log(
+            `[${roundName}] showModal : 토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요.`
+          );
+          mafiaIo
+            .to(roomId)
+            .emit(
+              "showModal",
+              "토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요."
+            );
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-5";
+          time = 1;
         }
       }
     }, 500);
