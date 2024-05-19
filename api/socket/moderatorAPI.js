@@ -21,7 +21,7 @@ export const showModal = (
 
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
 export const shufflePlayers = (allPlayers) => {
-  for (let i = allPlayers.length - 1; i > 0; i--) {
+  for (let i = allPlayers.length - 1; i >= 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [allPlayers[i], allPlayers[j]] = [allPlayers[j], allPlayers[i]];
   }

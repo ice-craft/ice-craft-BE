@@ -1220,20 +1220,21 @@ mafiaIo.on("connection", (socket) => {
       `[testStart 수신] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`
     );
 
+    let roundName = "r0-0";
     let allPlayers = null;
+
+    //NOTE - 플레이상 안쓰면 삭제
     let citizenMaxCount = null;
     let mafiaMaxCount = null;
     let doctorMaxCount = null;
     let policeMaxCount = null;
 
     let time = 1;
-    await updateRound(roomId, "r0-0");
 
     const start = setInterval(async () => {
       time--;
 
       if (time <= 0) {
-        let roundName = await getRound(roomId);
         allPlayers = await getPlayersInRoom(roomId);
 
         if (roundName === "r0-0") {
@@ -1249,23 +1250,19 @@ mafiaIo.on("connection", (socket) => {
           );
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
-          await updateRound(roomId, "r0-1");
-          time = 1;
           console.log(`${roundName} 종료`);
-        }
-
-        if (roundName === "r0-1") {
+          roundName = "r0-1";
+          time = 1;
+        } else if (roundName === "r0-1") {
           console.log(`${roundName} 시작`);
 
           console.log(`[${roundName}] showModal :  밤이 되었습니다.`);
           mafiaIo.to(roomId).emit("showModal", "밤이 되었습니다.");
 
-          await updateRound(roomId, "r0-2");
-          time = 1;
           console.log(`${roundName} 종료`);
-        }
-
-        if (roundName === "r0-2") {
+          roundName = "r0-2";
+          time = 1;
+        } else if (roundName === "r0-2") {
           console.log(`${roundName} 시작`);
 
           let playersUserId = allPlayers.map((player) => player.user_id);
@@ -1357,12 +1354,10 @@ mafiaIo.on("connection", (socket) => {
           console.log(`[${roundName}] showAllPlayerRole : 플레이어들 역할`);
           mafiaIo.to(roomId).emit("showAllPlayerRole", role);
 
-          await updateRound(roomId, "r0-3");
-          time = 1;
           console.log(`${roundName} 종료`);
-        }
-
-        if (roundName === "r0-3") {
+          roundName = "r0-3";
+          time = 1;
+        } else if (roundName === "r0-3") {
           console.log(`${roundName} 시작`);
 
           console.log(
@@ -1372,12 +1367,10 @@ mafiaIo.on("connection", (socket) => {
             .to(roomId)
             .emit("showModal", "마피아들은 고개를 들어 서로를 확인해주세요.");
 
-          await updateRound(roomId, "r0-4");
-          time = 1;
           console.log(`${roundName} 종료`);
-        }
-
-        if (roundName === "r0-4") {
+          roundName = "r0-4";
+          time = 1;
+        } else if (roundName === "r0-4") {
           console.log(`${roundName} 시작`);
 
           let media = {};
@@ -1392,12 +1385,10 @@ mafiaIo.on("connection", (socket) => {
           );
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
-          await updateRound(roomId, "r0-5");
-          time = 1;
           console.log(`${roundName} 종료`);
-        }
-
-        if (roundName === "r0-5") {
+          roundName = "r0-5";
+          time = 1;
+        } else if (roundName === "r0-5") {
           console.log(`${roundName} 시작`);
 
           let media = {};
@@ -1412,9 +1403,9 @@ mafiaIo.on("connection", (socket) => {
           );
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
-          await updateRound(roomId, "r0-5");
-          time = 1;
           console.log(`${roundName} 종료`);
+          roundName = "r0-6";
+          time = 1;
           clearInterval(start);
         }
       }
