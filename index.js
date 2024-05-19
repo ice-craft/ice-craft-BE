@@ -66,6 +66,8 @@ app.get("/", (req, res) => {
 
 mafiaIo.on("connection", (socket) => {
   socket.join("0ed9a099-f1b4-46eb-a187-2da752eed29c");
+  socket.data.userId = "11111111-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
+  socket.data.roomId = "0ed9a099-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
 
   socket.on("enterMafia", async (rowStart, rowEnd) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
@@ -1497,6 +1499,19 @@ mafiaIo.on("connection", (socket) => {
         }
       }
     }, 500);
+  });
+  socket.on("r1VoteToMafia", async (votedPlayer) => {
+    console.log("r1VoteToMafia 시작");
+
+    try {
+      await voteTo(votedPlayer);
+      console.log(`${userId}는 ${votedPlayer}에게 투표`);
+    } catch (error) {
+      console.log("[voteToMafiaError]");
+      socket.emit("voteToMafiaError");
+      return;
+    }
+    console.log("r1VoteToMafia 종료");
   });
 });
 
