@@ -1425,8 +1425,20 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName == "r1-1") {
           console.log(`${roundName} 시작`);
 
+          let media = {};
+          allPlayers
+            .filter((player) => player.is_lived == true)
+            .forEach((player) => {
+              media[player.user_id] = { camera: true, mike: true };
+            });
+
+          console.log(
+            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`
+          );
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
           console.log(`${roundName} 종료`);
-          roundName = "r1-1";
+          roundName = "r1-2";
           time = 1;
         }
       }
