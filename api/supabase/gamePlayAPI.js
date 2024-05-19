@@ -363,7 +363,7 @@ export const getRoleMaxCount = async (total_user_count, role) => {
 export const getCurrentUserDisplay = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
-    .select("user_id, user_nickname, is_lived")
+    .select("user_id, user_nickname, is_lived, role")
     .eq("room_id", room_id);
 
   if (error) {
@@ -484,4 +484,16 @@ export const updateRound = async (room_id, round) => {
   }
 
   return round;
+};
+
+export const getPlayersInRoom = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_id, user_nickname, is_lived, role")
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error();
+  }
+  return data;
 };

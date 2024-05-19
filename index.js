@@ -23,6 +23,7 @@ import {
   getCurrentUserDisplay,
   getPlayerByRole,
   getPlayerNickname,
+  getPlayersInRoom,
   getRoleMaxCount,
   getRound,
   getStatus,
@@ -1215,58 +1216,215 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("testStart", async (roomId) => {
-    console.log(`[testStart 수신] ${roomId}`);
+    console.log(`[testStart 수신] roomId : ${roomId}`);
 
-    let time = 2;
-    let roundCount = 1;
-    await updateRound(roomId, "round" + roundCount);
+    let allPlayers = null;
+
+    let time = 1;
+    await updateRound(roomId, "r0-0");
 
     const start = setInterval(async () => {
       time--;
-      console.log(time);
+
       if (time <= 0) {
         let roundName = await getRound(roomId);
+        allPlayers = await getPlayersInRoom(roomId);
 
-        if (roundName === "round1") {
-          console.log(`[test 송신] ${roundName}`);
-          mafiaIo.to(roomId).emit("test", roundName);
-          roundCount++;
-          await updateRound(roomId, "round" + roundCount);
-          time = 2;
+        if (roundName === "r0-0") {
+          console.log(`${roundName} 시작`);
+
+          let media = {};
+          allPlayers.forEach((player) => {
+            media[player.user_id] = { camera: false, mike: false };
+          });
+
+          console.log(
+            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`
+          );
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          await updateRound(roomId, "r0-1");
+          time = 1;
+          console.log(`${roundName} 종료`);
         }
 
-        if (roundName === "round2") {
-          console.log(`[test 송신] ${roundName}`);
-          mafiaIo.to(roomId).emit("test", roundName);
-          roundCount++;
-          await updateRound(roomId, "round" + roundCount);
-          time = 4;
+        if (roundName === "r0-1") {
+          console.log(`${roundName} 시작`);
+
+          console.log(`[${roundName}] showModal :  밤이 되었습니다.`);
+          mafiaIo.to(roomId).emit("showModal", "밤이 되었습니다.");
+
+          await updateRound(roomId, "r0-2");
+          time = 1;
+          console.log(`${roundName} 종료`);
         }
 
-        if (roundName === "round3") {
-          console.log(`[test 송신] ${roundName}`);
-          mafiaIo.to(roomId).emit("test", roundName);
-          roundCount++;
-          await updateRound(roomId, "round" + roundCount);
-          time = 6;
+        if (roundName === "r0-2") {
+          console.log(`${roundName} 시작`);
+
+          let playersUserId = allPlayers.map((player) => player.user_id);
+          const { total_user_count: totalUserCount } = await getUserCountInRoom(
+            roomId
+          );
+          const maxMafiaCount = await getRoleMaxCount(
+            totalUserCount,
+            "mafia_count"
+          );
+          const maxDoctorCount = await getRoleMaxCount(
+            totalUserCount,
+            "doctor_count"
+          );
+          const maxPoliceCount = await getRoleMaxCount(
+            totalUserCount,
+            "police_count"
+          );
+          let mafiaPlayers;
+          let doctorPlayer;
+          let policePlayer;
+          let citizenPlayers;
+
+          playersUserId = shufflePlayers(playersUserId);
+
+          console.log("총 멤버", playersUserId);
+          console.log("최대 마피아 인원 수", maxMafiaCount);
+          console.log("최대 의사 인원 수", maxDoctorCount);
+          console.log("최대 경찰 인원 수", maxPoliceCount);
+
+          //NOTE - 처음에는 모든 플레이어 시민으로 설정
+          for (
+            let playerIndex = 0;
+            playerIndex < totalUserCount;
+            playerIndex++
+          ) {
+            await setPlayerRole(playersUserId[playerIndex], "시민");
+          }
+
+          //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
+          console.log("마피아 역할 배정");
+          for (
+            let playerIndex = 0;
+            playerIndex < maxMafiaCount;
+            playerIndex++
+          ) {
+            await setPlayerRole(playersUserId[playerIndex], "마피아");
+          }
+
+          console.log("방에 의사가 있다면 실행");
+          if (maxDoctorCount !== 0) {
+            console.log("의사 뽑음");
+            await setPlayerRole(playersUserId[maxMafiaCount], "의사");
+          }
+
+          console.log("경찰이 있다면 실행");
+          if (maxPoliceCount !== 0) {
+            console.log("경찰 뽑음");
+            await setPlayerRole(playersUserId[maxMafiaCount + 1], "경찰");
+          }
+
+          allPlayers = await getPlayersInRoom(roomId);
+          mafiaPlayers = allPlayers
+            .filter((player) => player.role == "마피아")
+            .map((player) => player.user_id);
+
+          if (maxDoctorCount > 0) {
+            doctorPlayer = allPlayers
+              .find((player) => player.role == "의사")
+              .map((player) => player.user_id);
+          }
+
+          if (maxPoliceCount) {
+            policePlayer = allPlayers
+              .find((player) => player.role == "경찰")
+              .map((player) => player.user_id);
+          }
+
+          citizenPlayers = allPlayers
+            .filter((player) => player.role == "시민")
+            .map((player) => player.user_id);
+
+          let role = {};
+
+          role["마피아"] = mafiaPlayers;
+
+          if (doctorPlayer) {
+            role["의사"] = doctorPlayer;
+          } else {
+            role["의사"] = null;
+          }
+
+          if (policePlayer) {
+            role["경찰"] = policePlayer;
+          } else {
+            role["경찰"] = null;
+          }
+
+          role["시민"] = citizenPlayers;
+
+          console.log(`[${roundName}] showAllPlayerRole : 플레이어들 역할`);
+          mafiaIo.to(roomId).emit("showAllPlayerRole", role);
+
+          await updateRound(roomId, "r0-3");
+          time = 1;
+          console.log(`${roundName} 종료`);
         }
 
-        if (roundName === "round4") {
-          console.log(`[test 송신] ${roundName}`);
-          mafiaIo.to(roomId).emit("test", roundName);
-          roundCount++;
-          await updateRound(roomId, "round" + roundCount);
-          time = 8;
+        if (roundName === "r0-3") {
+          console.log(`${roundName} 시작`);
+
+          console.log(
+            `[${roundName}] showModal : 마피아들은 고개를 들어 서로를 확인해주세요.`
+          );
+          mafiaIo
+            .to(roomId)
+            .emit("showModal", "마피아들은 고개를 들어 서로를 확인해주세요.");
+
+          await updateRound(roomId, "r0-4");
+          time = 1;
+          console.log(`${roundName} 종료`);
         }
 
-        if (roundName === "round5") {
-          console.log("[test 송신] 게임종료");
-          mafiaIo.to(roomId).emit("test", "게임종료");
-          console.log("게임 종료");
+        if (roundName === "r0-4") {
+          console.log(`${roundName} 시작`);
+
+          let media = {};
+          allPlayers
+            .filter((player) => player.role == "마피아")
+            .forEach(
+              (player) =>
+                (media[player.user_id] = { camera: true, mike: false })
+            );
+          console.log(
+            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`
+          );
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          await updateRound(roomId, "r0-5");
+          time = 1;
+          console.log(`${roundName} 종료`);
+        }
+
+        if (roundName === "r0-5") {
+          console.log(`${roundName} 시작`);
+
+          let media = {};
+          allPlayers
+            .filter((player) => player.role == "마피아")
+            .forEach(
+              (player) =>
+                (media[player.user_id] = { camera: false, mike: false })
+            );
+          console.log(
+            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔`
+          );
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          await updateRound(roomId, "r0-5");
+          time = 1;
+          console.log(`${roundName} 종료`);
           clearInterval(start);
         }
       }
-    }, 500);
+    }, 1000);
   });
 });
 

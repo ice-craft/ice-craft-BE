@@ -1,5 +1,6 @@
 import {
   getCurrentUserDisplay,
+  getPlayersInRoom,
   getRoleMaxCount,
   getRound,
   resetPlayerStatus,
@@ -12,7 +13,7 @@ import {
 import { getUserIdInRoom } from "./api/supabase/roomAPI.js";
 
 try {
-  const data = await updateRound("0ed9a099-f1b4-46eb-a187-2da752eed29c", "r1");
+  const data = await getPlayersInRoom("0ed9a099-f1b4-46eb-a187-2da752eed29c");
   console.log(data);
 } catch (error) {
   console.log(error);
