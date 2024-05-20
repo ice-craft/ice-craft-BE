@@ -1,8 +1,7 @@
 import {
   getCurrentUserDisplay,
-  getPlayerByRole,
   getVoteYesOrNoResult,
-} from "../gamePlayAPI.js";
+} from "../supabase/gamePlayAPI.js";
 
 //NOTE - 클라이언트의 화면에 모달창을 띄움
 export const showModal = (
@@ -22,7 +21,7 @@ export const showModal = (
 
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
 export const shufflePlayers = (allPlayers) => {
-  for (let i = allPlayers.length - 1; i > 0; i--) {
+  for (let i = allPlayers.length - 1; i >= 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [allPlayers[i], allPlayers[j]] = [allPlayers[j], allPlayers[i]];
   }
@@ -123,4 +122,21 @@ export const showWhoWins = async (gameOver) => {
 export const updateUserInRoom = async (mafiaIo, roomId) => {
   const playerInfo = await getCurrentUserDisplay(roomId);
   mafiaIo.to(roomId).emit("updateUserInRoom", playerInfo);
+};
+
+export const getRoleMaxCount = (totalCount) => {
+  switch (totalCount) {
+    case 5:
+      return [4, 1, 0, 0];
+    case 6:
+      return [3, 2, 1, 0];
+    case 7:
+      return [4, 2, 1, 0];
+    case 8:
+      return [3, 3, 1, 1];
+    case 9:
+      return [4, 3, 1, 1];
+    case 10:
+      return [5, 3, 1, 1];
+  }
 };
