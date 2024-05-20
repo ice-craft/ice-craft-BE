@@ -92,9 +92,7 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("joinRoom", async (userId, roomId, nickname) => {
-    console.log(
-      `[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`
-    );
+    console.log(`[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`);
     socket.data.userId = userId;
     socket.data.roomId = roomId;
     try {
@@ -195,22 +193,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r0TurnAllUserCameraMikeOff",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r0TurnAllUserCameraMikeOff", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r0TurnAllUserCameraMikeOff",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r0TurnAllUserCameraMikeOff", total_user_count);
     } catch (error) {
       console.log("[r0TurnAllUserCameraMikeOffError]");
       socket.emit("r0TurnAllUserCameraMikeOffError");
@@ -260,12 +249,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r0ShowAllUserRole",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r0ShowAllUserRole", true);
 
       if (!isValid) {
         throw new Error();
@@ -293,22 +277,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r0ShowMafiaUserEachOther",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r0ShowMafiaUserEachOther", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r0ShowMafiaUserEachOther",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r0ShowMafiaUserEachOther", total_user_count);
     } catch (error) {
       console.log("[r0ShowMafiaUserEachOtherError]");
       socket.emit("r0ShowMafiaUserEachOtherError");
@@ -330,22 +305,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r0TurnMafiaUserCameraOn",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r0TurnMafiaUserCameraOn", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r0TurnMafiaUserCameraOn",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r0TurnMafiaUserCameraOn", total_user_count);
     } catch (error) {
       console.log("[r0TurnMafiaUserCameraOnError]");
       socket.emit("r0TurnMafiaUserCameraOnError");
@@ -367,22 +333,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r0TurnMafiaUserCameraOff",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r0TurnMafiaUserCameraOff", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r0TurnMafiaUserCameraOff",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r0TurnMafiaUserCameraOff", total_user_count);
     } catch (error) {
       console.log("[r0TurnMafiaUserCameraOffError]");
       socket.emit("r0TurnMafiaUserCameraOffError");
@@ -434,22 +391,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1TurnAllUserCameraMikeOn",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1TurnAllUserCameraMikeOn", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1TurnAllUserCameraMikeOn",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1TurnAllUserCameraMikeOn", total_user_count);
     } catch (error) {
       console.log("[r1TurnAllUserCameraMikeOnError]");
       socket.emit("r1TurnAllUserCameraMikeOnError");
@@ -558,12 +506,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1ShowVoteToResult",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1ShowVoteToResult", true);
 
       if (!isValid) {
         throw new Error();
@@ -591,22 +534,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1ShowMostVotedPlayer",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1ShowMostVotedPlayer", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1ShowMostVotedPlayer",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1ShowMostVotedPlayer", total_user_count);
     } catch (error) {
       console.log("[r1ShowMostVotedPlayerError]");
       socket.emit("r1ShowMostVotedPlayerError");
@@ -690,22 +624,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1ShowVoteYesOrNoResult",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1ShowVoteYesOrNoResult", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1ShowVoteYesOrNoResult",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1ShowVoteYesOrNoResult", total_user_count);
     } catch (error) {
       console.log("[r1ShowVoteYesOrNoResultError]");
       socket.emit("r1ShowVoteYesOrNoResultError");
@@ -727,22 +652,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1KillMostVotedPlayer",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1KillMostVotedPlayer", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1KillMostVotedPlayer",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1KillMostVotedPlayer", total_user_count);
     } catch (error) {
       console.log("[r1KillMostVotedPlayerError]");
       socket.emit("r1KillMostVotedPlayerError");
@@ -764,22 +680,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1TurnAllUserCameraMikeOff",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1TurnAllUserCameraMikeOff", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1TurnAllUserCameraMikeOff",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1TurnAllUserCameraMikeOff", total_user_count);
     } catch (error) {
       console.log("[r1TurnAllUserCameraMikeOffError]");
       socket.emit("r1TurnAllUserCameraMikeOffError");
@@ -801,22 +708,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1DecideMafiaToKillPlayer",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1DecideMafiaToKillPlayer", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1DecideMafiaToKillPlayer",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1DecideMafiaToKillPlayer", total_user_count);
     } catch (error) {
       console.log("[r1DecideMafiaToKillPlayerError]");
       socket.emit("r1DecideMafiaToKillPlayerError");
@@ -838,22 +736,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1TurnMafiaUserCameraOn",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1TurnMafiaUserCameraOn", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1TurnMafiaUserCameraOn",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1TurnMafiaUserCameraOn", total_user_count);
     } catch (error) {
       console.log("[r1TurnMafiaUserCameraOnError]");
       socket.emit("r1TurnMafiaUserCameraOnError");
@@ -875,22 +764,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1GestureToMafiaEachOther",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1GestureToMafiaEachOther", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1GestureToMafiaEachOther",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1GestureToMafiaEachOther", total_user_count);
 
       await choosePlayer(player, "마피아", date);
     } catch (error) {
@@ -914,22 +794,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1TurnMafiaUserCameraOff",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1TurnMafiaUserCameraOff", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1TurnMafiaUserCameraOff",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1TurnMafiaUserCameraOff", total_user_count);
     } catch (error) {
       console.log("[r1TurnMafiaUserCameraOffError]");
       socket.emit("r1TurnMafiaUserCameraOffError");
@@ -951,22 +822,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1DecideDoctorToSavePlayer",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1DecideDoctorToSavePlayer", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1DecideDoctorToSavePlayer",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1DecideDoctorToSavePlayer", total_user_count);
 
       if (player) {
         await choosePlayer(player, "의사", new Date());
@@ -992,22 +854,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1DecidePoliceToDoubtPlayer",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1DecidePoliceToDoubtPlayer", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r1DecidePoliceToDoubtPlayer",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r1DecidePoliceToDoubtPlayer", total_user_count);
       if (player) {
         await choosePlayer(player, "경찰", new Date());
       }
@@ -1032,12 +885,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1ShowDoubtedPlayer",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1ShowDoubtedPlayer", true);
 
       if (!isValid) {
         throw new Error();
@@ -1065,12 +913,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r1KillPlayerByRole",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r1KillPlayerByRole", true);
 
       if (isValid) {
         throw new Error();
@@ -1127,22 +970,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r2TurnAllUserCameraMikeOn",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r2TurnAllUserCameraMikeOn", true);
 
       if (!isValid) {
         throw new Error();
       }
 
-      isDone = await getStatus(
-        roomId,
-        "r2TurnAllUserCameraMikeOn",
-        total_user_count
-      );
+      isDone = await getStatus(roomId, "r2TurnAllUserCameraMikeOn", total_user_count);
     } catch (error) {
       console.log("[r2TurnAllUserCameraMikeOnError]");
       socket.emit("r2TurnAllUserCameraMikeOnError");
@@ -1165,12 +999,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const { total_user_count } = await getUserCountInRoom(roomId);
-      const isValid = await setStatus(
-        userId,
-        roomId,
-        "r2ShowIsPlayerLived",
-        true
-      );
+      const isValid = await setStatus(userId, roomId, "r2ShowIsPlayerLived", true);
 
       if (!isValid) {
         throw new Error();
@@ -1215,6 +1044,17 @@ mafiaIo.on("connection", (socket) => {
     // }
   });
 
+  //=========================================================================================================================================================
+  //=========================================================================================================================================================
+  //=========================================================================================================================================================
+  //=========================================================================================================================================================
+  //=========================================================================================================================================================
+  //=========================================================================================================================================================
+  //=========================================================================================================================================================
+  //=========================================================================================================================================================
+  //=========================================================================================================================================================
+  //=========================================================================================================================================================
+
   socket.on("testStart", async (roomId) => {
     console.log(`[testStart 수신] roomId : ${roomId}`);
 
@@ -1238,9 +1078,7 @@ mafiaIo.on("connection", (socket) => {
             media[player.user_id] = { camera: false, mike: false };
           });
 
-          console.log(
-            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`
-          );
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           await updateRound(roomId, "r0-1");
@@ -1263,21 +1101,10 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
 
           let playersUserId = allPlayers.map((player) => player.user_id);
-          const { total_user_count: totalUserCount } = await getUserCountInRoom(
-            roomId
-          );
-          const maxMafiaCount = await getRoleMaxCount(
-            totalUserCount,
-            "mafia_count"
-          );
-          const maxDoctorCount = await getRoleMaxCount(
-            totalUserCount,
-            "doctor_count"
-          );
-          const maxPoliceCount = await getRoleMaxCount(
-            totalUserCount,
-            "police_count"
-          );
+          const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
+          const maxMafiaCount = await getRoleMaxCount(totalUserCount, "mafia_count");
+          const maxDoctorCount = await getRoleMaxCount(totalUserCount, "doctor_count");
+          const maxPoliceCount = await getRoleMaxCount(totalUserCount, "police_count");
           let mafiaPlayers;
           let doctorPlayer;
           let policePlayer;
@@ -1291,21 +1118,13 @@ mafiaIo.on("connection", (socket) => {
           console.log("최대 경찰 인원 수", maxPoliceCount);
 
           //NOTE - 처음에는 모든 플레이어 시민으로 설정
-          for (
-            let playerIndex = 0;
-            playerIndex < totalUserCount;
-            playerIndex++
-          ) {
+          for (let playerIndex = 0; playerIndex < totalUserCount; playerIndex++) {
             await setPlayerRole(playersUserId[playerIndex], "시민");
           }
 
           //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
           console.log("마피아 역할 배정");
-          for (
-            let playerIndex = 0;
-            playerIndex < maxMafiaCount;
-            playerIndex++
-          ) {
+          for (let playerIndex = 0; playerIndex < maxMafiaCount; playerIndex++) {
             await setPlayerRole(playersUserId[playerIndex], "마피아");
           }
 
@@ -1322,25 +1141,17 @@ mafiaIo.on("connection", (socket) => {
           }
 
           allPlayers = await getPlayersInRoom(roomId);
-          mafiaPlayers = allPlayers
-            .filter((player) => player.role == "마피아")
-            .map((player) => player.user_id);
+          mafiaPlayers = allPlayers.filter((player) => player.role == "마피아").map((player) => player.user_id);
 
           if (maxDoctorCount > 0) {
-            doctorPlayer = allPlayers
-              .find((player) => player.role == "의사")
-              .map((player) => player.user_id);
+            doctorPlayer = allPlayers.find((player) => player.role == "의사").map((player) => player.user_id);
           }
 
           if (maxPoliceCount) {
-            policePlayer = allPlayers
-              .find((player) => player.role == "경찰")
-              .map((player) => player.user_id);
+            policePlayer = allPlayers.find((player) => player.role == "경찰").map((player) => player.user_id);
           }
 
-          citizenPlayers = allPlayers
-            .filter((player) => player.role == "시민")
-            .map((player) => player.user_id);
+          citizenPlayers = allPlayers.filter((player) => player.role == "시민").map((player) => player.user_id);
 
           let role = {};
 
@@ -1371,12 +1182,8 @@ mafiaIo.on("connection", (socket) => {
         if (roundName === "r0-3") {
           console.log(`${roundName} 시작`);
 
-          console.log(
-            `[${roundName}] showModal : 마피아들은 고개를 들어 서로를 확인해주세요.`
-          );
-          mafiaIo
-            .to(roomId)
-            .emit("showModal", "마피아들은 고개를 들어 서로를 확인해주세요.");
+          console.log(`[${roundName}] showModal : 마피아들은 고개를 들어 서로를 확인해주세요.`);
+          mafiaIo.to(roomId).emit("showModal", "마피아들은 고개를 들어 서로를 확인해주세요.");
 
           await updateRound(roomId, "r0-4");
           time = 1;
@@ -1389,13 +1196,8 @@ mafiaIo.on("connection", (socket) => {
           let media = {};
           allPlayers
             .filter((player) => player.role == "마피아")
-            .forEach(
-              (player) =>
-                (media[player.user_id] = { camera: true, mike: false })
-            );
-          console.log(
-            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`
-          );
+            .forEach((player) => (media[player.user_id] = { camera: true, mike: false }));
+          console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           await updateRound(roomId, "r0-5");
@@ -1409,13 +1211,8 @@ mafiaIo.on("connection", (socket) => {
           let media = {};
           allPlayers
             .filter((player) => player.role == "마피아")
-            .forEach(
-              (player) =>
-                (media[player.user_id] = { camera: false, mike: false })
-            );
-          console.log(
-            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔`
-          );
+            .forEach((player) => (media[player.user_id] = { camera: false, mike: false }));
+          console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           await updateRound(roomId, "r0-5");
@@ -1436,33 +1233,23 @@ const canGameStart = async (roomId) => {
   console.log("게임 진행 가능 확인");
   let canStart = false;
   try {
-    const { total_user_count: totalUserCount } = await getUserCountInRoom(
-      roomId
-    );
+    const { total_user_count: totalUserCount } = await getUserCountInRoom(roomId);
     console.log("총 인원 :", totalUserCount);
     console.log("룸 아이디", roomId);
 
-    const isAllPlayerEnoughCount = await checkPlayerCountEnough(
-      roomId,
-      totalUserCount
-    ); //NOTE - 플레이어들이 방 정원을 채웠는지
-    const isAllPlayersReady = await checkAllPlayersReady(
-      roomId,
-      totalUserCount
-    ); //NOTE - 플레이어들이 전부 레디했는지
+    const isAllPlayerEnoughCount = await checkPlayerCountEnough(roomId, totalUserCount); //NOTE - 플레이어들이 방 정원을 채웠는지
+    const isAllPlayersReady = await checkAllPlayersReady(roomId, totalUserCount); //NOTE - 플레이어들이 전부 레디했는지
     canStart = isAllPlayerEnoughCount && isAllPlayersReady;
-    console.log(
-      "인원 충분 :",
-      isAllPlayerEnoughCount,
-      " 전부 레디 :" + isAllPlayersReady
-    );
+    console.log("인원 충분 :", isAllPlayerEnoughCount, " 전부 레디 :" + isAllPlayersReady);
   } catch (error) {
     console.log("[canGameStartError]");
     mafiaIo.to(roomId).emit("canGameStartError");
   }
 
   if (canStart) {
-    play(roomId);
+    // play(roomId);
+    mafiaIo.to(roomId).emit("allReadyCompletion", true);
+    console.log("모든인원 게임 준비완료");
   } else {
     console.log("게임 준비X");
   }
@@ -1637,20 +1424,12 @@ const r1ShowMostVotedPlayer = async (roomId) => {
   if (mostVoteResult.isValid) {
     console.log("투표 성공");
     //NOTE - 투표 성공
-    console.log(
-      `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`
-    );
+    console.log(`${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`);
     mafiaIo
       .to(roomId)
-      .emit(
-        "r1ShowMostVotedPlayer",
-        `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`,
-        true
-      );
+      .emit("r1ShowMostVotedPlayer", `${mostVoteResult.result.user_nickname}님이 마피아로 지목되었습니다.`, true);
   } else {
-    mafiaIo
-      .to(roomId)
-      .emit("r1ShowMostVotedPlayer", "투표가 유효하지 않습니다.", false);
+    mafiaIo.to(roomId).emit("r1ShowMostVotedPlayer", "투표가 유효하지 않습니다.", false);
   }
 };
 
@@ -1658,17 +1437,13 @@ const r1LastTalk = async (roomId) => {
   console.log("r1LastTalk 송신");
   const voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
   const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
-  console.log(
-    `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`
-  );
+  console.log(`${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`);
 
   mafiaIo
     .to(roomId)
-    .emit(
-      "r1LastTalk",
-      `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`,
-      [mostVoteResult.result.user_id]
-    );
+    .emit("r1LastTalk", `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`, [
+      mostVoteResult.result.user_id,
+    ]);
 };
 
 const r1VoteYesOrNo = (roomId) => {
@@ -1682,12 +1457,7 @@ const r1ShowVoteYesOrNoResult = async (roomId) => {
   console.log("투표 결과 나옴");
   const yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
 
-  showVoteYesOrNoResult(
-    mafiaIo,
-    roomId,
-    "r1ShowVoteYesOrNoResult",
-    yesOrNoVoteResult.detail
-  ); //NOTE - 투표 결과를 방의 유저들에게 보여줌
+  showVoteYesOrNoResult(mafiaIo, roomId, "r1ShowVoteYesOrNoResult", yesOrNoVoteResult.detail); //NOTE - 투표 결과를 방의 유저들에게 보여줌
   // await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
 };
 
@@ -1707,21 +1477,15 @@ const r1KillMostVotedPlayer = async (roomId) => {
     //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
     if (isPlayerMafia) {
       console.log("마피아가 죽었습니다.");
-      mafiaIo
-        .to(roomId)
-        .emit("r1KillMostVotedPlayer", "마피아가 죽었습니다.", [killedPlayer]);
+      mafiaIo.to(roomId).emit("r1KillMostVotedPlayer", "마피아가 죽었습니다.", [killedPlayer]);
     } else {
       console.log("시민이 죽었습니다.");
-      mafiaIo
-        .to(roomId)
-        .emit("r1KillMostVotedPlayer", "시민이 죽었습니다.", [killedPlayer]);
+      mafiaIo.to(roomId).emit("r1KillMostVotedPlayer", "시민이 죽었습니다.", [killedPlayer]);
     }
   } else {
     //NOTE - 투표 실패, 동률이 나옴
     console.log("동률 나옴");
-    mafiaIo
-      .to(roomId)
-      .emit("r1KillMostVotedPlayer", "동률이 나왔습니다.", null);
+    mafiaIo.to(roomId).emit("r1KillMostVotedPlayer", "동률이 나왔습니다.", null);
   }
 };
 
@@ -1751,12 +1515,7 @@ const r1GestureToMafiaEachOther = async (roomId) => {
   console.log("r1GestureToMafiaEachOther 송신");
   console.log("누구를 죽일지 제스처를 통해 상의하세요.");
 
-  mafiaIo
-    .to(roomId)
-    .emit(
-      "r1GestureToMafiaEachOther",
-      "누구를 죽일지 제스처를 통해 상의하세요."
-    );
+  mafiaIo.to(roomId).emit("r1GestureToMafiaEachOther", "누구를 죽일지 제스처를 통해 상의하세요.");
 };
 
 const r1TurnMafiaUserCameraOff = async (roomId) => {
@@ -1776,18 +1535,9 @@ const r1DecideDoctorToSavePlayer = async (roomId) => {
   const doctorPlayer = await getPlayerByRole(roomId, "의사");
 
   if (maxDoctorCount !== 0) {
-    mafiaIo
-      .to(roomId)
-      .emit(
-        "r1DecideDoctorToSavePlayer",
-        "의사는 누구를 살릴 지 결정하세요.",
-        true,
-        doctorPlayer
-      );
+    mafiaIo.to(roomId).emit("r1DecideDoctorToSavePlayer", "의사는 누구를 살릴 지 결정하세요.", true, doctorPlayer);
   } else {
-    mafiaIo
-      .to(roomId)
-      .emit("r1DecideDoctorToSavePlayer", "의사 없음", false, null);
+    mafiaIo.to(roomId).emit("r1DecideDoctorToSavePlayer", "의사 없음", false, null);
   }
 };
 
@@ -1800,18 +1550,9 @@ const r1DecidePoliceToDoubtPlayer = async (roomId) => {
   const policePlayer = await getPlayerByRole(roomId, "경찰");
 
   if (maxPoliceCount !== 0) {
-    mafiaIo
-      .to(roomId)
-      .emit(
-        "r1DecidePoliceToDoubtPlayer",
-        "경찰은 마피아 의심자를 결정해주세요.",
-        true,
-        policePlayer
-      );
+    mafiaIo.to(roomId).emit("r1DecidePoliceToDoubtPlayer", "경찰은 마피아 의심자를 결정해주세요.", true, policePlayer);
   } else {
-    mafiaIo
-      .to(roomId)
-      .emit("r1DecidePoliceToDoubtPlayer", "경찰이 없습니다.", false, null);
+    mafiaIo.to(roomId).emit("r1DecidePoliceToDoubtPlayer", "경찰이 없습니다.", false, null);
   }
 };
 
@@ -1827,47 +1568,17 @@ const r1ShowDoubtedPlayer = async (roomId) => {
 
     if (isPlayerMafia === true) {
       console.log("해당 플레이어는 마피아가 맞습니다.");
-      mafiaIo.to(roomId),
-        emit(
-          "r1ShowDoubtedPlayer",
-          "해당 플레이어는 마피아가 맞습니다.",
-          true,
-          policePlayer
-        );
+      mafiaIo.to(roomId), emit("r1ShowDoubtedPlayer", "해당 플레이어는 마피아가 맞습니다.", true, policePlayer);
     } else if (isPlayerMafia === false) {
       console.log("해당 플레이어는 마피아가 아닙니다.");
-      mafiaIo
-        .to(roomId)
-        .emit(
-          "r1ShowDoubtedPlayer",
-          "해당 플레이어는 마피아가 아닙니다.",
-          true,
-          policePlayer
-        );
+      mafiaIo.to(roomId).emit("r1ShowDoubtedPlayer", "해당 플레이어는 마피아가 아닙니다.", true, policePlayer);
     } else {
       console.log("경찰이 지목하지 않았습니다.");
-      mafiaIo
-        .to(roomId)
-        .emit(
-          "r1ShowDoubtedPlayer",
-          "경찰이 지목하지 않았습니다.",
-          null,
-          policePlayer
-        );
+      mafiaIo.to(roomId).emit("r1ShowDoubtedPlayer", "경찰이 지목하지 않았습니다.", null, policePlayer);
     }
   } else {
     console.log("경찰이 없습니다.");
-    mafiaIo
-      .to(roomId)
-      .emit(
-        "r1ShowDoubtedPlayer",
-        "제목",
-        "경찰이 없습니다.",
-        500,
-        "닉네임",
-        false,
-        null
-      );
+    mafiaIo.to(roomId).emit("r1ShowDoubtedPlayer", "제목", "경찰이 없습니다.", 500, "닉네임", false, null);
   }
 };
 
@@ -1912,24 +1623,10 @@ const r2ShowIsPlayerLived = async (roomId) => {
 
   if (isPlayerLived) {
     console.log("의사의 활약으로 아무도 죽지 않았습니다.");
-    mafiaIo
-      .to(roomId)
-      .emit(
-        "r2ShowIsPlayerLived",
-        "의사의 활약으로 아무도 죽지 않았습니다.",
-        true,
-        [playerToKill]
-      );
+    mafiaIo.to(roomId).emit("r2ShowIsPlayerLived", "의사의 활약으로 아무도 죽지 않았습니다.", true, [playerToKill]);
   } else {
     const killedPlayerNickname = await getPlayerNickname(playerToKill);
     console.log(`${killedPlayerNickname}님이 죽었습니다.`);
-    mafiaIo
-      .to(roomId)
-      .emit(
-        "r2ShowIsPlayerLived",
-        `${killedPlayerNickname}님이 죽었습니다.`,
-        false,
-        [playerToKill]
-      );
+    mafiaIo.to(roomId).emit("r2ShowIsPlayerLived", `${killedPlayerNickname}님이 죽었습니다.`, false, [playerToKill]);
   }
 };
