@@ -1399,7 +1399,16 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 종료`);
           roundName = "r0-5";
           time = 1;
-        } else if (roundName === "r0-5") {
+        } else if (roundName == "r0-5") {
+          console.log(`${roundName} 시작`);
+
+          console.log(`[${roundName}] timerStatus / 5초`);
+          mafiaIo.to(roomId).emit("timerStatus", 5);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r0-6";
+          time = 1;
+        } else if (roundName === "r0-6") {
           console.log(`${roundName} 시작`);
 
           let media = {};
@@ -1511,11 +1520,43 @@ mafiaIo.on("connection", (socket) => {
 
           voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
           //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
-          console.log(`[${roundName}] showVoteResult : 마피아 의심 투표 결과`);
-          mafiaIo.to(roomId).emit("showVoteResult", voteBoard);
+          console.log(
+            `[${roundName}] showVoteResult : 마피아 의심 투표 결과 / 5초`
+          );
+          mafiaIo.to(roomId).emit("showVoteResult", voteBoard, 5);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-7";
+          time = 1;
+        } else if (roundName == "r1-7") {
+          console.log(`${roundName} 시작`);
+
+          const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+
+          if (mostVoteResult.isValid) {
+            console.log(
+              `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요. / 3초`
+            );
+            mafiaIo
+              .to(roomId)
+              .emit(
+                "showModal",
+                `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`,
+                3,
+                true
+              );
+
+            console.log(`${roundName} 종료`);
+            roundName = "r1-8";
+            time = 1;
+          } else {
+            mafiaIo
+              .to(roomId)
+              .emit("showModal", "투표가 유효하지 않습니다.", false);
+          }
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-8"; //FIXME - 찬반 투표 건너 뛰는 라운드로 설정하기
           time = 1;
         }
       }
