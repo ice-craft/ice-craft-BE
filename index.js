@@ -1079,12 +1079,14 @@ mafiaIo.on("connection", (socket) => {
         if (roundName === "r0-0") {
           console.log(`${roundName} 시작`);
 
-          let media = {};
-          allPlayers.forEach((player) => {
-            media[player.user_id] = { camera: false, mike: false };
+          let media = [];
+          allPlayers.forEach((player, index) => {
+            media[index] = { userId: player.user_id, camera: false, mike: false };
           });
 
           console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
+          console.log("me", typeof media);
+          console.log("mediaValue", media);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1189,11 +1191,11 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName === "r0-4") {
           console.log(`${roundName} 시작`);
 
-          let media = {};
+          let media = [];
           allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach((player) => (media[player.user_id] = { camera: true, mike: false }));
+            .forEach((player, index) => (media[index] = { userId: player.user_id, camera: true, mike: false }));
           console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
@@ -1203,11 +1205,11 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName === "r0-5") {
           console.log(`${roundName} 시작`);
 
-          let media = {};
+          let media = [];
           allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach((player) => (media[player.user_id] = { camera: false, mike: false }));
+            .forEach((player, index) => (media[index] = { userId: player.user_id, camera: false, mike: false }));
           console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
@@ -1226,14 +1228,12 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName == "r1-1") {
           console.log(`${roundName} 시작`);
 
-          let media = {};
+          let media = [];
           allPlayers
             .filter((player) => player.is_lived == true)
-            .forEach((player) => {
-              media[player.user_id] = { camera: true, mike: true };
-            });
+            .forEach((player, index) => (media[index] = { userId: player.user_id, camera: true, mike: true }));
 
-          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 킴`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1251,12 +1251,10 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName == "r1-3") {
           console.log(`${roundName} 시작`);
 
-          let media = {};
+          let media = [];
           allPlayers
             .filter((player) => player.is_lived == true)
-            .forEach((player) => {
-              media[player.user_id] = { camera: false, mike: false };
-            });
+            .forEach((player, index) => (media[index] = { userId: player.user_id, camera: false, mike: false }));
 
           console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
