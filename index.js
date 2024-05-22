@@ -1535,7 +1535,7 @@ mafiaIo.on("connection", (socket) => {
 
           if (mostVoteResult.isValid) {
             console.log(
-              `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요. / 3초`
+              `[${roundName}] showModal : ${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요. / 3초`
             );
             mafiaIo
               .to(roomId)
@@ -1550,13 +1550,34 @@ mafiaIo.on("connection", (socket) => {
             roundName = "r1-8";
             time = 1;
           } else {
+            console.log(
+              `[${roundName}] showModal : 동률로 인해 아무도 죽지 않았습니다. / 3초`
+            );
             mafiaIo
               .to(roomId)
-              .emit("showModal", "투표가 유효하지 않습니다.", false);
+              .emit("showModal", "동률로 인해 아무도 죽지 않았습니다.", 3);
+
+            console.log(`${roundName} 종료`);
+            roundName = "r1-8"; //FIXME - 찬반 투표 건너 뛰는 라운드로 설정하기
+            time = 1;
           }
+        } else if (roundName == "r1-8") {
+          console.log(`${roundName} 시작`);
+
+          let media = {};
+          allPlayers
+            .filter((player) => player.is_lived == true)
+            .forEach((player) => {
+              media[player.user_id] = { camera: true, mike: true };
+            });
+
+          console.log(
+            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 켬`
+          );
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-8"; //FIXME - 찬반 투표 건너 뛰는 라운드로 설정하기
+          roundName = "r1-9";
           time = 1;
         }
       }
