@@ -1708,6 +1708,25 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-16";
+        } else if (roundName === "r1-16") {
+          console.log(`${roundName} 시작`);
+          time = 1;
+
+          let media = {};
+          allPlayers
+            .filter((player) => player.is_lived == true)
+            .filter((player) => player.role == "마피아")
+            .forEach((player) => {
+              media[player.user_id] = { camera: true, mike: false };
+            });
+
+          console.log(
+            `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬 마이크 끔`
+          );
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-17";
         }
       }
     }, 1000);
