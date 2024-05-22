@@ -1606,6 +1606,19 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 종료`);
           roundName = "r1-11";
           time = 1;
+        } else if (roundName == "r1-11") {
+          console.log(`${roundName} 시작`);
+
+          console.log(
+            `[${roundName}] showModal : 찬성/반대 투표를 해주세요. / 10초`
+          );
+          mafiaIo
+            .to(roomId)
+            .emit("showModal", "찬성/반대 투표를 해주세요.", 10);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-12";
+          time = 1;
         }
       }
     }, 1000);
