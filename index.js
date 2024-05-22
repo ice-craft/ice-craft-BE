@@ -1691,6 +1691,23 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-15";
+        } else if (roundName === "r1-15") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          console.log(
+            `[${roundName}] showModal : 밤이 되었습니다. 마피아는 제스처를 통해 상의 후 누구를 죽일 지 선택해주세요. / 3초`
+          );
+          mafiaIo
+            .to(roomId)
+            .emit(
+              "showModal",
+              "밤이 되었습니다. 마피아는 제스처를 통해 상의 후 누구를 죽일 지 선택해주세요.",
+              time
+            );
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-16";
         }
       }
     }, 1000);
