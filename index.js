@@ -1622,7 +1622,8 @@ mafiaIo.on("connection", (socket) => {
       }
     }, 1000);
   });
-  socket.on("r1VoteToMafia", async (votedPlayer) => {
+
+  socket.on("VoteToMafia", async (votedPlayer) => {
     console.log("r1VoteToMafia 시작");
 
     try {
@@ -1634,6 +1635,22 @@ mafiaIo.on("connection", (socket) => {
       return;
     }
     console.log("r1VoteToMafia 종료");
+  });
+
+  socket.on("VoteYesOrNo", async (yesOrNo) => {
+    console.log("voteYesOrNo 시작");
+    const userId = socket.data.userId;
+
+    try {
+      await voteYesOrNo(userId, yesOrNo);
+      console.log(`${userId}가 ${yesOrNo} 투표를 함`);
+    } catch (error) {
+      console.log("[voteYesOrNoError]");
+      socket.emit("voteYesOrNo");
+      return;
+    }
+
+    console.log("voteYesOrNo 종료");
   });
 });
 
