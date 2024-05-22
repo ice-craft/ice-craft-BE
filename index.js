@@ -1366,7 +1366,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r0-3";
         } else if (roundName === "r0-3") {
           console.log(`${roundName} 시작`);
-          time = 5;
+          time = 1; //FIXME - 5초
 
           console.log(
             `[${roundName}] showModal : 마피아들은 고개를 들어 서로를 확인해주세요. / 5초`
@@ -1532,7 +1532,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-7";
         } else if (roundName == "r1-7") {
           console.log(`${roundName} 시작`);
-          time = 3;
+          time = 1; //FIXME - 3초
 
           const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
 
@@ -1559,7 +1559,7 @@ mafiaIo.on("connection", (socket) => {
               .emit("showModal", "동률로 인해 아무도 죽지 않았습니다.", time);
 
             console.log(`${roundName} 종료`);
-            roundName = "r1-8"; //FIXME - 찬반 투표 건너 뛰는 라운드로 설정하기
+            roundName = "r1-14";
           }
         } else if (roundName == "r1-8") {
           console.log(`${roundName} 시작`);
@@ -1635,6 +1635,46 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-13";
+        } else if (roundName == "r1-13") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+
+          if (yesOrNoVoteResult.isValid) {
+            console.log("투표 결과 우효함");
+            const killedPlayer = await killPlayer(
+              mostVoteResult.result.user_id
+            ); //NOTE - 투표를 가장 많이 받은 플레이어 사망
+            console.log(`[${roundName}}] diedPlayer : ${killedPlayer}`);
+            mafiaIo.to(roomId).emit("diedPlayer", killedPlayer);
+
+            const isPlayerMafia = await checkPlayerMafia(killedPlayer); //NOTE - 죽은 플레이어가 마피아인지 확인
+
+            //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
+            if (isPlayerMafia) {
+              console.log(
+                `[${roundName}] showModal : 마피아가 죽었습니다. / 3초`
+              );
+              mafiaIo
+                .to(roomId)
+                .emit("showModal", "마피아가 죽었습니다.", time);
+            } else {
+              console.log(
+                `[${roundName}] showModal : 시민이 죽었습니다. / 3초`
+              );
+              mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
+            }
+          } else {
+            //NOTE - 투표 실패, 동률이 나옴
+            console.log(
+              `[${roundName}] showModal : 동률로 인해 아무도 죽지 않았습니다. / 3초`
+            );
+            mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
+          }
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-14";
         }
       }
     }, 1000);
