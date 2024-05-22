@@ -1579,6 +1579,15 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 종료`);
           roundName = "r1-9";
           time = 1;
+        } else if (roundName == "r1-9") {
+          console.log(`${roundName} 시작`);
+
+          console.log(`[${roundName}] timerStatus : 10초`);
+          mafiaIo.to(roomId).emit("timerStatus", 10);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-10";
+          time = 1;
         }
       }
     }, 1000);
