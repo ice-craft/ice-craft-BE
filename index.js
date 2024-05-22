@@ -1232,6 +1232,7 @@ mafiaIo.on("connection", (socket) => {
     let policeMaxCount = null;
 
     let voteBoard = null;
+    let yesOrNoVoteResult = null;
 
     let time = 1;
 
@@ -1618,6 +1619,22 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-12";
+        } else if (roundName == "r1-12") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 5초
+          yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
+
+          console.log(
+            `[${roundName}] showVoteDeadOrLive ${yesOrNoVoteResult} / 5초`
+          );
+          mafiaIo
+            .to(roomId)
+            .emit("showVoteDeadOrLive", yesOrNoVoteResult, time);
+
+          // await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-13";
         }
       }
     }, 1000);
