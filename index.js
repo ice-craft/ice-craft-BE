@@ -1045,16 +1045,6 @@ mafiaIo.on("connection", (socket) => {
     //   console.log("방에서 나가기에 실패했습니다.");
     // }
   });
-  //=========================================================================================================================================================
-  //=========================================================================================================================================================
-  //=========================================================================================================================================================
-  //=========================================================================================================================================================
-  //=========================================================================================================================================================
-  //=========================================================================================================================================================
-  //=========================================================================================================================================================
-  //=========================================================================================================================================================
-  //=========================================================================================================================================================
-  //=========================================================================================================================================================
 
   socket.on("testStart", async (roomId, playersMaxCount) => {
     console.log(`[testStart 수신] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`);
@@ -1081,14 +1071,12 @@ mafiaIo.on("connection", (socket) => {
         if (roundName === "r0-0") {
           console.log(`${roundName} 시작`);
 
-          let media = [];
-          allPlayers.forEach((player, index) => {
-            media[index] = { userId: player.user_id, camera: false, mike: false };
+          let media = {};
+          allPlayers.forEach((player) => {
+            media[player.user_id] = { camera: false, mike: false };
           });
 
           console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
-          console.log("me", typeof media);
-          console.log("mediaValue", media);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1102,7 +1090,7 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r0-2";
-          time = 1;
+          time = 3;
         } else if (roundName === "r0-2") {
           console.log(`${roundName} 시작`);
 
@@ -1180,7 +1168,7 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r0-3";
-          time = 1;
+          time = 5;
         } else if (roundName === "r0-3") {
           console.log(`${roundName} 시작`);
 
@@ -1189,15 +1177,15 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r0-4";
-          time = 1;
+          time = 5;
         } else if (roundName === "r0-4") {
           console.log(`${roundName} 시작`);
 
-          let media = [];
+          let media = {};
           allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach((player, index) => (media[index] = { userId: player.user_id, camera: true, mike: false }));
+            .forEach((player) => (media[player.user_id] = { camera: true, mike: false }));
           console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
@@ -1216,17 +1204,17 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName === "r0-6") {
           console.log(`${roundName} 시작`);
 
-          let media = [];
+          let media = {};
           allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach((player, index) => (media[index] = { userId: player.user_id, camera: false, mike: false }));
+            .forEach((player) => (media[player.user_id] = { camera: false, mike: false }));
           console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-0";
-          time = 1;
+          time = 5;
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
 
@@ -1237,16 +1225,18 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-1";
-          time = 1;
+          time = 5;
         } else if (roundName == "r1-1") {
           console.log(`${roundName} 시작`);
 
-          let media = [];
+          let media = {};
           allPlayers
             .filter((player) => player.is_lived == true)
-            .forEach((player, index) => (media[index] = { userId: player.user_id, camera: true, mike: true }));
+            .forEach((player) => {
+              media[player.user_id] = { camera: true, mike: true };
+            });
 
-          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 킴`);
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1264,17 +1254,19 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName == "r1-3") {
           console.log(`${roundName} 시작`);
 
-          let media = [];
+          let media = {};
           allPlayers
             .filter((player) => player.is_lived == true)
-            .forEach((player, index) => (media[index] = { userId: player.user_id, camera: false, mike: false }));
+            .forEach((player) => {
+              media[player.user_id] = { camera: false, mike: false };
+            });
 
           console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-4";
-          time = 1;
+          time = 5;
         } else if (roundName == "r1-4") {
           console.log(`${roundName} 시작`);
 
@@ -1283,7 +1275,7 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-5";
-          time = 1;
+          time = 5;
         } else if (roundName == "r1-5") {
           console.log(`${roundName} 시작`);
 
@@ -1303,7 +1295,7 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-7";
-          time = 1;
+          time = 3;
         } else if (roundName == "r1-7") {
           console.log(`${roundName} 시작`);
 
@@ -1319,14 +1311,14 @@ mafiaIo.on("connection", (socket) => {
 
             console.log(`${roundName} 종료`);
             roundName = "r1-8";
-            time = 1;
+            time = 3;
           } else {
             console.log(`[${roundName}] showModal : 동률로 인해 아무도 죽지 않았습니다. / 3초`);
             mafiaIo.to(roomId).emit("showModal", "동률로 인해 아무도 죽지 않았습니다.", 3);
 
             console.log(`${roundName} 종료`);
             roundName = "r1-8"; //FIXME - 찬반 투표 건너 뛰는 라운드로 설정하기
-            time = 1;
+            time = 3;
           }
         } else if (roundName == "r1-8") {
           console.log(`${roundName} 시작`);
@@ -1338,7 +1330,7 @@ mafiaIo.on("connection", (socket) => {
               media[player.user_id] = { camera: true, mike: true };
             });
 
-          console.log(`[${roundName}] playerMediaStatus : A 유저 카메라 마이크 켬`);
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 켬`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1410,9 +1402,7 @@ const canGameStart = async (roomId) => {
   }
 
   if (canStart) {
-    // play(roomId);
-    mafiaIo.to(roomId).emit("allReadyCompletion", true);
-    console.log("모든인원 게임 준비완료");
+    play(roomId);
   } else {
     console.log("게임 준비X");
   }
