@@ -1613,7 +1613,7 @@ mafiaIo.on("connection", (socket) => {
             });
 
           console.log(
-            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`
+            `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 끔`
           );
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
@@ -1726,17 +1726,22 @@ mafiaIo.on("connection", (socket) => {
           time = 1;
 
           let media = {};
-          allPlayers
+          const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach((player) => {
-              media[player.user_id] = { camera: true, mike: false };
-            });
+            .map((player) => player.user_id);
+
+          mafiaPlayers.forEach(
+            (userId) => (media[userId] = { camera: true, mike: false })
+          );
 
           console.log(
-            `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬 마이크 끔`
+            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`
           );
-          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+          });
 
           console.log(`${roundName} 종료`);
           roundName = "r1-17";
@@ -1749,6 +1754,30 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-18";
+        } else if (roundName === "r1-18") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
+
+          let media = {};
+          const mafiaPlayers = allPlayers
+            .filter((player) => player.is_lived == true)
+            .filter((player) => player.role == "마피아")
+            .map((player) => player.user_id);
+
+          mafiaPlayers.forEach(
+            (userId) => (media[userId] = { camera: false, mike: false })
+          );
+
+          console.log(
+            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 마이크 끔`
+          );
+
+          mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+
+            console.log(`${roundName} 종료`);
+            roundName = "r1-19";
+          });
         }
       }
     }, 1000);
