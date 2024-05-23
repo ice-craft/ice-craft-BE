@@ -1742,11 +1742,11 @@ mafiaIo.on("connection", (socket) => {
     }, 1000);
   });
 
-  socket.on("voteToMafia", async (votedPlayer) => {
-    console.log("voteToMafia 시작");
+  socket.on("voteTo", async (votedPlayer) => {
+    console.log("voteTo 시작");
 
     try {
-      await voteTo(votedPlayer);
+      await voteTo(votedPlayer, new Date());
       console.log(`${userId}는 ${votedPlayer}에게 투표`);
     } catch (error) {
       console.log("[voteToMafiaError]");

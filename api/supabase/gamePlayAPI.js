@@ -70,7 +70,7 @@ export const getPlayerByRole = async (room_id, role) => {
   return result;
 };
 
-export const voteTo = async (user_id) => {
+export const voteTo = async (user_id, time) => {
   const { data, selectError } = await supabase
     .from("room_user_match_table")
     .select("voted_count")
@@ -85,7 +85,7 @@ export const voteTo = async (user_id) => {
 
   const { userId, updateError } = await supabase
     .from("room_user_match_table")
-    .update({ voted_count: votedCount + 1 })
+    .update({ voted_count: votedCount + 1, select_time: time })
     .eq("user_id", user_id);
 
   if (updateError) {
@@ -126,7 +126,7 @@ export const getVoteToResult = async (room_id) => {
 export const voteYesOrNo = async (user_id, yesOrNo) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
-    .update({ vote_to: yesOrNo })
+    .update({ vote_yes_or_no: yesOrNo })
     .eq("user_id", user_id)
     .select();
 
