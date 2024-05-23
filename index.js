@@ -1242,6 +1242,8 @@ mafiaIo.on("connection", (socket) => {
 
       if (time <= 0) {
         allPlayers = await getPlayersInRoom(roomId);
+        //FIXME - 초기 설정 넣기
+        //FIXME - 승리 조건 넣기
 
         if (roundName === "r0-0") {
           console.log(`${roundName} 시작`);
@@ -1274,7 +1276,7 @@ mafiaIo.on("connection", (socket) => {
 
           let playersUserId = allPlayers.map((player) => player.user_id);
           [citizenMaxCount, mafiaMaxCount, doctorMaxCount, policeMaxCount] =
-            getRoleMaxCount(playersMaxCount);
+            getRoleMaxCount(playersMaxCount); //FIXME - 각 요소들이 필요한지 보고 필요없으면 삭제
 
           let mafiaPlayers = null;
           let doctorPlayer = null;
@@ -1294,7 +1296,7 @@ mafiaIo.on("connection", (socket) => {
             playerIndex < playersMaxCount;
             playerIndex++
           ) {
-            await setPlayerRole(playersUserId[playerIndex], "시민"); //NOTE - 초기 설정이 시민이라 필요한지 생각해보기
+            await setPlayerRole(playersUserId[playerIndex], "시민"); //FIXME - 초기 설정이 시민이라 필요한지 생각해보기
           }
 
           //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
@@ -1387,17 +1389,22 @@ mafiaIo.on("connection", (socket) => {
           time = 1;
 
           let media = {};
-          allPlayers
+          const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach(
-              (player) =>
-                (media[player.user_id] = { camera: true, mike: false })
-            );
+            .map((player) => player.user_id);
+
+          mafiaPlayers.forEach(
+            (userId) => (media[userId] = { camera: true, mike: false })
+          );
+
           console.log(
             `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`
           );
-          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+          });
 
           console.log(`${roundName} 종료`);
           roundName = "r0-5";
@@ -1415,17 +1422,22 @@ mafiaIo.on("connection", (socket) => {
           time = 1;
 
           let media = {};
-          allPlayers
+          const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach(
-              (player) =>
-                (media[player.user_id] = { camera: false, mike: false })
-            );
+            .map((player) => player.user_id);
+
+          mafiaPlayers.forEach(
+            (userId) => (media[userId] = { camera: false, mike: false })
+          );
+
           console.log(
             `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔`
           );
-          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+          });
 
           console.log(`${roundName} 종료`);
           roundName = "r1-0";
