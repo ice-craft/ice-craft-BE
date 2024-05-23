@@ -80,6 +80,7 @@ export const voteTo = async (user_id) => {
   if (selectError) {
     throw new Error();
   }
+
   const votedCount = data.voted_count;
 
   const { userId, updateError } = await supabase
