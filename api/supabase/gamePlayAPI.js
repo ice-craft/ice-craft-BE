@@ -85,7 +85,7 @@ export const voteTo = async (user_id, time) => {
 
   const { userId, updateError } = await supabase
     .from("room_user_match_table")
-    .update({ voted_count: votedCount + 1, select_time: time })
+    .update({ voted_count: votedCount + 1, vote_time: time })
     .eq("user_id", user_id);
 
   if (updateError) {
@@ -98,7 +98,7 @@ export const voteTo = async (user_id, time) => {
 export const resetVote = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
-    .update({ vote_to: null, voted_count: 0 })
+    .update({ vote_to: null, voted_count: 0, vote_time: null })
     .eq("room_id", room_id)
     .select();
 
