@@ -1494,11 +1494,11 @@ mafiaIo.on("connection", (socket) => {
           allPlayers
             .filter((player) => player.is_lived == true)
             .forEach((player) => {
-              media[player.user_id] = { camera: false, mike: false };
+              media[player.user_id] = { camera: true, mike: false };
             });
 
           console.log(
-            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`
+            `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 끔`
           );
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
