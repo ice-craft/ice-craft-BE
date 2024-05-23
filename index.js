@@ -1059,6 +1059,7 @@ mafiaIo.on("connection", (socket) => {
     let policeMaxCount = null;
 
     let voteBoard = null;
+    let yesOrNoVoteResult = null;
 
     let time = 1;
 
@@ -1070,6 +1071,7 @@ mafiaIo.on("connection", (socket) => {
 
         if (roundName === "r0-0") {
           console.log(`${roundName} 시작`);
+          time = 1;
 
           let media = {};
           allPlayers.forEach((player) => {
@@ -1081,18 +1083,18 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r0-1";
-          time = 1;
         } else if (roundName === "r0-1") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
 
           console.log(`[${roundName}] showModal :  밤이 되었습니다. / 3초`);
-          mafiaIo.to(roomId).emit("showModal", "밤이 되었습니다.", 3);
+          mafiaIo.to(roomId).emit("showModal", "밤이 되었습니다.", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r0-2";
-          time = 3;
         } else if (roundName === "r0-2") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
 
           let playersUserId = allPlayers.map((player) => player.user_id);
           [citizenMaxCount, mafiaMaxCount, doctorMaxCount, policeMaxCount] = getRoleMaxCount(playersMaxCount);
@@ -1163,23 +1165,23 @@ mafiaIo.on("connection", (socket) => {
 
           role["시민"] = citizenPlayers;
 
-          console.log(`[${roundName}] showAllPlayerRole : 플레이어들 역할 / 5초`);
-          mafiaIo.to(roomId).emit("showAllPlayerRole", role, 5);
+          console.log(`[${roundName}] showAllPlayerRole : 플레이어들 역할 / 10초`);
+          mafiaIo.to(roomId).emit("showAllPlayerRole", role, time);
 
           console.log(`${roundName} 종료`);
           roundName = "r0-3";
-          time = 5;
         } else if (roundName === "r0-3") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 5초
 
           console.log(`[${roundName}] showModal : 마피아들은 고개를 들어 서로를 확인해주세요. / 5초`);
-          mafiaIo.to(roomId).emit("showModal", "마피아들은 고개를 들어 서로를 확인해주세요.", 5);
+          mafiaIo.to(roomId).emit("showModal", "마피아들은 고개를 들어 서로를 확인해주세요.", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r0-4";
-          time = 5;
         } else if (roundName === "r0-4") {
           console.log(`${roundName} 시작`);
+          time = 1;
 
           let media = {};
           allPlayers
@@ -1191,18 +1193,18 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r0-5";
-          time = 1;
         } else if (roundName == "r0-5") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 5초
 
           console.log(`[${roundName}] timerStatus / 5초`);
-          mafiaIo.to(roomId).emit("timerStatus", 5);
+          mafiaIo.to(roomId).emit("timerStatus", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r0-6";
-          time = 1;
         } else if (roundName === "r0-6") {
           console.log(`${roundName} 시작`);
+          time = 1;
 
           let media = {};
           allPlayers
@@ -1214,20 +1216,21 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-0";
-          time = 5;
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 5초
 
           console.log(
             `[${roundName}] showModal : 아침이 되었습니다. 모든 유저는 토론을 통해 마피아를 찾아내세요. / 5초`
           );
-          mafiaIo.to(roomId).emit("showModal", "아침이 되었습니다. 모든 유저는 토론을 통해 마피아를 찾아내세요.", 5);
+          mafiaIo.to(roomId).emit("showModal", "아침이 되었습니다. 모든 유저는 토론을 통해 마피아를 찾아내세요.", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-1";
           time = 5;
         } else if (roundName == "r1-1") {
           console.log(`${roundName} 시작`);
+          time = 1;
 
           let media = {};
           allPlayers
@@ -1241,18 +1244,18 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-2";
-          time = 1;
         } else if (roundName == "r1-2") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 60초
 
           console.log(`[${roundName}] inDiscuss / 60초`);
-          mafiaIo.to(roomId).emit("inDiscuss", 60);
+          mafiaIo.to(roomId).emit("inDiscuss", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-3";
-          time = 1;
         } else if (roundName == "r1-3") {
           console.log(`${roundName} 시작`);
+          time = 1;
 
           let media = {};
           allPlayers
@@ -1266,38 +1269,38 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-4";
-          time = 5;
         } else if (roundName == "r1-4") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 5초
 
           console.log(`[${roundName}] showModal : 토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요. / 5초`);
-          mafiaIo.to(roomId).emit("showModal", "토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요.", 5);
+          mafiaIo.to(roomId).emit("showModal", "토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요.", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-5";
-          time = 5;
         } else if (roundName == "r1-5") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
 
           console.log(`[${roundName}] inVote / 10초`);
-          mafiaIo.to(roomId).emit("inVote", 10);
+          mafiaIo.to(roomId).emit("inVote", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-6";
-          time = 1;
         } else if (roundName == "r1-6") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 5초
 
           voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
           //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
           console.log(`[${roundName}] showVoteResult : 마피아 의심 투표 결과 / 5초`);
-          mafiaIo.to(roomId).emit("showVoteResult", voteBoard, 5);
+          mafiaIo.to(roomId).emit("showVoteResult", voteBoard, time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-7";
-          time = 3;
         } else if (roundName == "r1-7") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
 
           const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
 
@@ -1307,21 +1310,20 @@ mafiaIo.on("connection", (socket) => {
             );
             mafiaIo
               .to(roomId)
-              .emit("showModal", `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`, 3, true);
+              .emit("showModal", `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`, time);
 
             console.log(`${roundName} 종료`);
             roundName = "r1-8";
-            time = 3;
           } else {
             console.log(`[${roundName}] showModal : 동률로 인해 아무도 죽지 않았습니다. / 3초`);
-            mafiaIo.to(roomId).emit("showModal", "동률로 인해 아무도 죽지 않았습니다.", 3);
+            mafiaIo.to(roomId).emit("showModal", "동률로 인해 아무도 죽지 않았습니다.", time);
 
             console.log(`${roundName} 종료`);
-            roundName = "r1-8"; //FIXME - 찬반 투표 건너 뛰는 라운드로 설정하기
-            time = 3;
+            roundName = "r1-14";
           }
         } else if (roundName == "r1-8") {
           console.log(`${roundName} 시작`);
+          time = 1;
 
           let media = {};
           allPlayers
@@ -1335,18 +1337,18 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-9";
-          time = 1;
         } else if (roundName == "r1-9") {
           console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
 
           console.log(`[${roundName}] timerStatus : 10초`);
-          mafiaIo.to(roomId).emit("timerStatus", 10);
+          mafiaIo.to(roomId).emit("timerStatus", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-10";
-          time = 1;
         } else if (roundName == "r1-10") {
           console.log(`${roundName} 시작`);
+          time = 1;
 
           let media = {};
           allPlayers
@@ -1360,12 +1362,107 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-11";
+        } else if (roundName == "r1-11") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
+
+          console.log(`[${roundName}] showModal : 찬성/반대 투표를 해주세요. / 10초`);
+          mafiaIo.to(roomId).emit("showModal", "찬성/반대 투표를 해주세요.", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-12";
+        } else if (roundName == "r1-12") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 5초
+          yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
+
+          console.log(`[${roundName}] showVoteDeadOrLive ${yesOrNoVoteResult} / 5초`);
+          mafiaIo.to(roomId).emit("showVoteDeadOrLive", yesOrNoVoteResult, time);
+
+          // await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-13";
+        } else if (roundName == "r1-13") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+
+          if (yesOrNoVoteResult.isValid) {
+            console.log("투표 결과 우효함");
+            const killedPlayer = await killPlayer(mostVoteResult.result.user_id); //NOTE - 투표를 가장 많이 받은 플레이어 사망
+            console.log(`[${roundName}}] diedPlayer : ${killedPlayer}`);
+            mafiaIo.to(roomId).emit("diedPlayer", killedPlayer);
+
+            const isPlayerMafia = await checkPlayerMafia(killedPlayer); //NOTE - 죽은 플레이어가 마피아인지 확인
+
+            //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
+            if (isPlayerMafia) {
+              console.log(`[${roundName}] showModal : 마피아가 죽었습니다. / 3초`);
+              mafiaIo.to(roomId).emit("showModal", "마피아가 죽었습니다.", time);
+            } else {
+              console.log(`[${roundName}] showModal : 시민이 죽었습니다. / 3초`);
+              mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
+            }
+          } else {
+            //NOTE - 투표 실패, 동률이 나옴
+            console.log(`[${roundName}] showModal : 동률로 인해 아무도 죽지 않았습니다. / 3초`);
+            mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
+          }
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-14";
+        } else if (roundName == "r1-14") {
+          console.log(`${roundName} 시작`);
           time = 1;
+
+          let media = {};
+          allPlayers.forEach((player) => {
+            media[player.user_id] = { camera: false, mike: false };
+          });
+
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-15";
+        } else if (roundName === "r1-15") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          console.log(
+            `[${roundName}] showModal : 밤이 되었습니다. 마피아는 제스처를 통해 상의 후 누구를 죽일 지 선택해주세요. / 3초`
+          );
+          mafiaIo
+            .to(roomId)
+            .emit("showModal", "밤이 되었습니다. 마피아는 제스처를 통해 상의 후 누구를 죽일 지 선택해주세요.", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-16";
+        } else if (roundName === "r1-16") {
+          console.log(`${roundName} 시작`);
+          time = 1;
+
+          let media = {};
+          allPlayers
+            .filter((player) => player.is_lived == true)
+            .filter((player) => player.role == "마피아")
+            .forEach((player) => {
+              media[player.user_id] = { camera: true, mike: false };
+            });
+
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 켬 마이크 끔`);
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-17";
         }
       }
     }, 1000);
   });
-  socket.on("r1VoteToMafia", async (votedPlayer) => {
+
+  socket.on("VoteToMafia", async (votedPlayer) => {
     console.log("r1VoteToMafia 시작");
 
     try {
@@ -1377,6 +1474,22 @@ mafiaIo.on("connection", (socket) => {
       return;
     }
     console.log("r1VoteToMafia 종료");
+  });
+
+  socket.on("VoteYesOrNo", async (yesOrNo) => {
+    console.log("voteYesOrNo 시작");
+    const userId = socket.data.userId;
+
+    try {
+      await voteYesOrNo(userId, yesOrNo);
+      console.log(`${userId}가 ${yesOrNo} 투표를 함`);
+    } catch (error) {
+      console.log("[voteYesOrNoError]");
+      socket.emit("voteYesOrNo");
+      return;
+    }
+
+    console.log("voteYesOrNo 종료");
   });
 });
 
