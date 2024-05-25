@@ -1842,6 +1842,24 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r2-1"; //FIXME - 경찰 역할 수행 스킵
+        } else if (roundName == "r2-1") {
+          console.log(`${roundName} 시작`);
+          time = 1;
+
+          let media = {};
+          allPlayers
+            .filter((player) => player.is_lived == true)
+            .forEach((player) => {
+              media[player.user_id] = { camera: true, mike: true };
+            });
+
+          console.log(
+            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 켬`
+          );
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r2-2";
         }
       }
     }, 1000);
