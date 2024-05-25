@@ -1822,7 +1822,7 @@ mafiaIo.on("connection", (socket) => {
       socket.emit("voteToMafiaError");
       return;
     }
-    console.log("r1VoteToMafia 종료");
+    console.log("voteToMafia 종료");
   });
 
   socket.on("VoteYesOrNo", async (yesOrNo) => {
@@ -1834,11 +1834,24 @@ mafiaIo.on("connection", (socket) => {
       console.log(`${userId}가 ${yesOrNo} 투표를 함`);
     } catch (error) {
       console.log("[voteYesOrNoError]");
-      socket.emit("voteYesOrNo");
+      socket.emit("voteYesOrNoError");
       return;
     }
-
     console.log("voteYesOrNo 종료");
+  });
+
+  socket.on("select", async (selectedPlayer) => {
+    console.log("select 시작");
+
+    try {
+      await select(selectedPlayer);
+      console.log(`${votedPlayer}가 의사의 선택을 받음`);
+    } catch (error) {
+      console.log("[selectError]");
+      socket.emit("selectError");
+      return;
+    }
+    console.log("select 종료");
   });
 });
 
