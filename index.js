@@ -1774,16 +1774,16 @@ mafiaIo.on("connection", (socket) => {
 
           mafiaPlayers.forEach((userId) => {
             mafiaIo.to(userId).emit("playerMediaStatus", media);
-
-            console.log(`${roundName} 종료`);
-            if (doctorMaxCount === 0 && policeMaxCount === 0) {
-              roundName = "r1-19"; //FIXME - 의사 경찰 역할 수행 스킵
-            } else if (doctorMaxCount == 0 && policeMaxCount > 0) {
-              roundName = "r1-19"; //FIXME - 의사 역할 수행 스킵
-            } else {
-              roundName = "r1-19";
-            }
           });
+
+          console.log(`${roundName} 종료`);
+          if (doctorMaxCount === 0 && policeMaxCount === 0) {
+            roundName = "r1-19"; //FIXME - 의사 경찰 역할 수행 스킵
+          } else if (doctorMaxCount == 0 && policeMaxCount > 0) {
+            roundName = "r1-19"; //FIXME - 의사 역할 수행 스킵
+          } else {
+            roundName = "r1-19";
+          }
         }
       }
     }, 1000);
