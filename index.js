@@ -1832,7 +1832,16 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("inSelect", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-23"; //FIXME - 경찰 역할 수행 스킵
+          roundName = "r2-0";
+        } else if (roundName == "r2-0") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          console.log(`[${roundName}] showModal : 아침이 되었습니다. / 3초`);
+          mafiaIo.to(roomId).emit("showModal", "아침이 되었습니다.", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r2-1"; //FIXME - 경찰 역할 수행 스킵
         }
       }
     }, 1000);
