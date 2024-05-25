@@ -1808,11 +1808,10 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 종료`);
           if (policeMaxCount > 0) {
             roundName = "r1-21";
-          }
-          else {
+          } else {
             roundName = "r1-21"; //FIXME - 경찰 역할 수행 스킵
           }
-        }else if (roundName == "r1-21") {
+        } else if (roundName == "r1-21") {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 3초
 
@@ -1825,6 +1824,16 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-22"; //FIXME - 경찰 역할 수행 스킵
+        } else if (roundName == "r1-22") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
+
+          console.log(`[${roundName}] inSelect : 경찰이 선택 중 / 10초`);
+          mafiaIo.to(roomId).emit("inSelect", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-23"; //FIXME - 경찰 역할 수행 스킵
+        }
       }
     }, 1000);
   });
