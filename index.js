@@ -1784,6 +1784,17 @@ mafiaIo.on("connection", (socket) => {
           } else {
             roundName = "r1-19";
           }
+        } else if (roundName == "r1-19") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          console.log(
+            `[${roundName}] showModal : 의사는 누구를 살릴 지 결정해주세요. / 3초`
+          );
+          mafiaIo.to(roomId).emit("의사는 누구를 살릴 지 결정해주세요.", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-20";
         }
       }
     }, 1000);
