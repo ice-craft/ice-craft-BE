@@ -1791,10 +1791,21 @@ mafiaIo.on("connection", (socket) => {
           console.log(
             `[${roundName}] showModal : 의사는 누구를 살릴 지 결정해주세요. / 3초`
           );
-          mafiaIo.to(roomId).emit("의사는 누구를 살릴 지 결정해주세요.", time);
+          mafiaIo
+            .to(roomId)
+            .emit("showModal", "의사는 누구를 살릴 지 결정해주세요.", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-20";
+        } else if (roundName == "r1-20") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
+
+          console.log(`[${roundName}] inSelect : 의사가 선택 중 / 10초`);
+          mafiaIo.to(roomId).emit("inSelect", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-21";
         }
       }
     }, 1000);
