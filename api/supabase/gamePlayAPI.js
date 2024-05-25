@@ -501,7 +501,6 @@ export const getPlayersInRoom = async (room_id) => {
 };
 
 export const selectPlayer = async (user_id, role) => {
-  console.log(user_id, role, date);
   const { error } = await supabase
     .from("room_user_match_table")
     .update({ selected_by: role })

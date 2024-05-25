@@ -1806,8 +1806,25 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("inSelect", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-21";
-        }
+          if (policeMaxCount > 0) {
+            roundName = "r1-21";
+          }
+          else {
+            roundName = "r1-21"; //FIXME - 경찰 역할 수행 스킵
+          }
+        }else if (roundName == "r1-21") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          console.log(
+            `[${roundName}] showModal : 경찰은 마피아 의심자를 결정해주세요. / 3초`
+          );
+          mafiaIo
+            .to(roomId)
+            .emit("showModal", "경찰은 마피아 의심자를 결정해주세요.", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-22"; //FIXME - 경찰 역할 수행 스킵
       }
     }, 1000);
   });
