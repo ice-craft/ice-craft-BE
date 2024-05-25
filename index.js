@@ -31,6 +31,7 @@ import {
   resetPlayerStatus,
   resetVote,
   savePlayer,
+  selectPlayer,
   setPlayerRole,
   setStatus,
   updateRound,
@@ -1840,18 +1841,18 @@ mafiaIo.on("connection", (socket) => {
     console.log("voteYesOrNo 종료");
   });
 
-  socket.on("select", async (selectedPlayer) => {
-    console.log("select 시작");
+  socket.on("selectPlayer", async (selectedPlayer) => {
+    console.log("selectPlayer 시작");
 
     try {
-      await select(selectedPlayer);
+      await selectPlayer(selectedPlayer);
       console.log(`${votedPlayer}가 의사의 선택을 받음`);
     } catch (error) {
-      console.log("[selectError]");
-      socket.emit("selectError");
+      console.log("[selectPlayerError]");
+      socket.emit("selectPlayerError");
       return;
     }
-    console.log("select 종료");
+    console.log("selectPlayer 종료");
   });
 });
 

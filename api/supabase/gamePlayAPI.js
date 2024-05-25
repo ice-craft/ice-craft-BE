@@ -499,3 +499,15 @@ export const getPlayersInRoom = async (room_id) => {
   }
   return data;
 };
+
+export const selectPlayer = async (user_id, role) => {
+  console.log(user_id, role, date);
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({ selected_by: role })
+    .eq("user_id", user_id);
+  if (error) {
+    console.log(error);
+    throw new Error();
+  }
+};
