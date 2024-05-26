@@ -70,7 +70,7 @@ export const getPlayerByRole = async (room_id, role) => {
   return result;
 };
 
-export const voteTo = async (user_id) => {
+export const voteTo = async (user_id, time) => {
   const { data, selectError } = await supabase
     .from("room_user_match_table")
     .select("voted_count")
@@ -80,11 +80,12 @@ export const voteTo = async (user_id) => {
   if (selectError) {
     throw new Error();
   }
+
   const votedCount = data.voted_count;
 
   const { userId, updateError } = await supabase
     .from("room_user_match_table")
-    .update({ voted_count: votedCount + 1 })
+    .update({ voted_count: votedCount + 1, vote_time: time })
     .eq("user_id", user_id);
 
   if (updateError) {
@@ -97,7 +98,7 @@ export const voteTo = async (user_id) => {
 export const resetVote = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
-    .update({ vote_to: null, voted_count: 0 })
+    .update({ vote_to: null, voted_count: 0, vote_time: null })
     .eq("room_id", room_id)
     .select();
 
@@ -113,7 +114,8 @@ export const getVoteToResult = async (room_id) => {
     .from("room_user_match_table")
     .select("user_id, user_nickname, voted_count")
     .eq("room_id", room_id)
-    .order("voted_count", { ascending: false });
+    .order("voted_count", { ascending: false })
+    .order("voted_time", { ascending: true });
 
   if (error) {
     throw new Error();
@@ -125,7 +127,7 @@ export const getVoteToResult = async (room_id) => {
 export const voteYesOrNo = async (user_id, yesOrNo) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
-    .update({ vote_to: yesOrNo })
+    .update({ vote_yes_or_no: yesOrNo })
     .eq("user_id", user_id)
     .select();
 
@@ -496,4 +498,15 @@ export const getPlayersInRoom = async (room_id) => {
     throw new Error();
   }
   return data;
+};
+
+export const selectPlayer = async (user_id, role) => {
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({ selected_by: role })
+    .eq("user_id", user_id);
+  if (error) {
+    console.log(error);
+    throw new Error();
+  }
 };

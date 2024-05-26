@@ -31,6 +31,7 @@ import {
   resetPlayerStatus,
   resetVote,
   savePlayer,
+  selectPlayer,
   setPlayerRole,
   setStatus,
   updateRound,
@@ -66,6 +67,7 @@ app.get("/", (req, res) => {
 
 mafiaIo.on("connection", (socket) => {
   socket.join("0ed9a099-f1b4-46eb-a187-2da752eed29c");
+  socket.join("11111111-f1b4-46eb-a187-2da752eed29c"); //NOTE - 테스트용 코드
   socket.data.userId = "11111111-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
   socket.data.roomId = "0ed9a099-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
 
@@ -1068,6 +1070,8 @@ mafiaIo.on("connection", (socket) => {
 
       if (time <= 0) {
         allPlayers = await getPlayersInRoom(roomId);
+        //FIXME - 초기 설정 넣기
+        //FIXME - 승리 조건 넣기
 
         if (roundName === "r0-0") {
           console.log(`${roundName} 시작`);
@@ -1097,7 +1101,7 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 10초
 
           let playersUserId = allPlayers.map((player) => player.user_id);
-          [citizenMaxCount, mafiaMaxCount, doctorMaxCount, policeMaxCount] = getRoleMaxCount(playersMaxCount);
+          [citizenMaxCount, mafiaMaxCount, doctorMaxCount, policeMaxCount] = getRoleMaxCount(playersMaxCount); //FIXME - 각 요소들이 필요한지 보고 필요없으면 삭제
 
           let mafiaPlayers = null;
           let doctorPlayer = null;
@@ -1113,7 +1117,7 @@ mafiaIo.on("connection", (socket) => {
 
           //NOTE - 처음에는 모든 플레이어 시민으로 설정
           for (let playerIndex = 0; playerIndex < playersMaxCount; playerIndex++) {
-            await setPlayerRole(playersUserId[playerIndex], "시민"); //NOTE - 초기 설정이 시민이라 필요한지 생각해보기
+            await setPlayerRole(playersUserId[playerIndex], "시민"); //FIXME - 초기 설정이 시민이라 필요한지 생각해보기
           }
 
           //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
@@ -1184,12 +1188,18 @@ mafiaIo.on("connection", (socket) => {
           time = 1;
 
           let media = {};
-          allPlayers
+          const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach((player) => (media[player.user_id] = { camera: true, mike: false }));
+            .map((player) => player.user_id);
+
+          mafiaPlayers.forEach((userId) => (media[userId] = { camera: true, mike: false }));
+
           console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`);
-          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+          });
 
           console.log(`${roundName} 종료`);
           roundName = "r0-5";
@@ -1207,12 +1217,18 @@ mafiaIo.on("connection", (socket) => {
           time = 1;
 
           let media = {};
-          allPlayers
+          const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach((player) => (media[player.user_id] = { camera: false, mike: false }));
+            .map((player) => player.user_id);
+
+          mafiaPlayers.forEach((userId) => (media[userId] = { camera: false, mike: false }));
+
           console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔`);
-          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+          });
 
           console.log(`${roundName} 종료`);
           roundName = "r1-0";
@@ -1261,10 +1277,10 @@ mafiaIo.on("connection", (socket) => {
           allPlayers
             .filter((player) => player.is_lived == true)
             .forEach((player) => {
-              media[player.user_id] = { camera: false, mike: false };
+              media[player.user_id] = { camera: true, mike: false };
             });
 
-          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 끔`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1357,7 +1373,7 @@ mafiaIo.on("connection", (socket) => {
               media[player.user_id] = { camera: true, mike: false };
             });
 
-          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 끔`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1445,35 +1461,138 @@ mafiaIo.on("connection", (socket) => {
           time = 1;
 
           let media = {};
-          allPlayers
+          const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
-            .forEach((player) => {
-              media[player.user_id] = { camera: true, mike: false };
-            });
+            .map((player) => player.user_id);
 
-          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 켬 마이크 끔`);
-          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+          mafiaPlayers.forEach((userId) => (media[userId] = { camera: true, mike: false }));
+
+          console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`);
+
+          mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+          });
 
           console.log(`${roundName} 종료`);
           roundName = "r1-17";
+        } else if (roundName === "r1-17") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
+
+          console.log(`[${roundName}] inSelect : 10초`);
+          mafiaIo.to(roomId).emit("inSelect", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-18";
+        } else if (roundName === "r1-18") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
+
+          let media = {};
+          const mafiaPlayers = allPlayers
+            .filter((player) => player.is_lived == true)
+            .filter((player) => player.role == "마피아")
+            .map((player) => player.user_id);
+
+          mafiaPlayers.forEach((userId) => (media[userId] = { camera: false, mike: false }));
+
+          console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 마이크 끔`);
+
+          mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+          });
+
+          console.log(`${roundName} 종료`);
+          if (doctorMaxCount === 0 && policeMaxCount === 0) {
+            roundName = "r1-19"; //FIXME - 의사 경찰 역할 수행 스킵
+          } else if (doctorMaxCount == 0 && policeMaxCount > 0) {
+            roundName = "r1-19"; //FIXME - 의사 역할 수행 스킵
+          } else {
+            roundName = "r1-19";
+          }
+        } else if (roundName == "r1-19") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          console.log(`[${roundName}] showModal : 의사는 누구를 살릴 지 결정해주세요. / 3초`);
+          mafiaIo.to(roomId).emit("showModal", "의사는 누구를 살릴 지 결정해주세요.", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-20";
+        } else if (roundName == "r1-20") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
+
+          console.log(`[${roundName}] inSelect : 의사가 선택 중 / 10초`);
+          mafiaIo.to(roomId).emit("inSelect", time);
+
+          console.log(`${roundName} 종료`);
+          if (policeMaxCount > 0) {
+            roundName = "r1-21";
+          } else {
+            roundName = "r1-21"; //FIXME - 경찰 역할 수행 스킵
+          }
+        } else if (roundName == "r1-21") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          console.log(`[${roundName}] showModal : 경찰은 마피아 의심자를 결정해주세요. / 3초`);
+          mafiaIo.to(roomId).emit("showModal", "경찰은 마피아 의심자를 결정해주세요.", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-22"; //FIXME - 경찰 역할 수행 스킵
+        } else if (roundName == "r1-22") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 10초
+
+          console.log(`[${roundName}] inSelect : 경찰이 선택 중 / 10초`);
+          mafiaIo.to(roomId).emit("inSelect", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r2-0";
+        } else if (roundName == "r2-0") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          console.log(`[${roundName}] showModal : 아침이 되었습니다. / 3초`);
+          mafiaIo.to(roomId).emit("showModal", "아침이 되었습니다.", time);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r2-1"; //FIXME - 경찰 역할 수행 스킵
+        } else if (roundName == "r2-1") {
+          console.log(`${roundName} 시작`);
+          time = 1;
+
+          let media = {};
+          allPlayers
+            .filter((player) => player.is_lived == true)
+            .forEach((player) => {
+              media[player.user_id] = { camera: true, mike: true };
+            });
+
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 켬`);
+          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+
+          console.log(`${roundName} 종료`);
+          roundName = "r2-2";
         }
       }
     }, 1000);
   });
 
-  socket.on("VoteToMafia", async (votedPlayer) => {
-    console.log("r1VoteToMafia 시작");
+  socket.on("voteTo", async (votedPlayer) => {
+    console.log("voteTo 시작");
 
     try {
-      await voteTo(votedPlayer);
+      await voteTo(votedPlayer, new Date());
       console.log(`${userId}는 ${votedPlayer}에게 투표`);
     } catch (error) {
       console.log("[voteToMafiaError]");
       socket.emit("voteToMafiaError");
       return;
     }
-    console.log("r1VoteToMafia 종료");
+    console.log("voteToMafia 종료");
   });
 
   socket.on("VoteYesOrNo", async (yesOrNo) => {
@@ -1485,11 +1604,24 @@ mafiaIo.on("connection", (socket) => {
       console.log(`${userId}가 ${yesOrNo} 투표를 함`);
     } catch (error) {
       console.log("[voteYesOrNoError]");
-      socket.emit("voteYesOrNo");
+      socket.emit("voteYesOrNoError");
       return;
     }
-
     console.log("voteYesOrNo 종료");
+  });
+
+  socket.on("selectPlayer", async (selectedPlayer) => {
+    console.log("selectPlayer 시작");
+
+    try {
+      await selectPlayer(selectedPlayer);
+      console.log(`${votedPlayer}가 의사의 선택을 받음`);
+    } catch (error) {
+      console.log("[selectPlayerError]");
+      socket.emit("selectPlayerError");
+      return;
+    }
+    console.log("selectPlayer 종료");
   });
 });
 
