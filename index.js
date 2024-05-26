@@ -25,6 +25,7 @@ import {
   getPlayerNickname,
   getPlayersInRoom,
   getRound,
+  getSelectedPlayer,
   getStatus,
   getVoteToResult,
   killPlayer,
@@ -1860,6 +1861,92 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r2-2";
+        } else if (roundName == "r2-2") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+          const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+          const mostVotedPlayer = mostVoteResult.result;
+
+          let playerToKill = null;
+          let playerToSave = null;
+          let killedPlayer = null;
+
+          const mafiaPlayers = allPlayers
+            .filter((player) => player.is_lived == true)
+            .filter((player) => player.role === "마피아")
+            .map((player) => player.user_id);
+          const doctorPlayer = allPlayers
+            .filter((player) => player.is_lived == true)
+            .find((player) => player.role === "의사")
+            .map((player) => player.user_id);
+
+          if (mostVotedPlayer.voted_count !== 0) {
+            playerToKill = mostVotedPlayer.user_id;
+          }
+          playerToSave = await getSelectedPlayer(roomId, "의사");
+
+          if (playerToKill !== playerToSave) {
+            if (mafiaPlayers) {
+              killedPlayer = await killPlayer(playerToKill); //FIXME - 마피아가 죽이는 타이밍 정하기
+            }
+
+            if (doctorPlayer) {
+              await savePlayer(playerToSave);
+            }
+          }
+
+          allPlayers = await getPlayersInRoom(roomId);
+          killedPlayer = allPlayers.filter(
+            (player) => player.user_id === killedPlayer
+          );
+
+          if (killedPlayer) {
+            console.log(
+              `[${roundName}] : ${mostVotedPlayer.nickname}님이 죽었습니다. / 3초`
+            );
+            mafiaIo
+              .to(roomId)
+              .emit(
+                "showModal",
+                `${mostVotedPlayer.nickname}님이 죽었습니다.`,
+                3
+              );
+            //FIXME - 사망 처리
+          } else {
+            console.log(
+              `[${roundName}] : ${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아 유저에게)`
+            );
+            mafiaPlayers.forEach((player) => {
+              mafiaIo
+                .to(player)
+                .emit(
+                  "showModal",
+                  `${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
+                  3
+                );
+            });
+
+            console.log(
+              `[${roundName}] : 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아가 아닌 유저에게)`
+            );
+            allPlayers
+              .filter((player) => player.role !== "마피아")
+              .map((player) => player.user_id)
+              .forEach((player) => {
+                mafiaIo
+                  .to(player)
+                  .emit(
+                    "showModal",
+                    `${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
+                    3
+                  );
+              });
+          }
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-0";
         }
       }
     }, 1000);
