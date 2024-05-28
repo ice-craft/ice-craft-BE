@@ -127,16 +127,16 @@ export const updateUserInRoom = async (mafiaIo, roomId) => {
 export const getRoleMaxCount = (totalCount) => {
   switch (totalCount) {
     case 5:
-      return [4, 1, 0, 0];
+      return [1, 0, 0];
     case 6:
-      return [3, 2, 1, 0];
+      return [2, 1, 0];
     case 7:
-      return [4, 2, 1, 0];
+      return [2, 1, 0];
     case 8:
-      return [3, 3, 1, 1];
+      return [3, 1, 1];
     case 9:
-      return [4, 3, 1, 1];
+      return [3, 1, 1];
     case 10:
-      return [5, 3, 1, 1];
+      return [3, 1, 1];
   }
 };

@@ -1229,7 +1229,6 @@ mafiaIo.on("connection", (socket) => {
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
-    let citizenMaxCount = null;
     let mafiaMaxCount = null;
     let doctorMaxCount = null;
     let policeMaxCount = null;
@@ -1283,7 +1282,7 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 10초
 
           let playersUserId = allPlayers.map((player) => player.user_id);
-          [citizenMaxCount, mafiaMaxCount, doctorMaxCount, policeMaxCount] =
+          [mafiaMaxCount, doctorMaxCount, policeMaxCount] =
             getRoleMaxCount(playersMaxCount); //FIXME - 각 요소들이 필요한지 보고 필요없으면 삭제
 
           let mafiaPlayers = null;
