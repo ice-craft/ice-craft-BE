@@ -1346,21 +1346,21 @@ mafiaIo.on("connection", (socket) => {
 
           let role = {};
 
-          role["마피아"] = mafiaPlayers;
+          role["mafia"] = mafiaPlayers;
 
           if (doctorPlayer) {
-            role["의사"] = doctorPlayer;
+            role["doctor"] = doctorPlayer;
           } else {
-            role["의사"] = null;
+            role["doctor"] = null;
           }
 
           if (policePlayer) {
-            role["경찰"] = policePlayer;
+            role["police"] = policePlayer;
           } else {
-            role["경찰"] = null;
+            role["police"] = null;
           }
 
-          role["시민"] = citizenPlayers;
+          role["citizen"] = citizenPlayers;
 
           console.log(
             `[${roundName}] showAllPlayerRole : 플레이어들 역할 / 10초`
