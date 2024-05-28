@@ -1244,9 +1244,14 @@ mafiaIo.on("connection", (socket) => {
 
       if (time <= 0) {
         allPlayers = await getPlayersInRoom(roomId);
-        //FIXME - 초기 설정 넣기
+
         //FIXME - 승리 조건 넣기
         //FIXME - 플레이어 사망 처리 넣기
+
+        if (roundName == "initiate") {
+          //FIXME - 초기 설정 넣기
+          await resetPlayerStatus(roomId);
+        }
 
         if (roundName === "r0-0") {
           console.log(`${roundName} 시작`);
