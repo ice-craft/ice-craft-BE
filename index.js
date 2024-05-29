@@ -1272,7 +1272,7 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 60초
 
           console.log(`[${roundName}] inDiscuss / 60초`);
-          mafiaIo.to(roomId).emit("inDiscuss", time);
+          mafiaIo.to(roomId).emit("timerStatus", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-3";
@@ -1305,8 +1305,8 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 10초
 
-          console.log(`[${roundName}] inVote / 10초`);
-          mafiaIo.to(roomId).emit("inVote", time);
+          console.log(`[${roundName}] inSelect / 10초`);
+          mafiaIo.to(roomId).emit("inSelect", true, time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-6";
@@ -1488,7 +1488,7 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 10초
 
           console.log(`[${roundName}] inSelect : 10초`);
-          mafiaIo.to(roomId).emit("inSelect", time);
+          mafiaIo.to(roomId).emit("inSelect", "mafia", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-18";
@@ -1532,7 +1532,7 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 10초
 
           console.log(`[${roundName}] inSelect : 의사가 선택 중 / 10초`);
-          mafiaIo.to(roomId).emit("inSelect", time);
+          mafiaIo.to(roomId).emit("inSelect", doctor, time);
 
           console.log(`${roundName} 종료`);
           if (policeMaxCount > 0) {
@@ -1554,7 +1554,7 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 10초
 
           console.log(`[${roundName}] inSelect : 경찰이 선택 중 / 10초`);
-          mafiaIo.to(roomId).emit("inSelect", time);
+          mafiaIo.to(roomId).emit("inSelect", police, time);
 
           console.log(`${roundName} 종료`);
           roundName = "r2-0";
