@@ -510,3 +510,21 @@ export const selectPlayer = async (user_id, role) => {
     throw new Error();
   }
 };
+
+export const getSelectedPlayer = async (room_id, role) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_id")
+    .eq("room_id", room_id)
+    .eq("selected_by", role);
+
+  if (error) {
+    throw new Error();
+  }
+
+  if (data.length === 0) {
+    return null;
+  }
+
+  return data[0].user_id;
+};

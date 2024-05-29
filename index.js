@@ -25,6 +25,7 @@ import {
   getPlayerNickname,
   getPlayersInRoom,
   getRound,
+  getSelectedPlayer,
   getStatus,
   getVoteToResult,
   killPlayer,
@@ -1055,7 +1056,6 @@ mafiaIo.on("connection", (socket) => {
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
-    let citizenMaxCount = null;
     let mafiaMaxCount = null;
     let doctorMaxCount = null;
     let policeMaxCount = null;
@@ -1070,8 +1070,15 @@ mafiaIo.on("connection", (socket) => {
 
       if (time <= 0) {
         allPlayers = await getPlayersInRoom(roomId);
-        //FIXME - 초기 설정 넣기
-        //FIXME - 승리 조건 넣기
+
+        //FIXME - 승리 조건 넣기 (플레이어가 죽었을 때, 중도 이탈 시)
+        //FIXME - 플레이어 사망 처리 넣기
+        //FIXME - showModal 메서드로 만들기
+
+        if (roundName == "init") {
+          //FIXME - 초기 설정 넣기
+          await resetPlayerStatus(roomId);
+        }
 
         if (roundName === "r0-0") {
           console.log(`${roundName} 시작`);
@@ -1101,7 +1108,7 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 10초
 
           let playersUserId = allPlayers.map((player) => player.user_id);
-          [citizenMaxCount, mafiaMaxCount, doctorMaxCount, policeMaxCount] = getRoleMaxCount(playersMaxCount); //FIXME - 각 요소들이 필요한지 보고 필요없으면 삭제
+          [mafiaMaxCount, doctorMaxCount, policeMaxCount] = getRoleMaxCount(playersMaxCount); //FIXME - 각 요소들이 필요한지 보고 필요없으면 삭제
 
           let mafiaPlayers = null;
           let doctorPlayer = null;
@@ -1110,7 +1117,7 @@ mafiaIo.on("connection", (socket) => {
 
           playersUserId = shufflePlayers(playersUserId);
 
-          console.log("총 멤버", playersUserId);
+          console.log("총 플레이어", playersUserId);
           console.log("최대 마피아 인원 수", mafiaMaxCount);
           console.log("최대 의사 인원 수", doctorMaxCount);
           console.log("최대 경찰 인원 수", policeMaxCount);
@@ -1153,21 +1160,21 @@ mafiaIo.on("connection", (socket) => {
 
           let role = {};
 
-          role["마피아"] = mafiaPlayers;
+          role["mafia"] = mafiaPlayers;
 
           if (doctorPlayer) {
-            role["의사"] = doctorPlayer;
+            role["doctor"] = doctorPlayer;
           } else {
-            role["의사"] = null;
+            role["doctor"] = null;
           }
 
           if (policePlayer) {
-            role["경찰"] = policePlayer;
+            role["police"] = policePlayer;
           } else {
-            role["경찰"] = null;
+            role["police"] = null;
           }
 
-          role["시민"] = citizenPlayers;
+          role["citizen"] = citizenPlayers;
 
           console.log(`[${roundName}] showAllPlayerRole : 플레이어들 역할 / 10초`);
           mafiaIo.to(roomId).emit("showAllPlayerRole", role, time);
@@ -1195,7 +1202,7 @@ mafiaIo.on("connection", (socket) => {
 
           mafiaPlayers.forEach((userId) => (media[userId] = { camera: true, mike: false }));
 
-          console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`);
+          console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬, 마이크 끔`);
 
           mafiaPlayers.forEach((userId) => {
             mafiaIo.to(userId).emit("playerMediaStatus", media);
@@ -1224,14 +1231,14 @@ mafiaIo.on("connection", (socket) => {
 
           mafiaPlayers.forEach((userId) => (media[userId] = { camera: false, mike: false }));
 
-          console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔`);
+          console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔, 마이크 끔`);
 
           mafiaPlayers.forEach((userId) => {
             mafiaIo.to(userId).emit("playerMediaStatus", media);
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-0";
+          roundName = "end";
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 5초
@@ -1576,6 +1583,72 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r2-2";
+        } else if (roundName == "r2-2") {
+          console.log(`${roundName} 시작`);
+          time = 1; //FIXME - 3초
+
+          voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+          const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+          const mostVotedPlayer = mostVoteResult.result;
+
+          let playerToKill = null;
+          let playerToSave = null;
+          let killedPlayer = null;
+
+          const mafiaPlayers = allPlayers
+            .filter((player) => player.is_lived == true)
+            .filter((player) => player.role === "마피아")
+            .map((player) => player.user_id);
+          const doctorPlayer = allPlayers
+            .filter((player) => player.is_lived == true)
+            .find((player) => player.role === "의사")
+            .map((player) => player.user_id);
+
+          if (mostVotedPlayer.voted_count !== 0) {
+            playerToKill = mostVotedPlayer.user_id;
+          }
+          playerToSave = await getSelectedPlayer(roomId, "의사");
+
+          if (playerToKill !== playerToSave) {
+            if (mafiaPlayers) {
+              killedPlayer = await killPlayer(playerToKill); //FIXME - 마피아가 죽이는 타이밍 정하기
+            }
+
+            if (doctorPlayer) {
+              await savePlayer(playerToSave);
+            }
+          }
+
+          allPlayers = await getPlayersInRoom(roomId);
+          killedPlayer = allPlayers.filter((player) => player.user_id === killedPlayer);
+
+          if (killedPlayer) {
+            console.log(`[${roundName}] : ${mostVotedPlayer.nickname}님이 죽었습니다. / 3초`);
+            mafiaIo.to(roomId).emit("showModal", `${mostVotedPlayer.nickname}님이 죽었습니다.`, 3);
+            //FIXME - 사망 처리
+          } else {
+            console.log(
+              `[${roundName}] : ${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아 유저에게)`
+            );
+            mafiaPlayers.forEach((player) => {
+              mafiaIo
+                .to(player)
+                .emit("showModal", `${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`, 3);
+            });
+
+            console.log(`[${roundName}] : 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아가 아닌 유저에게)`);
+            allPlayers
+              .filter((player) => player.role !== "마피아")
+              .map((player) => player.user_id)
+              .forEach((player) => {
+                mafiaIo
+                  .to(player)
+                  .emit("showModal", `${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`, 3);
+              });
+          }
+
+          console.log(`${roundName} 종료`);
+          roundName = "r1-0";
         }
       }
     }, 1000);
