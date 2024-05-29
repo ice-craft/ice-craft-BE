@@ -1244,10 +1244,11 @@ mafiaIo.on("connection", (socket) => {
       if (time <= 0) {
         allPlayers = await getPlayersInRoom(roomId);
 
-        //FIXME - 승리 조건 넣기
+        //FIXME - 승리 조건 넣기 (플레이어가 죽었을 때, 중도 이탈 시)
         //FIXME - 플레이어 사망 처리 넣기
+        //FIXME - showModal 메서드로 만들기
 
-        if (roundName == "initiate") {
+        if (roundName == "init") {
           //FIXME - 초기 설정 넣기
           await resetPlayerStatus(roomId);
         }
@@ -1406,7 +1407,7 @@ mafiaIo.on("connection", (socket) => {
           );
 
           console.log(
-            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬`
+            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬, 마이크 끔`
           );
 
           mafiaPlayers.forEach((userId) => {
@@ -1439,7 +1440,7 @@ mafiaIo.on("connection", (socket) => {
           );
 
           console.log(
-            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔`
+            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔, 마이크 끔`
           );
 
           mafiaPlayers.forEach((userId) => {
@@ -1447,7 +1448,7 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-0";
+          roundName = "end";
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 5초
