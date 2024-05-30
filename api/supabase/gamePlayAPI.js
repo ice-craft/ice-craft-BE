@@ -115,7 +115,7 @@ export const getVoteToResult = async (room_id) => {
     .select("user_id, user_nickname, voted_count")
     .eq("room_id", room_id)
     .order("voted_count", { ascending: false })
-    .order("voted_time", { ascending: true });
+    .order("vote_time", { ascending: true });
 
   if (error) {
     throw new Error();

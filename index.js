@@ -1074,6 +1074,7 @@ mafiaIo.on("connection", (socket) => {
         //FIXME - 승리 조건 넣기 (플레이어가 죽었을 때, 중도 이탈 시)
         //FIXME - 플레이어 사망 처리 넣기
         //FIXME - showModal 메서드로 만들기
+        //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
 
         if (roundName == "init") {
           //FIXME - 초기 설정 넣기
@@ -1090,6 +1091,7 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
+          console.log(media);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1128,20 +1130,17 @@ mafiaIo.on("connection", (socket) => {
           }
 
           //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
-          console.log("마피아 역할 배정");
           for (let playerIndex = 0; playerIndex < mafiaMaxCount; playerIndex++) {
             await setPlayerRole(playersUserId[playerIndex], "마피아");
           }
 
-          console.log("방에 의사가 있다면 실행");
           if (doctorMaxCount !== 0) {
-            console.log("의사 뽑음");
+            console.log("의사 역할 배정");
             await setPlayerRole(playersUserId[mafiaMaxCount], "의사");
           }
 
-          console.log("경찰이 있다면 실행");
           if (policeMaxCount !== 0) {
-            console.log("경찰 뽑음");
+            console.log("경찰 역할 배정");
             await setPlayerRole(playersUserId[mafiaMaxCount + 1], "경찰");
           }
 
@@ -1177,6 +1176,7 @@ mafiaIo.on("connection", (socket) => {
           role["citizen"] = citizenPlayers;
 
           console.log(`[${roundName}] showAllPlayerRole : 플레이어들 역할 / 10초`);
+          console.log(role);
           mafiaIo.to(roomId).emit("showAllPlayerRole", role, time);
 
           console.log(`${roundName} 종료`);
@@ -1203,6 +1203,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaPlayers.forEach((userId) => (media[userId] = { camera: true, mike: false }));
 
           console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬, 마이크 끔`);
+          console.log(media);
 
           mafiaPlayers.forEach((userId) => {
             mafiaIo.to(userId).emit("playerMediaStatus", media);
@@ -1232,6 +1233,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaPlayers.forEach((userId) => (media[userId] = { camera: false, mike: false }));
 
           console.log(`[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔, 마이크 끔`);
+          console.log(media);
 
           mafiaPlayers.forEach((userId) => {
             mafiaIo.to(userId).emit("playerMediaStatus", media);
@@ -1250,7 +1252,6 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           roundName = "r1-1";
-          time = 5;
         } else if (roundName == "r1-1") {
           console.log(`${roundName} 시작`);
           time = 1;
@@ -1262,7 +1263,7 @@ mafiaIo.on("connection", (socket) => {
               media[player.user_id] = { camera: true, mike: true };
             });
 
-          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 끔`);
+          console.log(`[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 켬`);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1271,7 +1272,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 60초
 
-          console.log(`[${roundName}] inDiscuss / 60초`);
+          console.log(`[${roundName}] timerStatus / 60초`);
           mafiaIo.to(roomId).emit("timerStatus", time);
 
           console.log(`${roundName} 종료`);
@@ -1294,9 +1295,9 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-4";
         } else if (roundName == "r1-4") {
           console.log(`${roundName} 시작`);
-          time = 1; //FIXME - 5초
+          time = 1; //FIXME - 3초
 
-          console.log(`[${roundName}] showModal : 토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요. / 5초`);
+          console.log(`[${roundName}] showModal : 토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요. / 3초`);
           mafiaIo.to(roomId).emit("showModal", "토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요.", time);
 
           console.log(`${roundName} 종료`);
@@ -1306,7 +1307,7 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 10초
 
           console.log(`[${roundName}] inSelect / 10초`);
-          mafiaIo.to(roomId).emit("inSelect", true, time);
+          mafiaIo.to(roomId).emit("inSelect", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-6";
@@ -1557,7 +1558,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("inSelect", police, time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r2-0";
+          roundName = "end";
         } else if (roundName == "r2-0") {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 3초
