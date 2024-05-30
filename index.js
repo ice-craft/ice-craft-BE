@@ -1514,10 +1514,10 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-4";
         } else if (roundName == "r1-4") {
           console.log(`${roundName} 시작`);
-          time = 1; //FIXME - 5초
+          time = 1; //FIXME - 3초
 
           console.log(
-            `[${roundName}] showModal : 토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요. / 5초`
+            `[${roundName}] showModal : 토론이 끝났습니다. 마피아일 것 같은 사람의 화면을 클릭하세요. / 3초`
           );
           mafiaIo
             .to(roomId)
