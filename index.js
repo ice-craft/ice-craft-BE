@@ -1225,7 +1225,7 @@ mafiaIo.on("connection", (socket) => {
       `[testStart 수신] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`
     );
 
-    let roundName = "r0-0";
+    let roundName = "r1-6";
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -1234,6 +1234,7 @@ mafiaIo.on("connection", (socket) => {
     let policeMaxCount = null;
 
     let voteBoard = null;
+    let mostVoteResult = null;
     let yesOrNoVoteResult = null;
 
     let time = 1;
@@ -1450,13 +1451,13 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "end";
+          roundName = "r1-0";
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
-          time = 1; //FIXME - 5초
+          time = 1; //FIXME - 3초
 
           console.log(
-            `[${roundName}] showModal : 아침이 되었습니다. 모든 유저는 토론을 통해 마피아를 찾아내세요. / 5초`
+            `[${roundName}] showModal : 아침이 되었습니다. 모든 유저는 토론을 통해 마피아를 찾아내세요. / 3초`
           );
           mafiaIo
             .to(roomId)
@@ -1482,6 +1483,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(
             `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 켬`
           );
+          console.log(media);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1509,6 +1511,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(
             `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 끔`
           );
+          console.log(media);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1548,6 +1551,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(
             `[${roundName}] showVoteResult : 마피아 의심 투표 결과 / 5초`
           );
+          console.log(voteBoard);
           mafiaIo.to(roomId).emit("showVoteResult", voteBoard, time);
 
           console.log(`${roundName} 종료`);
@@ -1556,7 +1560,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 3초
 
-          const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+          mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
 
           if (mostVoteResult.isValid) {
             console.log(
@@ -1589,14 +1593,17 @@ mafiaIo.on("connection", (socket) => {
 
           let media = {};
           allPlayers
-            .filter((player) => player.is_lived == true)
+            .filter(
+              (player) => player.user_id === mostVoteResult.result.user_id
+            )
             .forEach((player) => {
               media[player.user_id] = { camera: true, mike: true };
             });
 
           console.log(
-            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 켬`
+            `[${roundName}] playerMediaStatus : 최대 투표를 받은 유저 카메라 켬, 마이크 켬`
           );
+          console.log(media);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
@@ -1616,7 +1623,9 @@ mafiaIo.on("connection", (socket) => {
 
           let media = {};
           allPlayers
-            .filter((player) => player.is_lived == true)
+            .filter(
+              (player) => player.user_id === mostVoteResult.result.user_id
+            )
             .forEach((player) => {
               media[player.user_id] = { camera: true, mike: false };
             });
@@ -1624,10 +1633,11 @@ mafiaIo.on("connection", (socket) => {
           console.log(
             `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 끔`
           );
+          console.log(media);
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-11";
+          roundName = "end";
         } else if (roundName == "r1-11") {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 10초
