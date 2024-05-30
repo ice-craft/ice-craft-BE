@@ -1479,7 +1479,7 @@ mafiaIo.on("connection", (socket) => {
             });
 
           console.log(
-            `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크`
+            `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 켬`
           );
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
@@ -1489,8 +1489,8 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 60초
 
-          console.log(`[${roundName}] inDiscuss / 60초`);
-          mafiaIo.to(roomId).emit("inDiscuss", time);
+          console.log(`[${roundName}] timerStatus / 60초`);
+          mafiaIo.to(roomId).emit("timerStatus", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-3";
