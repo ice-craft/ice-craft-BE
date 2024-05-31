@@ -62,10 +62,7 @@ export const getYesOrNoVoteResult = async (roomId) => {
     }
   });
 
-  isValid = yesCount !== noCount;
-
   return {
-    isValid,
     result: yesCount > noCount,
     detail: { yesCount, noCount },
   };

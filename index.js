@@ -1249,6 +1249,7 @@ mafiaIo.on("connection", (socket) => {
         //FIXME - 플레이어 사망 처리 넣기
         //FIXME - showModal 메서드로 만들기
         //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
+        //FIXME - resetVote 확인
 
         if (roundName == "init") {
           //FIXME - 초기 설정 넣기
@@ -1637,7 +1638,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
-          roundName = "end";
+          roundName = "r1-11";
         } else if (roundName == "r1-11") {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 10초
@@ -1656,9 +1657,8 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 5초
           yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
 
-          console.log(
-            `[${roundName}] showVoteDeadOrLive ${yesOrNoVoteResult} / 5초`
-          );
+          console.log(`[${roundName}] showVoteDeadOrLive / 5초`);
+          console.log(yesOrNoVoteResult);
           mafiaIo
             .to(roomId)
             .emit("showVoteDeadOrLive", yesOrNoVoteResult, time);
@@ -1671,17 +1671,17 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 3초
 
-          const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
-
-          if (yesOrNoVoteResult.isValid) {
-            console.log("투표 결과 우효함");
+          if (yesOrNoVoteResult.result) {
+            console.log("투표 결과 유효함");
             const killedPlayer = await killPlayer(
               mostVoteResult.result.user_id
             ); //NOTE - 투표를 가장 많이 받은 플레이어 사망
-            console.log(`[${roundName}}] diedPlayer : ${killedPlayer}`);
+            console.log(`[${roundName}] diedPlayer : ${killedPlayer}`);
             mafiaIo.to(roomId).emit("diedPlayer", killedPlayer);
+            //FIXME - 승리조건 확인
 
             const isPlayerMafia = await checkPlayerMafia(killedPlayer); //NOTE - 죽은 플레이어가 마피아인지 확인
+            //FIXME - DB쓰지말고 자체 처리 가능
 
             //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
             if (isPlayerMafia) {
