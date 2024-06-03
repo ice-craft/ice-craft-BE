@@ -1788,7 +1788,7 @@ mafiaIo.on("connection", (socket) => {
           );
 
           console.log(
-            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 마이크 끔`
+            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔, 마이크 끔`
           );
 
           mafiaPlayers.forEach((userId) => {
@@ -1797,9 +1797,9 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           if (doctorMaxCount === 0 && policeMaxCount === 0) {
-            roundName = "r1-19"; //FIXME - 의사 경찰 역할 수행 스킵
+            roundName = "r2-0"; //FIXME - 의사 경찰 역할 수행 스킵
           } else if (doctorMaxCount == 0 && policeMaxCount > 0) {
-            roundName = "r1-19"; //FIXME - 의사 역할 수행 스킵
+            roundName = "r1-21"; //FIXME - 의사 역할 수행 스킵
           } else {
             roundName = "r1-19";
           }
