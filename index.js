@@ -1249,8 +1249,6 @@ mafiaIo.on("connection", (socket) => {
         //FIXME - 플레이어 사망 처리 넣기
         //FIXME - showModal 메서드로 만들기
         //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
-        //FIXME - resetVote 확인
-        //FIXME - inSelect 변수명 보내기
 
         if (roundName == "init") {
           //FIXME - 초기 설정 넣기
@@ -1539,8 +1537,8 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 10초
 
-          console.log(`[${roundName}] inSelect / 10초`);
-          mafiaIo.to(roomId).emit("inSelect", time);
+          console.log(`[${roundName}] inSelect : vote /  10초`);
+          mafiaIo.to(roomId).emit("inSelect", "vote", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-6";
@@ -1769,8 +1767,8 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 10초
 
-          console.log(`[${roundName}] inSelect : 10초`);
-          mafiaIo.to(roomId).emit("inSelect", time);
+          console.log(`[${roundName}] inSelect : mafia /  10초`);
+          mafiaIo.to(roomId).emit("inSelect", "mafia", time);
 
           console.log(`${roundName} 종료`);
           roundName = "r1-18";
@@ -1821,8 +1819,8 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 10초
 
-          console.log(`[${roundName}] inSelect : 의사가 선택 중 / 10초`);
-          mafiaIo.to(roomId).emit("inSelect", time);
+          console.log(`[${roundName}] inSelect : doctor / 10초`);
+          mafiaIo.to(roomId).emit("inSelect", "doctor", time);
 
           console.log(`${roundName} 종료`);
           if (policeMaxCount > 0) {
@@ -1847,8 +1845,8 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 10초
 
-          console.log(`[${roundName}] inSelect : 경찰이 선택 중 / 10초`);
-          mafiaIo.to(roomId).emit("inSelect", time);
+          console.log(`[${roundName}] inSelect : police / 10초`);
+          mafiaIo.to(roomId).emit("inSelect", "police", time);
 
           console.log(`${roundName} 종료`);
           roundName = "end";
