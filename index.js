@@ -1250,6 +1250,7 @@ mafiaIo.on("connection", (socket) => {
         //FIXME - showModal 메서드로 만들기
         //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
         //FIXME - resetVote 확인
+        //FIXME - inSelect 변수명 보내기
 
         if (roundName == "init") {
           //FIXME - 초기 설정 넣기
@@ -1797,7 +1798,7 @@ mafiaIo.on("connection", (socket) => {
 
           console.log(`${roundName} 종료`);
           if (doctorMaxCount === 0 && policeMaxCount === 0) {
-            roundName = "r2-0"; //FIXME - 의사 경찰 역할 수행 스킵
+            roundName = "r2-0"; //FIXME - 의사, 경찰 역할 수행 스킵
           } else if (doctorMaxCount == 0 && policeMaxCount > 0) {
             roundName = "r1-21"; //FIXME - 의사 역할 수행 스킵
           } else {
@@ -1883,8 +1884,9 @@ mafiaIo.on("connection", (socket) => {
           time = 1; //FIXME - 3초
 
           voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-          const mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+          mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
           const mostVotedPlayer = mostVoteResult.result;
+          //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
           let playerToKill = null;
           let playerToSave = null;
@@ -1894,6 +1896,7 @@ mafiaIo.on("connection", (socket) => {
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role === "마피아")
             .map((player) => player.user_id);
+
           const doctorPlayer = allPlayers
             .filter((player) => player.is_lived == true)
             .find((player) => player.role === "의사")
@@ -1906,7 +1909,7 @@ mafiaIo.on("connection", (socket) => {
 
           if (playerToKill !== playerToSave) {
             if (mafiaPlayers) {
-              killedPlayer = await killPlayer(playerToKill); //FIXME - 마피아가 죽이는 타이밍 정하기
+              killedPlayer = await killPlayer(playerToKill);
             }
 
             if (doctorPlayer) {
@@ -1915,7 +1918,7 @@ mafiaIo.on("connection", (socket) => {
           }
 
           allPlayers = await getPlayersInRoom(roomId);
-          killedPlayer = allPlayers.filter(
+          killedPlayer = allPlayers.find(
             (player) => player.user_id === killedPlayer
           );
 
@@ -1928,7 +1931,7 @@ mafiaIo.on("connection", (socket) => {
               .emit(
                 "showModal",
                 `${mostVotedPlayer.nickname}님이 죽었습니다.`,
-                3
+                time
               );
             //FIXME - 사망 처리
           } else {
@@ -1941,7 +1944,7 @@ mafiaIo.on("connection", (socket) => {
                 .emit(
                   "showModal",
                   `${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
-                  3
+                  time
                 );
             });
 
@@ -1957,7 +1960,7 @@ mafiaIo.on("connection", (socket) => {
                   .emit(
                     "showModal",
                     `${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
-                    3
+                    time
                   );
               });
           }
