@@ -1677,7 +1677,6 @@ mafiaIo.on("connection", (socket) => {
             ); //NOTE - 투표를 가장 많이 받은 플레이어 사망
             console.log(`[${roundName}] diedPlayer : ${killedPlayer}`);
             mafiaIo.to(roomId).emit("diedPlayer", killedPlayer);
-            //FIXME - 승리조건 확인
 
             const isPlayerMafia = allPlayers
               .filter((player) => player.role === "마피아")
@@ -1696,6 +1695,17 @@ mafiaIo.on("connection", (socket) => {
                 `[${roundName}] showModal : 시민이 죽었습니다. / 3초`
               );
               mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
+            }
+            const winResult = whoWins(allPlayers);
+            if (winResult.isValid) {
+              if (winResult.result === "시민") {
+                console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
+                mafiaIo.to(roomId).emit("victoryPlayer", "citizen", 5);
+              } else if (winResult.result === "마피아") {
+                console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
+                mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
+              }
+              roundName = "r1-0"; //FIXME - 게임 초기화
             }
           } else {
             //NOTE - 투표 실패, 동률이 나옴
@@ -1932,7 +1942,18 @@ mafiaIo.on("connection", (socket) => {
                 `${mostVotedPlayer.nickname}님이 죽었습니다.`,
                 time
               );
-            //FIXME - 사망 처리
+
+            const winResult = whoWins(allPlayers);
+            if (winResult.isValid) {
+              if (winResult.result === "시민") {
+                console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
+                mafiaIo.to(roomId).emit("victoryPlayer", "citizen", 5);
+              } else if (winResult.result === "마피아") {
+                console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
+                mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
+              }
+              roundName = "r1-0"; //FIXME - 게임 초기화
+            }
           } else {
             console.log(
               `[${roundName}] : ${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아 유저에게)`
