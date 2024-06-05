@@ -79,9 +79,13 @@ export const showVoteYesOrNoResult = async (
 };
 
 //NOTE - 어느 팀이 이겼는지 결과 반환
-export const whoWins = async (roomId) => {
-  const mafiaPlayers = await getPlayerByRole(roomId, "마피아");
-  const citizenPlayers = await getPlayerByRole(roomId, "시민");
+export const whoWins = async (allPlayers) => {
+  const mafiaPlayers = allPlayers
+    .filter((player) => player.is_lived === true)
+    .filter((player) => player.role === "마피아");
+  const citizenPlayers = allPlayers
+    .filter((player) => player.is_lived === true)
+    .filter((player) => player.role === "시민");
   let mafiaCount;
   let citizenCount;
 
