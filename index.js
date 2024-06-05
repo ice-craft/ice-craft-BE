@@ -1679,8 +1679,9 @@ mafiaIo.on("connection", (socket) => {
             mafiaIo.to(roomId).emit("diedPlayer", killedPlayer);
             //FIXME - 승리조건 확인
 
-            const isPlayerMafia = await checkPlayerMafia(killedPlayer); //NOTE - 죽은 플레이어가 마피아인지 확인
-            //FIXME - DB쓰지말고 자체 처리 가능
+            const isPlayerMafia = allPlayers
+              .filter((player) => player.role === "마피아")
+              .some((player) => player.user_id === killedPlayer);
 
             //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
             if (isPlayerMafia) {
