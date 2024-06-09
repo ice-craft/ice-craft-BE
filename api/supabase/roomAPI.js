@@ -92,6 +92,9 @@ export const exitRoom = async (room_id, user_id) => {
       throw new Error(error.message);
     }
 
+    const chief = await decideChief(room_id);
+    await setChief(room_id, chief);
+
     return data;
   } else if (current_user_count === 1 && usersInRoom.indexOf(user_id) !== -1) {
     const data = deleteRoom(room_id, user_id);
