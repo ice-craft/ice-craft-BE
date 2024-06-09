@@ -10,10 +10,17 @@ import {
   setStatus,
   updateRound,
 } from "./api/supabase/gamePlayAPI.js";
-import { getUserIdInRoom } from "./api/supabase/roomAPI.js";
+import {
+  getUserIdInRoom,
+  isChiefExisted,
+  setChief,
+} from "./api/supabase/roomAPI.js";
 
 try {
-  const data = await getPlayersInRoom("0ed9a099-f1b4-46eb-a187-2da752eed29c");
+  const data = await setChief(
+    "0ed9a099-f1b4-46eb-a187-2da752eed29c",
+    "0ed9a099-f1b4-46eb-a187-2da752eed29b"
+  );
   console.log(data);
 } catch (error) {
   console.log(error);

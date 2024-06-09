@@ -67,7 +67,7 @@ app.get("/", (req, res) => {
 });
 
 mafiaIo.on("connection", (socket) => {
-  socket.join("0ed9a099-f1b4-46eb-a187-2da752eed29c");
+  socket.join("0ed9a099-f1b4-46eb-a187-2da752eed29c"); //NOTE - 테스트용 코드
   socket.join("11111111-f1b4-46eb-a187-2da752eed29c"); //NOTE - 테스트용 코드
   socket.data.userId = "11111111-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
   socket.data.roomId = "0ed9a099-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
@@ -204,7 +204,7 @@ mafiaIo.on("connection", (socket) => {
       if (time <= 0) {
         allPlayers = await getPlayersInRoom(roomId);
 
-        //FIXME - 승리 조건 넣기 (플레이어가 죽었을 때, 중도 이탈 시)
+        //FIXME - 승리 조건 넣기 (중도 이탈 시)
         //FIXME - 플레이어 사망 처리 넣기
         //FIXME - showModal 메서드로 만들기
         //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
