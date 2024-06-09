@@ -233,3 +233,17 @@ export const setChief = async (room_id, user_id) => {
 
   return data;
 };
+
+export const decideChief = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_id")
+    .eq("room_id", room_id)
+    .order("join_time", { ascending: true });
+
+  if (error) {
+    throw new Error();
+  }
+
+  return data[0].user_id;
+};
