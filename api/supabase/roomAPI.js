@@ -240,6 +240,19 @@ export const setChief = async (room_id, user_id) => {
   return data;
 };
 
+export const getChief = async (room_id, user_id) => {
+  const { data, error } = await supabase
+    .from("room_table")
+    .select("chief")
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error();
+  }
+
+  return data;
+};
+
 export const decideChief = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")

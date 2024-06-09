@@ -7,6 +7,7 @@ import {
   createRoom,
   exitRoom,
   fastJoinRoom,
+  getChief,
   getRooms,
   getUserCountInRoom,
   getUserIdInRoom,
@@ -1032,7 +1033,8 @@ const canGameStart = async (roomId) => {
   }
 
   if (canStart) {
-    play(roomId);
+    const chief = await getChief(roomId);
+    mafiaIo.to(chief).emit("chiefStart");
   } else {
     console.log("게임 준비X");
   }
