@@ -61,6 +61,9 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
         throw new Error("방 입장에 실패했습니다.");
       }
 
+      const chief = await decideChief(room_id);
+      await setChief(room_id, chief);
+
       return data.room_id;
     }
 
