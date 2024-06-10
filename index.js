@@ -675,7 +675,9 @@ mafiaIo.on("connection", (socket) => {
             console.log(
               `[${roundName}] showModal : 동률로 인해 아무도 죽지 않았습니다. / 3초`
             );
-            mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
+            mafiaIo
+              .to(roomId)
+              .emit("showModal", "동률로 인해 아무도 죽지 않았습니다.", time);
           }
 
           console.log(`${roundName} 종료`);
