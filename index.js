@@ -871,8 +871,7 @@ mafiaIo.on("connection", (socket) => {
 
           const doctorPlayer = allPlayers
             .filter((player) => player.is_lived == true)
-            .find((player) => player.role === "의사")
-            .map((player) => player.user_id);
+            .find((player) => player.role === "의사").user_id;
 
           if (mostVotedPlayer.voted_count !== 0) {
             playerToKill = mostVotedPlayer.user_id;
