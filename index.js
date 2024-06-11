@@ -1,5 +1,6 @@
 //NOTE - 네임스페이스, 룸 구현
 //FIXME - try/catch를 통한 예외처리 다시 확인
+//FIXME - deleteRoom에서 따지는 조건이 exitRoom에서 이미 확인함
 
 import express from "express";
 import { createServer } from "http";

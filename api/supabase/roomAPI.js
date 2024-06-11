@@ -73,9 +73,9 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
 //NOTE - 방 나가기 (내가 방에 존재하고 나 이외에 유저가 있으면 방에서 나감, 다른 유저가 방에 없으면 방 삭제)
 export const exitRoom = async (room_id, user_id) => {
   const { current_user_count } = await getUserCountInRoom(room_id);
-  const usersInRoom = await getUsersIdInRoom(room_id);
+  const usersIdInRoom = await getUsersIdInRoom(room_id);
 
-  if (current_user_count > 1 && usersInRoom.indexOf(user_id) !== -1) {
+  if (current_user_count > 1 && usersIdInRoom.indexOf(user_id) !== -1) {
     await changeUserCountInRoom(room_id, -1);
 
     const { data, error } = await supabase
@@ -86,14 +86,17 @@ export const exitRoom = async (room_id, user_id) => {
       .select();
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error(error.message); //FIXME - 확인해보고 삭제할지 결정
     }
 
     const chief = await decideChief(room_id);
     await setChief(room_id, chief);
 
     return data;
-  } else if (current_user_count === 1 && usersInRoom.indexOf(user_id) !== -1) {
+  } else if (
+    current_user_count === 1 &&
+    usersIdInRoom.indexOf(user_id) !== -1
+  ) {
     const data = deleteRoom(room_id, user_id);
     return data;
   }
@@ -128,12 +131,13 @@ export const fastJoinRoom = async (user_id, user_nickname) => {
     .select("*")
     .order("total_user_count", { ascending: true })
     .order("current_user_count", { ascending: false });
+
   if (error) {
     throw new Error();
   }
 
   const rows = data.filter(
-    (row) => row.current_user_count !== row.total_user_count
+    (row) => row.current_user_count < row.total_user_count
   );
   const room_id = rows[0].room_id;
   const result = await joinRoom(room_id, user_id, user_nickname);
