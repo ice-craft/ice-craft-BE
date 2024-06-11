@@ -204,18 +204,6 @@ export const getUsersInfoInRoom = async (roomId) => {
   return data;
 };
 
-export const isChiefExisted = async (room_id) => {
-  const { data, error } = await supabase
-    .from("room_table")
-    .select("chief")
-    .eq("room_id", room_id);
-
-  if (error) {
-    throw new Error();
-  }
-  return data.length > 0;
-};
-
 export const setChief = async (room_id, user_id) => {
   const { data, error } = await supabase
     .from("room_table")
