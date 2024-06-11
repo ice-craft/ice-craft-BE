@@ -202,7 +202,7 @@ export const getUserIdInRoom = async (roomId) => {
 };
 
 //NOTE - roomId의 방에 입장한 유저들 id와 닉네임 목록 반환
-export const getUserInfoInRoom = async (roomId) => {
+export const getUsersInfoInRoom = async (roomId) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id, user_nickname")

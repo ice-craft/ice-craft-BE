@@ -11,7 +11,7 @@ import {
   getRooms,
   getUserCountInRoom,
   getUserIdInRoom,
-  getUserInfoInRoom,
+  getUsersInfoInRoom,
   joinRoom,
 } from "./api/supabase/roomAPI.js";
 import {
@@ -72,6 +72,7 @@ mafiaIo.on("connection", (socket) => {
   socket.join("11111111-f1b4-46eb-a187-2da752eed29c"); //NOTE - 테스트용 코드
   socket.data.userId = "11111111-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
   socket.data.roomId = "0ed9a099-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
+  //NOTE - joinRoom에서 처리하고 있음
 
   socket.on("enterMafia", async (rowStart, rowEnd) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
@@ -103,12 +104,12 @@ mafiaIo.on("connection", (socket) => {
     );
     socket.data.userId = userId;
     socket.data.roomId = roomId;
-    try {
-      socket.join(roomId);
-      socket.join(userId);
 
+    socket.join(roomId);
+    socket.join(userId);
+    try {
       await joinRoom(roomId, userId, nickname);
-      const userInfo = await getUserInfoInRoom(roomId);
+      const userInfo = await getUsersInfoInRoom(roomId);
 
       mafiaIo.to(roomId).emit("joinRoom", userInfo);
     } catch (error) {
@@ -123,7 +124,7 @@ mafiaIo.on("connection", (socket) => {
       const roomId = await fastJoinRoom(userId, nickname);
       socket.join(roomId);
 
-      const userInfo = await getUserInfoInRoom(roomId);
+      const userInfo = await getUsersInfoInRoom(roomId);
 
       mafiaIo.to(roomId).emit("fastJoinRoom", roomId, userInfo);
     } catch (error) {
