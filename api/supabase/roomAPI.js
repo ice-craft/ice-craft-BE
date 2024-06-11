@@ -41,36 +41,33 @@ export const createRoom = async (title, game_category, total_user_count) => {
 
 //NOTE - 방에 들어가기 (방 자리에 여유가 있고, 자신이 방에 없으면 방에 들어갈 수 있음 )
 export const joinRoom = async (room_id, user_id, user_nickname) => {
-  try {
-    const { total_user_count, current_user_count } = await getUserCountInRoom(
-      room_id
-    );
-    const usersIdInRoom = await getUsersIdInRoom(room_id);
-    if (
-      total_user_count - current_user_count > 0 &&
-      usersIdInRoom.indexOf(user_id) === -1
-    ) {
-      await changeUserCountInRoom(room_id, 1);
-      const { data, error } = await supabase
-        .from("room_user_match_table")
-        .insert([{ room_id, user_id, user_nickname }])
-        .select()
-        .single();
+  const { total_user_count, current_user_count } = await getUserCountInRoom(
+    room_id
+  );
+  const usersIdInRoom = await getUsersIdInRoom(room_id);
 
-      if (error) {
-        throw new Error("방 입장에 실패했습니다.");
-      }
+  if (
+    total_user_count - current_user_count > 0 &&
+    usersIdInRoom.indexOf(user_id) === -1
+  ) {
+    await changeUserCountInRoom(room_id, 1);
+    const { data, error } = await supabase
+      .from("room_user_match_table")
+      .insert([{ room_id, user_id, user_nickname }])
+      .select()
+      .single();
 
-      const chief = await decideChief(room_id);
-      await setChief(room_id, chief);
-
-      return data.room_id;
+    if (error) {
+      throw new Error("방 입장에 실패했습니다."); //FIXME - 확인해보고 삭제할지 결정
     }
 
-    throw new Error();
-  } catch (error) {
-    throw new Error();
+    const chief = await decideChief(room_id);
+    await setChief(room_id, chief);
+
+    return data.room_id;
   }
+
+  throw new Error();
 };
 
 //NOTE - 방 나가기 (내가 방에 존재하고 나 이외에 유저가 있으면 방에서 나감, 다른 유저가 방에 없으면 방 삭제)
@@ -100,7 +97,7 @@ export const exitRoom = async (room_id, user_id) => {
     const data = deleteRoom(room_id, user_id);
     return data;
   }
-  throw new Error("방에서 나갈 수 없습니다.");
+  throw new Error("방에서 나갈 수 없습니다."); //FIXME - 확인해보고 삭제할지 결정
 };
 
 //NOTE - 방 삭제하기 (방에 있는 유저가 오직 자신일 경우에 방 삭제)

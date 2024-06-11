@@ -1,4 +1,5 @@
 //NOTE - 네임스페이스, 룸 구현
+//FIXME - try/catch를 통한 예외처리 다시 확인
 
 import express from "express";
 import { createServer } from "http";
