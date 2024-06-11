@@ -178,17 +178,6 @@ export const getUserCountInRoom = async (room_id) => {
   };
 };
 
-//NOTE - 방의 총 갯수 반환
-export const getRoomsCount = async () => {
-  const { count, error } = await supabase
-    .from("room_table")
-    .select("*", { count: "exact", head: true });
-  if (error) {
-    throw new Error();
-  }
-  return count;
-};
-
 //NOTE - roomId의 방에 입장한 유저들 id 목록 반환
 export const getUsersIdInRoom = async (roomId) => {
   const { data, error } = await supabase
