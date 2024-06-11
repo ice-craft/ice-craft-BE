@@ -10,7 +10,6 @@ import {
   getChief,
   getRooms,
   getUserCountInRoom,
-  getUserIdInRoom,
   getUsersInfoInRoom,
   joinRoom,
 } from "./api/supabase/roomAPI.js";
@@ -72,7 +71,7 @@ mafiaIo.on("connection", (socket) => {
   socket.join("11111111-f1b4-46eb-a187-2da752eed29c"); //NOTE - 테스트용 코드
   socket.data.userId = "11111111-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
   socket.data.roomId = "0ed9a099-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
-  //NOTE - joinRoom에서 처리하고 있음
+  //NOTE - joinRoom하고 fastJoinRoom에서 처리하고 있음
 
   socket.on("enterMafia", async (rowStart, rowEnd) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
@@ -142,6 +141,12 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("exitRoom", async (roomId, userId) => {
     console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
+
+    socket.data.userId = null;
+    socket.data.roomId = null;
+    socket.leave(userId);
+    socket.leave(roomId);
+
     try {
       await exitRoom(roomId, userId);
       await updateUserInRoom(mafiaIo, roomId);
