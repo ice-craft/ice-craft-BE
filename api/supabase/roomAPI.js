@@ -237,6 +237,7 @@ export const getChief = async (room_id) => {
   return data;
 };
 
+//NOTE - 방의 방장 정하기
 export const decideChief = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
@@ -245,7 +246,7 @@ export const decideChief = async (room_id) => {
     .order("join_time", { ascending: true });
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 방장 정하기 실패");
   }
 
   return data[0].user_id;
