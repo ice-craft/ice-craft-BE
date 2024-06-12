@@ -64,7 +64,7 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
       .single();
 
     if (error) {
-      throw new Error("방 입장에 실패했습니다."); //FIXME - 확인해보고 삭제할지 결정
+      throw new Error("방 입장 실패"); //FIXME - 확인해보고 삭제할지 결정
     }
 
     const chief = await decideChief(room_id);
