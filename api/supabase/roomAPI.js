@@ -148,6 +148,7 @@ export const fastJoinRoom = async (user_id, user_nickname) => {
 //NOTE - 방의 현재 인원 변경 (방의 인원을 change만큼 더함, change는 음수가 될 수 있어서, 인원을 감소할 수 있음)
 export const changeUserCountInRoom = async (room_id, change) => {
   const { current_user_count } = await getUserCountInRoom(room_id);
+
   const { data, error } = await supabase
     .from("room_table")
     .update({ current_user_count: current_user_count + change })
@@ -155,7 +156,7 @@ export const changeUserCountInRoom = async (room_id, change) => {
     .select();
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 현재 인원 변경 실패");
   }
 
   return data;
