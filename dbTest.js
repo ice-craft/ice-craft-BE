@@ -1,8 +1,8 @@
-import { decideChief } from "./api/supabase/roomAPI.js";
+import { decideChief, getRooms } from "./api/supabase/roomAPI.js";
 
 try {
-  const data = await decideChief("0ed9a099-f1b4-46eb-a187-2da752eed29c");
+  const data = await getRooms(-1);
   console.log(data);
 } catch (error) {
-  console.log(error);
+  console.log(error.message);
 }
