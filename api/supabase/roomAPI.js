@@ -208,6 +208,7 @@ export const getUsersInfoInRoom = async (roomId) => {
   return data;
 };
 
+//NOTE - 방의 방장을 설정
 export const setChief = async (room_id, user_id) => {
   const { data, error } = await supabase
     .from("room_table")
@@ -216,7 +217,7 @@ export const setChief = async (room_id, user_id) => {
     .select();
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 방장 설정 실패");
   }
 
   return data;
