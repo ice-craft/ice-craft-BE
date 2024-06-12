@@ -57,6 +57,7 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
     usersIdInRoom.indexOf(user_id) === -1
   ) {
     await changeUserCountInRoom(room_id, 1);
+
     const { data, error } = await supabase
       .from("room_user_match_table")
       .insert([{ room_id, user_id, user_nickname }])
@@ -64,7 +65,7 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
       .single();
 
     if (error) {
-      throw new Error("방 입장 실패"); //FIXME - 확인해보고 삭제할지 결정
+      throw new Error("방 입장 실패");
     }
 
     const chief = await decideChief(room_id);
@@ -73,7 +74,7 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
     return data.room_id;
   }
 
-  throw new Error();
+  throw new Error("방 입장 실패");
 };
 
 //NOTE - 방 나가기 (내가 방에 존재하고 나 이외에 유저가 있으면 방에서 나감, 다른 유저가 방에 없으면 방 삭제)
@@ -92,7 +93,7 @@ export const exitRoom = async (room_id, user_id) => {
       .select();
 
     if (error) {
-      throw new Error(error.message); //FIXME - 확인해보고 삭제할지 결정
+      throw new Error("방 나가기 실패");
     }
 
     const chief = await decideChief(room_id);
@@ -106,7 +107,7 @@ export const exitRoom = async (room_id, user_id) => {
     const data = deleteRoom(room_id, user_id);
     return data;
   }
-  throw new Error("방에서 나갈 수 없습니다."); //FIXME - 확인해보고 삭제할지 결정
+  throw new Error("방 나가기 실패");
 };
 
 //NOTE - 방 삭제하기 (방에 있는 유저가 오직 자신일 경우에 방 삭제)
