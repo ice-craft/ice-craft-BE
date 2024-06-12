@@ -37,9 +37,11 @@ export const createRoom = async (title, game_category, total_user_count) => {
     .insert([{ title, game_category, current_user_count: 0, total_user_count }])
     .select()
     .single();
+
   if (error) {
-    throw new Error();
+    throw new Error("방 만들기 실패");
   }
+
   return data;
 };
 
