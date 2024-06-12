@@ -133,7 +133,7 @@ export const fastJoinRoom = async (user_id, user_nickname) => {
     .order("current_user_count", { ascending: false });
 
   if (error) {
-    throw new Error();
+    throw new Error("빠른 방 입장 실패");
   }
 
   const rows = data.filter(
@@ -141,6 +141,7 @@ export const fastJoinRoom = async (user_id, user_nickname) => {
   );
   const room_id = rows[0].room_id;
   const result = await joinRoom(room_id, user_id, user_nickname);
+
   return result;
 };
 
