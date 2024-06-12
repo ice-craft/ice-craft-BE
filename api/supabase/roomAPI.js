@@ -188,8 +188,9 @@ export const getUsersIdInRoom = async (roomId) => {
     .eq("room_id", roomId);
 
   if (error) {
-    throw new Error();
+    throw new Error("방에 있는 유저들의 유저아이디 조회 실패");
   }
+
   return data.map((row) => row.user_id);
 };
 
