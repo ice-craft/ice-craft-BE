@@ -223,14 +223,15 @@ export const setChief = async (room_id, user_id) => {
   return data;
 };
 
-export const getChief = async (room_id, user_id) => {
+//NOTE - 방의 방장 유저아이디 반환
+export const getChief = async (room_id) => {
   const { data, error } = await supabase
     .from("room_table")
     .select("chief")
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 방장 유저아이디 조회 실패");
   }
 
   return data;
