@@ -104,31 +104,24 @@ export const exitRoom = async (room_id, user_id) => {
     current_user_count === 1 &&
     usersIdInRoom.indexOf(user_id) !== -1
   ) {
-    const data = deleteRoom(room_id, user_id);
+    const data = deleteRoom(room_id);
     return data;
   }
   throw new Error("방 나가기 실패");
 };
 
 //NOTE - 방 삭제하기 (방에 있는 유저가 오직 자신일 경우에 방 삭제)
-export const deleteRoom = async (room_id, user_id) => {
-  const { current_user_count } = await getUserCountInRoom(room_id);
-  const usersInRoom = await getUsersIdInRoom(room_id);
+export const deleteRoom = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_table")
+    .delete()
+    .eq("room_id", room_id);
 
-  if (current_user_count === 1 && usersInRoom.indexOf(user_id) !== -1) {
-    const { data, error } = await supabase
-      .from("room_table")
-      .delete()
-      .eq("room_id", room_id);
-
-    if (error) {
-      throw new Error();
-    }
-
-    return data;
+  if (error) {
+    throw new Error("방 삭제 실패");
   }
 
-  throw new Error();
+  return data;
 };
 
 //NOTE - 빠른 방 입장 (전체 인원 오름차순으로 정렬 후, 현재 인원 내림차순 정렬 후, 남은 인원이 0명인 방을 제외한 후, 첫 번째 방 입장)
