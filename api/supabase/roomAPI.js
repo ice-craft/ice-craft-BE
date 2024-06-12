@@ -171,7 +171,7 @@ export const getUserCountInRoom = async (room_id) => {
     .single();
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 현재 인원과 총 인원 조회 실패");
   }
 
   return {
