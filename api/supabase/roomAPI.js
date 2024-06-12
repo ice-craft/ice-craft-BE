@@ -22,9 +22,11 @@ export const getRoomsWithKeyword = async (keyword) => {
     .select("*, users:room_user_match_table(user_id)")
     .like("title", `%${keyword}%`)
     .order("created_at", { ascending: false });
+
   if (error) {
-    throw new Error();
+    throw new Error("키워드를 통해 방 목록 불러오기 실패");
   }
+
   return data;
 };
 
