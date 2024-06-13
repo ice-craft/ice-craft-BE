@@ -111,14 +111,14 @@ mafiaIo.on("connection", (socket) => {
 
     socket.join(roomId);
     socket.join(userId);
+
     try {
       await joinRoom(roomId, userId, nickname);
       const usersInfo = await getUsersInfoInRoom(roomId);
-
       mafiaIo.to(roomId).emit("joinRoom", usersInfo);
     } catch (error) {
-      console.log("[joinRoomError] 방 입장에 실패했습니다.");
-      socket.emit("joinRoomError", "방 입장에 실패했습니다.");
+      console.log(`[joinRoomError] ${error.message}`);
+      socket.emit("joinRoomError", error.message);
     }
   });
 
