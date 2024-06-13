@@ -81,8 +81,8 @@ mafiaIo.on("connection", (socket) => {
       const rooms = await getRooms(rowStart, rowEnd);
       socket.emit("enterMafia", rooms);
     } catch (error) {
-      console.log("[enterMafiaError] 방 목록을 불러오는데 실패했습니다.");
-      socket.emit("enterMafiaError", "방 목록을 불러오는데 실패했습니다.");
+      console.log(`[enterMafiaError] ${error.message}`);
+      socket.emit("enterMafiaError", error.message);
     }
   });
 
