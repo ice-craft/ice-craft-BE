@@ -7,9 +7,11 @@ export const getRooms = async (rowStart, rowEnd) => {
     .select("*, users:room_user_match_table(user_id)")
     .range(rowStart, rowEnd)
     .order("created_at", { ascending: false });
+
   if (error) {
-    throw new Error();
+    throw new Error("방 목록 불러오기 실패");
   }
+
   return data;
 };
 
@@ -20,9 +22,11 @@ export const getRoomsWithKeyword = async (keyword) => {
     .select("*, users:room_user_match_table(user_id)")
     .like("title", `%${keyword}%`)
     .order("created_at", { ascending: false });
+
   if (error) {
-    throw new Error();
+    throw new Error("키워드를 통해 방 목록 불러오기 실패");
   }
+
   return data;
 };
 
@@ -33,49 +37,52 @@ export const createRoom = async (title, game_category, total_user_count) => {
     .insert([{ title, game_category, current_user_count: 0, total_user_count }])
     .select()
     .single();
+
   if (error) {
-    throw new Error();
+    throw new Error("방 만들기 실패");
   }
+
   return data;
 };
 
 //NOTE - 방에 들어가기 (방 자리에 여유가 있고, 자신이 방에 없으면 방에 들어갈 수 있음 )
 export const joinRoom = async (room_id, user_id, user_nickname) => {
-  try {
-    const { total_user_count, current_user_count } = await getUserCountInRoom(
-      room_id
-    );
-    const usersInRoom = await getUserIdInRoom(room_id);
-    if (
-      total_user_count - current_user_count > 0 &&
-      usersInRoom.indexOf(user_id) === -1
-    ) {
-      await changeUserCountInRoom(room_id, 1);
-      const { data, error } = await supabase
-        .from("room_user_match_table")
-        .insert([{ room_id, user_id, user_nickname }])
-        .select()
-        .single();
+  const { total_user_count, current_user_count } = await getUserCountInRoom(
+    room_id
+  );
+  const usersIdInRoom = await getUsersIdInRoom(room_id);
 
-      if (error) {
-        throw new Error("방 입장에 실패했습니다.");
-      }
+  if (
+    total_user_count - current_user_count > 0 &&
+    usersIdInRoom.indexOf(user_id) === -1
+  ) {
+    await changeUserCountInRoom(room_id, 1);
 
-      return data.room_id;
+    const { data, error } = await supabase
+      .from("room_user_match_table")
+      .insert([{ room_id, user_id, user_nickname }])
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error("방 입장 실패");
     }
 
-    throw new Error();
-  } catch (error) {
-    throw new Error();
+    const chief = await decideChief(room_id);
+    await setChief(room_id, chief);
+
+    return data.room_id;
   }
+
+  throw new Error("방 입장 실패");
 };
 
 //NOTE - 방 나가기 (내가 방에 존재하고 나 이외에 유저가 있으면 방에서 나감, 다른 유저가 방에 없으면 방 삭제)
 export const exitRoom = async (room_id, user_id) => {
   const { current_user_count } = await getUserCountInRoom(room_id);
-  const usersInRoom = await getUserIdInRoom(room_id);
+  const usersIdInRoom = await getUsersIdInRoom(room_id);
 
-  if (current_user_count > 1 && usersInRoom.indexOf(user_id) !== -1) {
+  if (current_user_count > 1 && usersIdInRoom.indexOf(user_id) !== -1) {
     await changeUserCountInRoom(room_id, -1);
 
     const { data, error } = await supabase
@@ -86,36 +93,35 @@ export const exitRoom = async (room_id, user_id) => {
       .select();
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error("방 나가기 실패");
     }
 
+    const chief = await decideChief(room_id);
+    await setChief(room_id, chief);
+
     return data;
-  } else if (current_user_count === 1 && usersInRoom.indexOf(user_id) !== -1) {
-    const data = deleteRoom(room_id, user_id);
+  } else if (
+    current_user_count === 1 &&
+    usersIdInRoom.indexOf(user_id) !== -1
+  ) {
+    const data = deleteRoom(room_id);
     return data;
   }
-  throw new Error("방에서 나갈 수 없습니다.");
+  throw new Error("방 나가기 실패");
 };
 
 //NOTE - 방 삭제하기 (방에 있는 유저가 오직 자신일 경우에 방 삭제)
-export const deleteRoom = async (room_id, user_id) => {
-  const { current_user_count } = await getUserCountInRoom(room_id);
-  const usersInRoom = await getUserIdInRoom(room_id);
+export const deleteRoom = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_table")
+    .delete()
+    .eq("room_id", room_id);
 
-  if (current_user_count === 1 && usersInRoom.indexOf(user_id) !== -1) {
-    const { data, error } = await supabase
-      .from("room_table")
-      .delete()
-      .eq("room_id", room_id);
-
-    if (error) {
-      throw new Error();
-    }
-
-    return data;
+  if (error) {
+    throw new Error("방 삭제 실패");
   }
 
-  throw new Error();
+  return data;
 };
 
 //NOTE - 빠른 방 입장 (전체 인원 오름차순으로 정렬 후, 현재 인원 내림차순 정렬 후, 남은 인원이 0명인 방을 제외한 후, 첫 번째 방 입장)
@@ -125,21 +131,24 @@ export const fastJoinRoom = async (user_id, user_nickname) => {
     .select("*")
     .order("total_user_count", { ascending: true })
     .order("current_user_count", { ascending: false });
+
   if (error) {
-    throw new Error();
+    throw new Error("빠른 방 입장 실패");
   }
 
   const rows = data.filter(
-    (row) => row.current_user_count !== row.total_user_count
+    (row) => row.current_user_count < row.total_user_count
   );
   const room_id = rows[0].room_id;
   const result = await joinRoom(room_id, user_id, user_nickname);
+
   return result;
 };
 
 //NOTE - 방의 현재 인원 변경 (방의 인원을 change만큼 더함, change는 음수가 될 수 있어서, 인원을 감소할 수 있음)
 export const changeUserCountInRoom = async (room_id, change) => {
   const { current_user_count } = await getUserCountInRoom(room_id);
+
   const { data, error } = await supabase
     .from("room_table")
     .update({ current_user_count: current_user_count + change })
@@ -147,7 +156,7 @@ export const changeUserCountInRoom = async (room_id, change) => {
     .select();
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 현재 인원 변경 실패");
   }
 
   return data;
@@ -162,7 +171,7 @@ export const getUserCountInRoom = async (room_id) => {
     .single();
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 현재 인원과 총 인원 조회 실패");
   }
 
   return {
@@ -171,55 +180,35 @@ export const getUserCountInRoom = async (room_id) => {
   };
 };
 
-//NOTE - 방의 총 갯수 반환
-export const getRoomsCount = async () => {
-  const { count, error } = await supabase
-    .from("room_table")
-    .select("*", { count: "exact", head: true });
-  if (error) {
-    throw new Error();
-  }
-  return count;
-};
-
 //NOTE - roomId의 방에 입장한 유저들 id 목록 반환
-export const getUserIdInRoom = async (roomId) => {
+export const getUsersIdInRoom = async (roomId) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id")
     .eq("room_id", roomId);
 
   if (error) {
-    throw new Error();
+    throw new Error("방에 있는 유저들의 유저아이디 조회 실패");
   }
+
   return data.map((row) => row.user_id);
 };
 
 //NOTE - roomId의 방에 입장한 유저들 id와 닉네임 목록 반환
-export const getUserInfoInRoom = async (roomId) => {
+export const getUsersInfoInRoom = async (roomId) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id, user_nickname")
     .eq("room_id", roomId);
 
   if (error) {
-    throw new Error();
+    throw new Error("방에 있는 유저들의 유저 아이디와 닉네임 조회 실패");
   }
+
   return data;
 };
 
-export const isChiefExisted = async (room_id) => {
-  const { data, error } = await supabase
-    .from("room_table")
-    .select("chief")
-    .eq("room_id", room_id);
-
-  if (error) {
-    throw new Error();
-  }
-  return data.length > 0;
-};
-
+//NOTE - 방의 방장을 설정
 export const setChief = async (room_id, user_id) => {
   const { data, error } = await supabase
     .from("room_table")
@@ -228,8 +217,37 @@ export const setChief = async (room_id, user_id) => {
     .select();
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 방장 설정 실패");
   }
 
   return data;
+};
+
+//NOTE - 방의 방장 유저아이디 반환
+export const getChief = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_table")
+    .select("chief")
+    .eq("room_id", room_id);
+
+  if (error) {
+    throw new Error("방의 방장 유저아이디 조회 실패");
+  }
+
+  return data;
+};
+
+//NOTE - 방의 방장 정하기
+export const decideChief = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_user_match_table")
+    .select("user_id")
+    .eq("room_id", room_id)
+    .order("join_time", { ascending: true });
+
+  if (error) {
+    throw new Error("방의 방장 정하기 실패");
+  }
+
+  return data[0].user_id;
 };

@@ -1,4 +1,6 @@
 //NOTE - 네임스페이스, 룸 구현
+//FIXME - try/catch를 통한 예외처리 다시 확인
+//FIXME - deleteRoom에서 따지는 조건이 exitRoom에서 이미 확인함
 
 import express from "express";
 import { createServer } from "http";
@@ -7,10 +9,10 @@ import {
   createRoom,
   exitRoom,
   fastJoinRoom,
+  getChief,
   getRooms,
   getUserCountInRoom,
-  getUserIdInRoom,
-  getUserInfoInRoom,
+  getUsersInfoInRoom,
   joinRoom,
 } from "./api/supabase/roomAPI.js";
 import {
@@ -71,15 +73,17 @@ mafiaIo.on("connection", (socket) => {
   socket.join("11111111-f1b4-46eb-a187-2da752eed29c"); //NOTE - 테스트용 코드
   socket.data.userId = "11111111-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
   socket.data.roomId = "0ed9a099-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
+  //NOTE - joinRoom하고 fastJoinRoom에서 처리하고 있음
 
   socket.on("enterMafia", async (rowStart, rowEnd) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
+
     try {
       const rooms = await getRooms(rowStart, rowEnd);
       socket.emit("enterMafia", rooms);
     } catch (error) {
-      console.log("[enterMafiaError] 방 목록을 불러오는데 실패했습니다.");
-      socket.emit("enterMafiaError", "방 목록을 불러오는데 실패했습니다.");
+      console.log(`[enterMafiaError] ${error.message}`);
+      socket.emit("enterMafiaError", error.message);
     }
   });
 
@@ -87,58 +91,70 @@ mafiaIo.on("connection", (socket) => {
     console.log(
       `[createRoom] title : ${title}, game_category : ${game_category}, total_user_count : ${total_user_count}`
     );
+
     try {
       const room = await createRoom(title, game_category, total_user_count);
       socket.emit("createRoom", room);
     } catch (error) {
-      console.log("[createRoomError] 방을 생성하는데 실패했습니다.");
-      socket.emit("createRoomError", "방을 생성하는데 실패했습니다.");
+      console.log(`[createRoomError] ${error.message}`);
+      socket.emit("createRoomError", error.message);
     }
   });
 
   socket.on("joinRoom", async (userId, roomId, nickname) => {
     console.log(`[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`);
+
     socket.data.userId = userId;
     socket.data.roomId = roomId;
+
+    socket.join(roomId);
+    socket.join(userId);
+
     try {
-      socket.join(roomId);
-      socket.join(userId);
-
       await joinRoom(roomId, userId, nickname);
-      const userInfo = await getUserInfoInRoom(roomId);
-
-      mafiaIo.to(roomId).emit("joinRoom", userInfo);
+      const usersInfo = await getUsersInfoInRoom(roomId);
+      mafiaIo.to(roomId).emit("joinRoom", usersInfo);
     } catch (error) {
-      console.log("[joinRoomError] 방 입장에 실패했습니다.");
-      socket.emit("joinRoomError", "방 입장에 실패했습니다.");
+      console.log(`[joinRoomError] ${error.message}`);
+      socket.emit("joinRoomError", error.message);
     }
   });
 
   socket.on("fastJoinRoom", async (userId, nickname) => {
     console.log(`[fastJoinRoom] userId : ${userId}, nickname : ${nickname}`);
+
+    socket.data.userId = userId;
+    socket.join(userId);
+
     try {
       const roomId = await fastJoinRoom(userId, nickname);
+
+      socket.data.roomId = roomId;
       socket.join(roomId);
 
-      const userInfo = await getUserInfoInRoom(roomId);
-
-      mafiaIo.to(roomId).emit("fastJoinRoom", roomId, userInfo);
+      const usersInfo = await getUsersInfoInRoom(roomId);
+      mafiaIo.to(roomId).emit("fastJoinRoom", roomId, usersInfo);
     } catch (error) {
-      console.log("[fastJoinRoomError] 빠른 방 입장에 실패했습니다.");
-      socket.emit("fastJoinRoomError", "빠른 방 입장에 실패했습니다.");
+      console.log(`[fastJoinRoomError] ${error.message}`);
+      socket.emit("fastJoinRoomError", error.message);
     }
   });
 
   socket.on("exitRoom", async (roomId, userId) => {
     console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
+
+    socket.data.userId = null;
+    socket.data.roomId = null;
+    socket.leave(userId);
+    socket.leave(roomId);
+
     try {
       await exitRoom(roomId, userId);
-      await updateUserInRoom(mafiaIo, roomId);
-
+      //FIXME - 상태 업데이트 필요
       mafiaIo.to(roomId).emit("exitRoom");
     } catch (error) {
-      console.log("[exitRoomError] 방에서 나가기에 실패했습니다.");
-      socket.emit("exitRoomError", "방에서 나가기에 실패했습니다.");
+      console.log(`[exitRoomError] ${error.message}`);
+      socket.emit("exitRoomError", error.message);
     }
   });
 
@@ -582,7 +598,7 @@ mafiaIo.on("connection", (socket) => {
           } else {
             //NOTE - 투표 실패, 동률이 나옴
             console.log(`[${roundName}] showModal : 동률로 인해 아무도 죽지 않았습니다. / 3초`);
-            mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
+            mafiaIo.to(roomId).emit("showModal", "동률로 인해 아무도 죽지 않았습니다.", time);
           }
 
           console.log(`${roundName} 종료`);
@@ -754,8 +770,7 @@ mafiaIo.on("connection", (socket) => {
 
           const doctorPlayer = allPlayers
             .filter((player) => player.is_lived == true)
-            .filter((player) => player.role === "의사")
-            .map((player) => player.user_id);
+            .find((player) => player.role === "의사").user_id;
 
           if (mostVotedPlayer.voted_count !== 0) {
             playerToKill = mostVotedPlayer.user_id;
@@ -884,7 +899,8 @@ const canGameStart = async (roomId) => {
   }
 
   if (canStart) {
-    play(roomId);
+    const chief = await getChief(roomId);
+    mafiaIo.to(chief).emit("chiefStart");
   } else {
     console.log("게임 준비X");
   }
