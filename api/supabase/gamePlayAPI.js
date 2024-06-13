@@ -428,7 +428,7 @@ export const resetRoundR2 = async (room_id) => {
   }
 };
 
-export const resetPlayerStatus = async (room_id) => {
+export const initGame = async (room_id) => {
   const { error } = await supabase
     .from("room_user_match_table")
     .update({
