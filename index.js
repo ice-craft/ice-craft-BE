@@ -106,11 +106,15 @@ mafiaIo.on("connection", (socket) => {
       `[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`
     );
 
+    socket.join(roomId);
+
     try {
       await joinRoom(roomId, userId, nickname);
       const usersInfo = await getUsersInfoInRoom(roomId);
       mafiaIo.to(roomId).emit("joinRoom", usersInfo);
     } catch (error) {
+      socket.leave(roomId);
+
       console.log(`[joinRoomError] ${error.message}`);
       socket.emit("joinRoomError", error.message);
     }
@@ -118,7 +122,6 @@ mafiaIo.on("connection", (socket) => {
     socket.data.userId = userId;
     socket.data.roomId = roomId;
 
-    socket.join(roomId);
     socket.join(userId);
   });
 
