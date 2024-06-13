@@ -183,7 +183,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("testStart", async (roomId, playersMaxCount) => {
     console.log(`[testStart 수신] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r1-4";
+    let roundName = "r0-0";
     //r1-14
     let allPlayers = null;
 
@@ -240,7 +240,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r0-2";
         } else if (roundName === "r0-2") {
           console.log(`${roundName} 시작`);
-          time = 5; //FIXME - 10초
+          time = 6; //FIXME - 10초
 
           let playersUserId = allPlayers.map((player) => player.user_id);
           [mafiaMaxCount, doctorMaxCount, policeMaxCount] = getRoleMaxCount(playersMaxCount); //FIXME - 각 요소들이 필요한지 보고 필요없으면 삭제
@@ -754,7 +754,7 @@ mafiaIo.on("connection", (socket) => {
 
           const doctorPlayer = allPlayers
             .filter((player) => player.is_lived == true)
-            .find((player) => player.role === "의사")
+            .filter((player) => player.role === "의사")
             .map((player) => player.user_id);
 
           if (mostVotedPlayer.voted_count !== 0) {

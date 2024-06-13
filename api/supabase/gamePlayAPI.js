@@ -39,10 +39,7 @@ export const getRoleCount = async (room_id, role) => {
 };
 
 export const setPlayerRole = async (user_id, role) => {
-  const { error } = await supabase
-    .from("room_user_match_table")
-    .update({ role })
-    .eq("user_id", user_id);
+  const { error } = await supabase.from("room_user_match_table").update({ role }).eq("user_id", user_id);
 
   if (error) {
     throw new Error();
@@ -139,10 +136,7 @@ export const voteYesOrNo = async (user_id, yesOrNo) => {
 };
 
 export const getVoteYesOrNoResult = async (room_id) => {
-  const { data, error } = await supabase
-    .from("room_user_match_table")
-    .select("vote_yes_or_no")
-    .eq("room_id", room_id);
+  const { data, error } = await supabase.from("room_user_match_table").select("vote_yes_or_no").eq("room_id", room_id);
 
   if (error) {
     throw new Error();
@@ -237,10 +231,7 @@ export const checkPlayerMafia = async (user_id) => {
 };
 
 export const resetChosenPlayer = async (room_id) => {
-  const { error } = await supabase
-    .from("room_user_match_table")
-    .update({ chosen_by: null })
-    .eq("room_id", room_id);
+  const { error } = await supabase.from("room_user_match_table").update({ chosen_by: null }).eq("room_id", room_id);
 
   if (error) {
     throw new Error();
@@ -460,11 +451,7 @@ export const resetPlayerStatus = async (room_id) => {
 };
 
 export const getRound = async (room_id) => {
-  const { data, error } = await supabase
-    .from("room_table")
-    .select("round")
-    .eq("room_id", room_id)
-    .single();
+  const { data, error } = await supabase.from("room_table").select("round").eq("room_id", room_id).single();
 
   if (error) {
     throw new Error();
@@ -501,10 +488,7 @@ export const getPlayersInRoom = async (room_id) => {
 };
 
 export const selectPlayer = async (user_id) => {
-  const { error } = await supabase
-    .from("room_user_match_table")
-    .update({ selected_by: "의사" })
-    .eq("user_id", user_id);
+  const { error } = await supabase.from("room_user_match_table").update({ selected_by: "의사" }).eq("user_id", user_id);
   if (error) {
     throw new Error();
   }
@@ -518,6 +502,7 @@ export const getSelectedPlayer = async (room_id, role) => {
     .eq("selected_by", role);
 
   if (error) {
+    console.log("error", error);
     throw new Error();
   }
 
