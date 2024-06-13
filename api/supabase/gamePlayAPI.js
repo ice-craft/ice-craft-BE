@@ -483,7 +483,7 @@ export const getPlayersInRoom = async (room_id) => {
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 플레이어들 정보 조회 실패");
   }
   return data;
 };
