@@ -30,8 +30,8 @@ import {
   getSelectedPlayer,
   getStatus,
   getVoteToResult,
+  initGame,
   killPlayer,
-  resetPlayerStatus,
   resetVote,
   savePlayer,
   selectPlayer,
@@ -194,9 +194,7 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("gameStart", async (roomId, playersMaxCount) => {
-    console.log(
-      `[gameStart] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`
-    );
+    console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
     let roundName = "r0-0"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
@@ -224,8 +222,12 @@ mafiaIo.on("connection", (socket) => {
         //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
 
         if (roundName == "init") {
-          //FIXME - 초기 설정 넣기
-          await resetPlayerStatus(roomId);
+          try {
+            await initGame(roomId);
+          } catch (error) {
+            console.log(`[initError] ${error.message}`);
+            mafiaIo.to(roomId).emit("initError", error.message);
+          }
         }
 
         if (roundName === "r0-0") {
