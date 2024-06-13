@@ -435,10 +435,10 @@ export const resetPlayerStatus = async (room_id) => {
       is_ready: false,
       role: "시민",
       is_lived: true,
-      vote_to: null,
+      vote_yes_or_no: null,
       voted_count: 0,
-      chosen_by: null,
-      choose_time: null,
+      vote_time: null,
+      selected_by: null,
     })
     .eq("room_id", room_id);
 
