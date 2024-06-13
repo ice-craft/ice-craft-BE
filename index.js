@@ -131,16 +131,18 @@ mafiaIo.on("connection", (socket) => {
     try {
       const roomId = await fastJoinRoom(userId, nickname);
 
-      socket.data.roomId = roomId;
       socket.join(roomId);
 
       const usersInfo = await getUsersInfoInRoom(roomId);
       mafiaIo.to(roomId).emit("fastJoinRoom", roomId, usersInfo);
     } catch (error) {
+      socket.leave(roomId);
+
       console.log(`[fastJoinRoomError] ${error.message}`);
       socket.emit("fastJoinRoomError", error.message);
     }
 
+    socket.data.roomId = roomId;
     socket.data.userId = userId;
     socket.join(userId);
   });
