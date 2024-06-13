@@ -77,6 +77,7 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("enterMafia", async (rowStart, rowEnd) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
+
     try {
       const rooms = await getRooms(rowStart, rowEnd);
       socket.emit("enterMafia", rooms);
@@ -90,12 +91,13 @@ mafiaIo.on("connection", (socket) => {
     console.log(
       `[createRoom] title : ${title}, game_category : ${game_category}, total_user_count : ${total_user_count}`
     );
+
     try {
       const room = await createRoom(title, game_category, total_user_count);
       socket.emit("createRoom", room);
     } catch (error) {
-      console.log("[createRoomError] 방을 생성하는데 실패했습니다.");
-      socket.emit("createRoomError", "방을 생성하는데 실패했습니다.");
+      console.log(`[createRoomError] ${error.message}`);
+      socket.emit("createRoomError", error.message);
     }
   });
 
