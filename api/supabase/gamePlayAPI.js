@@ -515,3 +515,13 @@ export const getSelectedPlayer = async (room_id, role) => {
 
   return data[0].user_id;
 };
+
+export const setReady = async (user_id, is_ready) => {
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({ is_ready })
+    .eq("user_id", user_id);
+  if (error) {
+    throw new Error("유저의 레디 설정 실패");
+  }
+};
