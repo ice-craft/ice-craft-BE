@@ -20,7 +20,7 @@ export const checkAllPlayersReady = async (room_id, total_user_count) => {
     .eq("is_ready", true);
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 모든 플레이어들 레디 여부 조회 실패");
   }
   return total_user_count === count;
 };
