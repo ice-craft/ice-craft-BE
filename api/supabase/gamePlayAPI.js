@@ -7,7 +7,7 @@ export const checkPlayerCountEnough = async (room_id, total_user_count) => {
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 플레이어들 인원 수 조건 만족 여부 조회 실패");
   }
   return total_user_count === count;
 };
