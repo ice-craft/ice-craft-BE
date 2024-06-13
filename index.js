@@ -36,6 +36,7 @@ import {
   savePlayer,
   selectPlayer,
   setPlayerRole,
+  setReady,
   setStatus,
   updateRound,
   voteTo,
@@ -106,23 +107,20 @@ mafiaIo.on("connection", (socket) => {
       `[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`
     );
 
-    socket.join(roomId);
-
     try {
       await joinRoom(roomId, userId, nickname);
       const usersInfo = await getUsersInfoInRoom(roomId);
+
+      socket.join(roomId);
+      socket.join(userId);
+      socket.data.userId = userId;
+      socket.data.roomId = roomId;
+
       mafiaIo.to(roomId).emit("joinRoom", usersInfo);
     } catch (error) {
-      socket.leave(roomId);
-
       console.log(`[joinRoomError] ${error.message}`);
       socket.emit("joinRoomError", error.message);
     }
-
-    socket.data.userId = userId;
-    socket.data.roomId = roomId;
-
-    socket.join(userId);
   });
 
   socket.on("fastJoinRoom", async (userId, nickname) => {
@@ -130,21 +128,18 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const roomId = await fastJoinRoom(userId, nickname);
+      const usersInfo = await getUsersInfoInRoom(roomId);
 
       socket.join(roomId);
+      socket.join(userId);
+      socket.data.roomId = roomId;
+      socket.data.userId = userId;
 
-      const usersInfo = await getUsersInfoInRoom(roomId);
       mafiaIo.to(roomId).emit("fastJoinRoom", usersInfo);
     } catch (error) {
-      socket.leave(roomId);
-
       console.log(`[fastJoinRoomError] ${error.message}`);
       socket.emit("fastJoinRoomError", error.message);
     }
-
-    socket.data.roomId = roomId;
-    socket.data.userId = userId;
-    socket.join(userId);
   });
 
   socket.on("exitRoom", async (roomId, userId) => {
@@ -153,29 +148,31 @@ mafiaIo.on("connection", (socket) => {
     try {
       await exitRoom(roomId, userId);
       const usersInfo = await getUsersInfoInRoom(roomId);
+
+      socket.data.userId = null;
+      socket.data.roomId = null;
+      socket.leave(userId);
+      socket.leave(roomId);
+
       mafiaIo.to(roomId).emit("exitRoom", usersInfo);
     } catch (error) {
       console.log(`[exitRoomError] ${error.message}`);
       socket.emit("exitRoomError", error.message);
     }
-
-    socket.data.userId = null;
-    socket.data.roomId = null;
-    socket.leave(userId);
-    socket.leave(roomId);
   });
 
   socket.on("setReady", async (userId, ready) => {
     console.log(`[setReady] userId : ${userId}, ready : ${ready}`);
 
     try {
-      await setStatus(userId, roomId, "is_ready", ready);
+      await setReady(userId, ready);
     } catch (error) {
-      console.log("[setReadyError]");
-      socket.emit("setReadyError", "레디를  설정하는데 실패했습니다.");
+      console.log(`[setReadyError] ${error.message}`);
+      socket.emit("setReadyError", error.message);
       return;
     }
-    mafiaIo.to(roomId).emit("updateUserReady", userId, ready);
+
+    mafiaIo.to(roomId).emit("setReady", userId, ready);
     canGameStart(roomId);
   });
 
