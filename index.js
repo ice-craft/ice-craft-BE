@@ -135,11 +135,10 @@ mafiaIo.on("connection", (socket) => {
       socket.join(roomId);
 
       const usersInfo = await getUsersInfoInRoom(roomId);
-
       mafiaIo.to(roomId).emit("fastJoinRoom", roomId, usersInfo);
     } catch (error) {
-      console.log("[fastJoinRoomError] 빠른 방 입장에 실패했습니다.");
-      socket.emit("fastJoinRoomError", "빠른 방 입장에 실패했습니다.");
+      console.log(`[fastJoinRoomError] ${error.message}`);
+      socket.emit("fastJoinRoomError", error.message);
     }
   });
 
