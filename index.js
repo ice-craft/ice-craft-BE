@@ -193,12 +193,12 @@ mafiaIo.on("connection", (socket) => {
     // }
   });
 
-  socket.on("testStart", async (roomId, playersMaxCount) => {
+  socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(
-      `[testStart 수신] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`
+      `[gameStart] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`
     );
 
-    let roundName = "r1-14";
+    let roundName = "r0-0";
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
