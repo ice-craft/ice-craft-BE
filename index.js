@@ -1032,21 +1032,22 @@ const canGameStart = async (roomId) => {
       roomId,
       totalUserCount
     ); //NOTE - 플레이어들이 전부 레디했는지
+
     canStart = isAllPlayerEnoughCount && isAllPlayersReady;
     console.log(
       "인원 충분 :",
       isAllPlayerEnoughCount,
       " 전부 레디 :" + isAllPlayersReady
     );
-  } catch (error) {
-    console.log("[canGameStartError]");
-    mafiaIo.to(roomId).emit("canGameStartError");
-  }
 
-  if (canStart) {
-    const chief = await getChief(roomId);
-    mafiaIo.to(chief).emit("chiefStart");
-  } else {
-    console.log("게임 준비X");
+    if (canStart) {
+      const chief = await getChief(roomId);
+      mafiaIo.to(chief).emit("chiefStart");
+    } else {
+      console.log("게임 준비X");
+    }
+  } catch (error) {
+    console.log(`[canGameStartError] ${error.message}`);
+    mafiaIo.to(roomId).emit("canGameStartError", error.message);
   }
 };
