@@ -166,14 +166,13 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       await setReady(userId, ready);
+
+      mafiaIo.to(roomId).emit("setReady", userId, ready);
+      canGameStart(roomId);
     } catch (error) {
       console.log(`[setReadyError] ${error.message}`);
       socket.emit("setReadyError", error.message);
-      return;
     }
-
-    mafiaIo.to(roomId).emit("setReady", userId, ready);
-    canGameStart(roomId);
   });
 
   socket.on("disconnect", async () => {
