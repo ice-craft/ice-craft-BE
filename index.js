@@ -152,12 +152,11 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       await exitRoom(roomId, userId);
-      await updateUserInRoom(mafiaIo, roomId);
-
+      //FIXME - 상태 업데이트 필요
       mafiaIo.to(roomId).emit("exitRoom");
     } catch (error) {
-      console.log("[exitRoomError] 방에서 나가기에 실패했습니다.");
-      socket.emit("exitRoomError", "방에서 나가기에 실패했습니다.");
+      console.log(`[exitRoomError] ${error.message}`);
+      socket.emit("exitRoomError", error.message);
     }
   });
 

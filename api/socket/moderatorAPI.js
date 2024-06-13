@@ -120,11 +120,6 @@ export const showWhoWins = async (gameOver) => {
   mafiaIo.to(roomId).emit("gameOver", `${gameOver.result}팀이 이겼습니다.`);
 };
 
-export const updateUserInRoom = async (mafiaIo, roomId) => {
-  const playerInfo = await getCurrentUserDisplay(roomId);
-  mafiaIo.to(roomId).emit("updateUserInRoom", playerInfo);
-};
-
 export const getRoleMaxCount = (totalCount) => {
   switch (totalCount) {
     case 5:

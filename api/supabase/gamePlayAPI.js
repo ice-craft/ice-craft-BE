@@ -362,18 +362,6 @@ export const getRoleMaxCount = async (total_user_count, role) => {
   return data[role];
 };
 
-export const getCurrentUserDisplay = async (room_id) => {
-  const { data, error } = await supabase
-    .from("room_user_match_table")
-    .select("user_id, user_nickname, is_lived, role")
-    .eq("room_id", room_id);
-
-  if (error) {
-    throw new Error();
-  }
-  return data;
-};
-
 export const resetRoundR0 = async (room_id) => {
   const { error } = await supabase
     .from("room_user_match_table")
