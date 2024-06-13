@@ -106,12 +106,6 @@ mafiaIo.on("connection", (socket) => {
       `[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`
     );
 
-    socket.data.userId = userId;
-    socket.data.roomId = roomId;
-
-    socket.join(roomId);
-    socket.join(userId);
-
     try {
       await joinRoom(roomId, userId, nickname);
       const usersInfo = await getUsersInfoInRoom(roomId);
@@ -120,13 +114,16 @@ mafiaIo.on("connection", (socket) => {
       console.log(`[joinRoomError] ${error.message}`);
       socket.emit("joinRoomError", error.message);
     }
+
+    socket.data.userId = userId;
+    socket.data.roomId = roomId;
+
+    socket.join(roomId);
+    socket.join(userId);
   });
 
   socket.on("fastJoinRoom", async (userId, nickname) => {
     console.log(`[fastJoinRoom] userId : ${userId}, nickname : ${nickname}`);
-
-    socket.data.userId = userId;
-    socket.join(userId);
 
     try {
       const roomId = await fastJoinRoom(userId, nickname);
@@ -140,24 +137,29 @@ mafiaIo.on("connection", (socket) => {
       console.log(`[fastJoinRoomError] ${error.message}`);
       socket.emit("fastJoinRoomError", error.message);
     }
+
+    socket.data.userId = userId;
+    socket.join(userId);
   });
 
   socket.on("exitRoom", async (roomId, userId) => {
     console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
-    socket.data.userId = null;
-    socket.data.roomId = null;
-    socket.leave(userId);
-    socket.leave(roomId);
-
     try {
       await exitRoom(roomId, userId);
-      //FIXME - 상태 업데이트 필요
+      const allPlayersStatus = await getPlayersInRoom(roomId);
+
+      mafiaIo.to(roomId).emit("updatePlayerStatus", allPlayersStatus);
       mafiaIo.to(roomId).emit("exitRoom");
     } catch (error) {
       console.log(`[exitRoomError] ${error.message}`);
       socket.emit("exitRoomError", error.message);
     }
+
+    socket.data.userId = null;
+    socket.data.roomId = null;
+    socket.leave(userId);
+    socket.leave(roomId);
   });
 
   socket.on("setReady", async (userId, ready, roomId) => {
