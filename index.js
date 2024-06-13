@@ -134,7 +134,7 @@ mafiaIo.on("connection", (socket) => {
       socket.join(roomId);
 
       const usersInfo = await getUsersInfoInRoom(roomId);
-      mafiaIo.to(roomId).emit("fastJoinRoom", roomId, usersInfo);
+      mafiaIo.to(roomId).emit("fastJoinRoom", usersInfo);
     } catch (error) {
       socket.leave(roomId);
 
@@ -152,10 +152,8 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       await exitRoom(roomId, userId);
-      const allPlayersStatus = await getPlayersInRoom(roomId);
-
-      mafiaIo.to(roomId).emit("updatePlayerStatus", allPlayersStatus);
-      mafiaIo.to(roomId).emit("exitRoom");
+      const usersInfo = await getUsersInfoInRoom(roomId);
+      mafiaIo.to(roomId).emit("exitRoom", usersInfo);
     } catch (error) {
       console.log(`[exitRoomError] ${error.message}`);
       socket.emit("exitRoomError", error.message);
@@ -169,9 +167,6 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("setReady", async (userId, ready, roomId) => {
     console.log("setReady 수신");
-
-    socket.data.userId = userId; //NOTE - 테스트용 코드
-    socket.data.roomId = roomId; //NOTE - 테스트용 코드
 
     try {
       const isValid = await setStatus(userId, roomId, "is_ready", ready);
