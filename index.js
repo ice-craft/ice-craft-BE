@@ -198,7 +198,7 @@ mafiaIo.on("connection", (socket) => {
       `[gameStart] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`
     );
 
-    let roundName = "r0-0";
+    let roundName = "r0-0"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제

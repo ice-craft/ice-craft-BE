@@ -443,7 +443,7 @@ export const resetPlayerStatus = async (room_id) => {
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error();
+    throw new Error("플레이어의 상태 초기화 실패");
   }
 };
 
