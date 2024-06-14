@@ -37,6 +37,44 @@ import {
   getUsersInfoInRoom,
   joinRoom,
 } from "./api/supabase/roomAPI.js";
+import {
+  checkAllPlayersReady,
+  checkChosenPlayer,
+  checkPlayerCountEnough,
+  checkPlayerLived,
+  checkPlayerMafia,
+  choosePlayer,
+  getCurrentUserDisplay,
+  getPlayerByRole,
+  getPlayerNickname,
+  getPlayersInRoom,
+  getRound,
+  getSelectedPlayer,
+  getStatus,
+  getVoteToResult,
+  initGame,
+  killPlayer,
+  resetVote,
+  savePlayer,
+  selectPlayer,
+  setPlayerRole,
+  setReady,
+  setStatus,
+  updateRound,
+  voteTo,
+  voteYesOrNo,
+} from "./api/supabase/gamePlayAPI.js";
+import {
+  getMostVotedPlayer,
+  getRoleMaxCount,
+  getYesOrNoVoteResult,
+  showVoteToResult,
+  showVoteYesOrNoResult,
+  showWhoWins,
+  shufflePlayers,
+  updateUserInRoom,
+  whoWins,
+} from "./api/socket/moderatorAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -89,15 +127,15 @@ mafiaIo.on("connection", (socket) => {
   socket.on("joinRoom", async (userId, roomId, nickname) => {
     console.log(`[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`);
 
-    socket.data.userId = userId;
-    socket.data.roomId = roomId;
-
-    socket.join(roomId);
-    socket.join(userId);
-
     try {
       await joinRoom(roomId, userId, nickname);
       const usersInfo = await getUsersInfoInRoom(roomId);
+
+      socket.join(roomId);
+      socket.join(userId);
+      socket.data.userId = userId;
+      socket.data.roomId = roomId;
+
       mafiaIo.to(roomId).emit("joinRoom", usersInfo);
     } catch (error) {
       console.log(`[joinRoomError] ${error.message}`);
@@ -108,17 +146,16 @@ mafiaIo.on("connection", (socket) => {
   socket.on("fastJoinRoom", async (userId, nickname) => {
     console.log(`[fastJoinRoom] userId : ${userId}, nickname : ${nickname}`);
 
-    socket.data.userId = userId;
-    socket.join(userId);
-
     try {
       const roomId = await fastJoinRoom(userId, nickname);
-
-      socket.data.roomId = roomId;
-      socket.join(roomId);
-
       const usersInfo = await getUsersInfoInRoom(roomId);
-      mafiaIo.to(roomId).emit("fastJoinRoom", roomId, usersInfo);
+
+      socket.join(roomId);
+      socket.join(userId);
+      socket.data.roomId = roomId;
+      socket.data.userId = userId;
+
+      mafiaIo.to(roomId).emit("fastJoinRoom", usersInfo);
     } catch (error) {
       console.log(`[fastJoinRoomError] ${error.message}`);
       socket.emit("fastJoinRoomError", error.message);
@@ -128,39 +165,34 @@ mafiaIo.on("connection", (socket) => {
   socket.on("exitRoom", async (roomId, userId) => {
     console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
-    socket.data.userId = null;
-    socket.data.roomId = null;
-    socket.leave(userId);
-    socket.leave(roomId);
-
     try {
       await exitRoom(roomId, userId);
-      //FIXME - 상태 업데이트 필요
-      mafiaIo.to(roomId).emit("exitRoom");
+      const usersInfo = await getUsersInfoInRoom(roomId);
+
+      socket.data.userId = null;
+      socket.data.roomId = null;
+      socket.leave(userId);
+      socket.leave(roomId);
+
+      mafiaIo.to(roomId).emit("exitRoom", usersInfo);
     } catch (error) {
       console.log(`[exitRoomError] ${error.message}`);
       socket.emit("exitRoomError", error.message);
     }
   });
 
-  socket.on("setReady", async (userId, ready, roomId) => {
-    console.log("setReady 수신");
-
-    socket.data.userId = userId; //NOTE - 테스트용 코드
-    socket.data.roomId = roomId; //NOTE - 테스트용 코드
+  socket.on("setReady", async (userId, ready) => {
+    console.log(`[setReady] userId : ${userId}, ready : ${ready}`);
 
     try {
-      const isValid = await setStatus(userId, roomId, "is_ready", ready);
-      if (!isValid) {
-        throw new Error();
-      }
+      await setReady(userId, ready);
+
+      mafiaIo.to(roomId).emit("setReady", userId, ready);
+      canGameStart(roomId);
     } catch (error) {
-      console.log("[setReadyError]");
-      socket.emit("setReadyError", "레디를  설정하는데 실패했습니다.");
-      return;
+      console.log(`[setReadyError] ${error.message}`);
+      socket.emit("setReadyError", error.message);
     }
-    mafiaIo.to(roomId).emit("updateUserReady", userId, ready);
-    canGameStart(roomId);
   });
 
   socket.on("disconnect", async () => {
@@ -181,11 +213,10 @@ mafiaIo.on("connection", (socket) => {
     // }
   });
 
-  socket.on("testStart", async (roomId, playersMaxCount) => {
-    console.log(`[testStart 수신] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`);
+  socket.on("gameStart", async (roomId, playersMaxCount) => {
+    console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r1-4";
-    //r1-14
+    let roundName = "r0-0"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -211,8 +242,12 @@ mafiaIo.on("connection", (socket) => {
         //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
 
         if (roundName == "init") {
-          //FIXME - 초기 설정 넣기
-          await resetPlayerStatus(roomId);
+          try {
+            await initGame(roomId);
+          } catch (error) {
+            console.log(`[initError] ${error.message}`);
+            mafiaIo.to(roomId).emit("initError", error.message);
+          }
         }
 
         if (roundName === "r0-0") {
@@ -876,17 +911,18 @@ const canGameStart = async (roomId) => {
 
     const isAllPlayerEnoughCount = await checkPlayerCountEnough(roomId, totalUserCount); //NOTE - 플레이어들이 방 정원을 채웠는지
     const isAllPlayersReady = await checkAllPlayersReady(roomId, totalUserCount); //NOTE - 플레이어들이 전부 레디했는지
+
     canStart = isAllPlayerEnoughCount && isAllPlayersReady;
     console.log("인원 충분 :", isAllPlayerEnoughCount, " 전부 레디 :" + isAllPlayersReady);
-  } catch (error) {
-    console.log("[canGameStartError]");
-    mafiaIo.to(roomId).emit("canGameStartError");
-  }
 
-  if (canStart) {
-    const chief = await getChief(roomId);
-    mafiaIo.to(chief).emit("chiefStart");
-  } else {
-    console.log("게임 준비X");
+    if (canStart) {
+      const chief = await getChief(roomId);
+      mafiaIo.to(chief).emit("chiefStart");
+    } else {
+      console.log("게임 준비X");
+    }
+  } catch (error) {
+    console.log(`[canGameStartError] ${error.message}`);
+    mafiaIo.to(roomId).emit("canGameStartError", error.message);
   }
 };

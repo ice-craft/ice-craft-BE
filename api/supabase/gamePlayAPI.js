@@ -7,7 +7,7 @@ export const checkPlayerCountEnough = async (room_id, total_user_count) => {
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 플레이어들 인원 수 조건 만족 여부 조회 실패");
   }
   return total_user_count === count;
 };
@@ -20,7 +20,7 @@ export const checkAllPlayersReady = async (room_id, total_user_count) => {
     .eq("is_ready", true);
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 모든 플레이어들 레디 여부 조회 실패");
   }
   return total_user_count === count;
 };
@@ -419,22 +419,22 @@ export const resetRoundR2 = async (room_id) => {
   }
 };
 
-export const resetPlayerStatus = async (room_id) => {
+export const initGame = async (room_id) => {
   const { error } = await supabase
     .from("room_user_match_table")
     .update({
       is_ready: false,
       role: "시민",
       is_lived: true,
-      vote_to: null,
+      vote_yes_or_no: null,
       voted_count: 0,
-      chosen_by: null,
-      choose_time: null,
+      vote_time: null,
+      selected_by: null,
     })
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error();
+    throw new Error("플레이어의 상태 초기화 실패");
   }
 };
 
@@ -470,7 +470,7 @@ export const getPlayersInRoom = async (room_id) => {
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error();
+    throw new Error("방의 플레이어들 정보 조회 실패");
   }
   return data;
 };
@@ -499,4 +499,14 @@ export const getSelectedPlayer = async (room_id, role) => {
   }
 
   return data[0].user_id;
+};
+
+export const setReady = async (user_id, is_ready) => {
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({ is_ready })
+    .eq("user_id", user_id);
+  if (error) {
+    throw new Error("유저의 레디 설정 실패");
+  }
 };
