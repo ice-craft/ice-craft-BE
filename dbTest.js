@@ -1,8 +1,9 @@
 import { setReady } from "./api/supabase/gamePlayAPI.js";
-import { decideChief, getRooms } from "./api/supabase/roomAPI.js";
+import { decideChief, getChief, getRooms } from "./api/supabase/roomAPI.js";
 
 try {
-  await setReady("11111111-f1b4-46eb-a187-2da752eed29c", true);
+  const data = await getChief("ab726fd9-6196-426c-8d76-064f9c134e11");
+  console.log(data);
 } catch (error) {
   console.log(error.message);
 }

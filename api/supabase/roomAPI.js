@@ -228,13 +228,14 @@ export const getChief = async (room_id) => {
   const { data, error } = await supabase
     .from("room_table")
     .select("chief")
+    .single()
     .eq("room_id", room_id);
 
   if (error) {
     throw new Error("방의 방장 유저아이디 조회 실패");
   }
 
-  return data;
+  return data.chief;
 };
 
 //NOTE - 방의 방장 정하기
