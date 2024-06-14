@@ -1,7 +1,4 @@
-import {
-  getCurrentUserDisplay,
-  getVoteYesOrNoResult,
-} from "../supabase/gamePlayAPI.js";
+import { getVoteYesOrNoResult } from "../supabase/gamePlayAPI.js";
 
 //NOTE - 클라이언트의 화면에 모달창을 띄움
 export const showModal = (

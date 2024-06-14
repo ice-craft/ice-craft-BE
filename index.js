@@ -22,7 +22,6 @@ import {
   checkPlayerLived,
   checkPlayerMafia,
   choosePlayer,
-  getCurrentUserDisplay,
   getPlayerByRole,
   getPlayerNickname,
   getPlayersInRoom,
@@ -50,7 +49,6 @@ import {
   showVoteYesOrNoResult,
   showWhoWins,
   shufflePlayers,
-  updateUserInRoom,
   whoWins,
 } from "./api/socket/moderatorAPI.js";
 
@@ -166,6 +164,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       await setReady(userId, ready);
+
       const roomId = socket.data.roomId;
       mafiaIo.to(roomId).emit("setReady", userId, ready);
       canGameStart(roomId);
