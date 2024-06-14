@@ -166,7 +166,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       await setReady(userId, ready);
-
+      const roomId = socket.data.roomId;
       mafiaIo.to(roomId).emit("setReady", userId, ready);
       canGameStart(roomId);
     } catch (error) {
@@ -214,7 +214,11 @@ mafiaIo.on("connection", (socket) => {
       time--;
 
       if (time <= 0) {
-        allPlayers = await getPlayersInRoom(roomId);
+        try {
+          allPlayers = await getPlayersInRoom(roomId);
+        } catch (error) {
+          console.log(`[]`);
+        }
 
         //FIXME - 승리 조건 넣기 (중도 이탈 시)
         //FIXME - 플레이어 사망 처리 넣기
