@@ -1,22 +1,8 @@
-import {
-  getCurrentUserDisplay,
-  getVoteYesOrNoResult,
-} from "../supabase/gamePlayAPI.js";
+import { getVoteYesOrNoResult } from "../supabase/gamePlayAPI.js";
 
 //NOTE - 클라이언트의 화면에 모달창을 띄움
-export const showModal = (
-  mafiaIo,
-  roomName,
-  eventName,
-  title,
-  message,
-  timer,
-  nickname,
-  yesOrNo
-) => {
-  mafiaIo
-    .to(roomName)
-    .emit(eventName, title, message, timer, nickname, yesOrNo);
+export const showModal = (mafiaIo, roomName, eventName, title, message, timer, nickname, yesOrNo) => {
+  mafiaIo.to(roomName).emit(eventName, title, message, timer, nickname, yesOrNo);
 };
 
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
@@ -69,12 +55,7 @@ export const getYesOrNoVoteResult = async (roomId) => {
 };
 
 //NOTE - 유저들에게 찬성/반대 투표 결과 보여줌
-export const showVoteYesOrNoResult = async (
-  mafiaIo,
-  roomId,
-  eventName,
-  voteResult
-) => {
+export const showVoteYesOrNoResult = async (mafiaIo, roomId, eventName, voteResult) => {
   mafiaIo.to(roomId).emit(eventName, voteResult);
 };
 
