@@ -1047,6 +1047,7 @@ const canGameStart = async (roomId) => {
 
     if (canStart) {
       const chief = await getChief(roomId);
+      console.log(`chiefStart ${chief}`);
       mafiaIo.to(chief).emit("chiefStart");
     } else {
       console.log("게임 준비X");
