@@ -6,6 +6,28 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import {
+  getMostVotedPlayer,
+  getRoleMaxCount,
+  getYesOrNoVoteResult,
+  shufflePlayers,
+  whoWins,
+} from "./api/socket/moderatorAPI.js";
+import {
+  checkAllPlayersReady,
+  checkPlayerCountEnough,
+  getPlayersInRoom,
+  getSelectedPlayer,
+  getVoteToResult,
+  killPlayer,
+  resetPlayerStatus,
+  savePlayer,
+  selectPlayer,
+  setPlayerRole,
+  setStatus,
+  voteTo,
+  voteYesOrNo,
+} from "./api/supabase/gamePlayAPI.js";
+import {
   createRoom,
   exitRoom,
   fastJoinRoom,
@@ -15,43 +37,6 @@ import {
   getUsersInfoInRoom,
   joinRoom,
 } from "./api/supabase/roomAPI.js";
-import {
-  checkAllPlayersReady,
-  checkChosenPlayer,
-  checkPlayerCountEnough,
-  checkPlayerLived,
-  checkPlayerMafia,
-  choosePlayer,
-  getCurrentUserDisplay,
-  getPlayerByRole,
-  getPlayerNickname,
-  getPlayersInRoom,
-  getRound,
-  getSelectedPlayer,
-  getStatus,
-  getVoteToResult,
-  killPlayer,
-  resetPlayerStatus,
-  resetVote,
-  savePlayer,
-  selectPlayer,
-  setPlayerRole,
-  setStatus,
-  updateRound,
-  voteTo,
-  voteYesOrNo,
-} from "./api/supabase/gamePlayAPI.js";
-import {
-  getMostVotedPlayer,
-  getRoleMaxCount,
-  getYesOrNoVoteResult,
-  showVoteToResult,
-  showVoteYesOrNoResult,
-  showWhoWins,
-  shufflePlayers,
-  updateUserInRoom,
-  whoWins,
-} from "./api/socket/moderatorAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -199,7 +184,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("testStart", async (roomId, playersMaxCount) => {
     console.log(`[testStart 수신] roomId : ${roomId} | 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r0-0";
+    let roundName = "r1-4";
     //r1-14
     let allPlayers = null;
 
