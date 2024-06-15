@@ -228,8 +228,9 @@ mafiaIo.on("connection", (socket) => {
           try {
             await initGame(roomId);
           } catch (error) {
-            console.log(`[initError] ${error.message}`);
-            mafiaIo.to(roomId).emit("initError", error.message);
+            console.log(`[playError] ${roundName}, ${error.message}`);
+            mafiaIo.to(roomId).emit("playError", roundName, error.message);
+            clearInterval(start);
           }
         }
 
@@ -429,7 +430,7 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-0";
+          roundName = "end";
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 3초
@@ -1047,7 +1048,7 @@ const canGameStart = async (roomId) => {
 
     if (canStart) {
       const chief = await getChief(roomId);
-      console.log(`chiefStart ${chief}`);
+      console.log(`[chiefStart] ${chief}`);
       mafiaIo.to(chief).emit("chiefStart");
     } else {
       console.log("게임 준비X");

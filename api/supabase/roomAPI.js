@@ -198,11 +198,13 @@ export const getUsersIdInRoom = async (roomId) => {
 export const getUsersInfoInRoom = async (roomId) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
-    .select("user_id, user_nickname")
+    .select("user_id, user_nickname, is_ready")
     .eq("room_id", roomId);
 
   if (error) {
-    throw new Error("방에 있는 유저들의 유저 아이디와 닉네임 조회 실패");
+    throw new Error(
+      "방에 있는 유저들의 유저 아이디, 닉네임, 레디 여부 조회 실패"
+    );
   }
 
   return data;
