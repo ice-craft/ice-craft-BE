@@ -216,7 +216,14 @@ mafiaIo.on("connection", (socket) => {
         try {
           allPlayers = await getPlayersInRoom(roomId);
         } catch (error) {
-          console.log(`[]`);
+          await initGame(roomId);
+          console.log(
+            `[playError] 모든 플레이어 정보 가져오기, ${error.message}`
+          );
+          mafiaIo
+            .to(roomId)
+            .emit("playError", "모든 플레이어 정보 가져오기", error.message);
+          clearInterval(start);
         }
 
         //FIXME - 승리 조건 넣기 (중도 이탈 시)
