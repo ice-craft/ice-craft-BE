@@ -42,6 +42,7 @@ import {
   voteYesOrNo,
 } from "./api/supabase/gamePlayAPI.js";
 import {
+  gameError,
   getMostVotedPlayer,
   getRoleMaxCount,
   getYesOrNoVoteResult,
@@ -290,39 +291,41 @@ mafiaIo.on("connection", (socket) => {
           console.log("최대 경찰 인원 수", policeMaxCount);
 
           try {
-          } catch (error) {}
-          //NOTE - 처음에는 모든 플레이어 시민으로 설정
-          for (
-            let playerIndex = 0;
-            playerIndex < playersMaxCount;
-            playerIndex++
-          ) {
-            await setPlayerRole(playersUserId[playerIndex], "시민"); //FIXME - 테스트용 코드, 배포시 삭제
-          }
+            //FIXME - 테스트용 코드, 배포시 삭제
+            for (
+              let playerIndex = 0;
+              playerIndex < playersMaxCount;
+              playerIndex++
+            ) {
+              await setPlayerRole(playersUserId[playerIndex], "시민");
+            }
 
-          //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
-          for (
-            let playerIndex = 0;
-            playerIndex < mafiaMaxCount;
-            playerIndex++
-          ) {
-            await setPlayerRole(playersUserId[playerIndex], "마피아");
-          }
+            //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
+            for (
+              let playerIndex = 0;
+              playerIndex < mafiaMaxCount;
+              playerIndex++
+            ) {
+              await setPlayerRole(playersUserId[playerIndex], "마피아");
+            }
 
-          if (doctorMaxCount !== 0) {
-            console.log("의사 역할 배정");
-            await setPlayerRole(playersUserId[mafiaMaxCount], "의사");
-          }
+            if (doctorMaxCount !== 0) {
+              console.log("의사 역할 배정");
+              await setPlayerRole(playersUserId[mafiaMaxCount], "의사");
+            }
 
-          if (policeMaxCount !== 0) {
-            console.log("경찰 역할 배정");
-            await setPlayerRole(playersUserId[mafiaMaxCount + 1], "경찰");
-          }
+            if (policeMaxCount !== 0) {
+              console.log("경찰 역할 배정");
+              await setPlayerRole(playersUserId[mafiaMaxCount + 1], "경찰");
+            }
 
-          allPlayers = await getPlayersInRoom(roomId);
-          mafiaPlayers = allPlayers
-            .filter((player) => player.role == "마피아")
-            .map((player) => player.user_id);
+            allPlayers = await getPlayersInRoom(roomId);
+            mafiaPlayers = allPlayers
+              .filter((player) => player.role == "마피아")
+              .map((player) => player.user_id);
+          } catch (error) {
+            return await gameError(roundName, error);
+          }
 
           if (doctorMaxCount > 0) {
             doctorPlayer = allPlayers
