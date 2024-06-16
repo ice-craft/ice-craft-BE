@@ -133,3 +133,12 @@ export const getRoleMaxCount = (totalCount) => {
       return [3, 1, 1];
   }
 };
+
+export const gameError = async () => {
+  await initGame(roomId);
+  console.log(`[playError] 모든 플레이어 정보 가져오기, ${error.message}`);
+  mafiaIo
+    .to(roomId)
+    .emit("playError", "모든 플레이어 정보 가져오기", error.message);
+  clearInterval(start);
+};
