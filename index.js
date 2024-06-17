@@ -989,7 +989,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-0";
         }
       }
-    }, 1000);
+    }, 3000);
   });
 
   socket.on("voteTo", async (votedPlayer) => {
