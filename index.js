@@ -1,11 +1,10 @@
 //NOTE - 네임스페이스, 룸 구현
 //FIXME - try/catch를 통한 예외처리 다시 확인
-//FIXME - deleteRoom에서 따지는 조건이 exitRoom에서 이미 확인함
-//FIXME - userInfo로 방에 들어있는 모든 유저 정보 송신
 //FIXME - 907번 째 줄 의사 없을 때 고려할 것
 //FIXME - voteToMafiaError
 //FIXME - 타이머 시간 노가다
 //FIXME - undefined 뜨는거 (아무것도 안했을 때)
+//FIXME - 게임 시작 조건이 안맞아지면 게임시작 비활성화
 
 import express from "express";
 import { createServer } from "http";
@@ -921,6 +920,7 @@ mafiaIo.on("connection", (socket) => {
             .find((player) => player.role === "의사");
 
           if (doctorPlayer) {
+            doctorPlayer = doctorPlayer.userId;
           }
 
           if (mostVotedPlayer.voted_count !== 0) {
