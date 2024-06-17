@@ -1081,11 +1081,11 @@ const canGameStart = async (roomId) => {
     const chief = await getChief(roomId);
 
     if (canStart) {
-      console.log(`[chiefStart] ${chief} ${true}`);
-      mafiaIo.to(chief).emit("chiefStart", true);
+      console.log(`[chiefStart] ${chief} ${canStart}`);
+      mafiaIo.to(chief).emit("chiefStart", canStart);
     } else {
-      console.log(`[chiefStart] ${chief} ${false}`);
-      mafiaIo.to(chief).emit("chiefStart", false);
+      console.log(`[chiefStart] ${chief} ${canStart}`);
+      mafiaIo.to(chief).emit("chiefStart", canStart);
     }
   } catch (error) {
     console.log(`[canGameStartError] ${error.message}`);
