@@ -37,6 +37,43 @@ import {
   getUsersInfoInRoom,
   joinRoom,
 } from "./api/supabase/roomAPI.js";
+import {
+  checkAllPlayersReady,
+  checkChosenPlayer,
+  checkPlayerCountEnough,
+  checkPlayerLived,
+  checkPlayerMafia,
+  choosePlayer,
+  getPlayerByRole,
+  getPlayerNickname,
+  getPlayersInRoom,
+  getRound,
+  getSelectedPlayer,
+  getStatus,
+  getVoteToResult,
+  initGame,
+  killPlayer,
+  resetVote,
+  savePlayer,
+  selectPlayer,
+  setPlayerRole,
+  setReady,
+  setStatus,
+  updateRound,
+  voteTo,
+  voteYesOrNo,
+} from "./api/supabase/gamePlayAPI.js";
+import {
+  gameError,
+  getMostVotedPlayer,
+  getRoleMaxCount,
+  getYesOrNoVoteResult,
+  showVoteToResult,
+  showVoteYesOrNoResult,
+  showWhoWins,
+  shufflePlayers,
+  whoWins,
+} from "./api/socket/moderatorAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -148,6 +185,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       await setReady(userId, ready);
+
       const roomId = socket.data.roomId;
       mafiaIo.to(roomId).emit("setReady", userId, ready);
       canGameStart(roomId);
@@ -178,7 +216,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r0-0"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = "r0-2"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -199,20 +237,26 @@ mafiaIo.on("connection", (socket) => {
         try {
           allPlayers = await getPlayersInRoom(roomId);
         } catch (error) {
-          console.log(`[]`);
+          await initGame(roomId);
+          console.log(`[playError] 모든 플레이어 정보 가져오기, ${error.message}`);
+          mafiaIo.to(roomId).emit("playError", "모든 플레이어 정보 가져오기", error.message);
+          clearInterval(start);
         }
 
         //FIXME - 승리 조건 넣기 (중도 이탈 시)
         //FIXME - 플레이어 사망 처리 넣기
         //FIXME - showModal 메서드로 만들기
         //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
+        //FIXME - 라운드명 상수화
+        //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 
         if (roundName == "init") {
           try {
             await initGame(roomId);
           } catch (error) {
-            console.log(`[initError] ${error.message}`);
-            mafiaIo.to(roomId).emit("initError", error.message);
+            console.log(`[playError] ${roundName}, ${error.message}`);
+            mafiaIo.to(roomId).emit("playError", roundName, error.message);
+            clearInterval(start);
           }
         }
 
@@ -245,7 +289,7 @@ mafiaIo.on("connection", (socket) => {
           time = 6; //FIXME - 10초
 
           let playersUserId = allPlayers.map((player) => player.user_id);
-          [mafiaMaxCount, doctorMaxCount, policeMaxCount] = getRoleMaxCount(playersMaxCount); //FIXME - 각 요소들이 필요한지 보고 필요없으면 삭제
+          [mafiaMaxCount, doctorMaxCount, policeMaxCount] = getRoleMaxCount(playersMaxCount);
 
           let mafiaPlayers = null;
           let doctorPlayer = null;
@@ -259,28 +303,32 @@ mafiaIo.on("connection", (socket) => {
           console.log("최대 의사 인원 수", doctorMaxCount);
           console.log("최대 경찰 인원 수", policeMaxCount);
 
-          //NOTE - 처음에는 모든 플레이어 시민으로 설정
-          for (let playerIndex = 0; playerIndex < playersMaxCount; playerIndex++) {
-            await setPlayerRole(playersUserId[playerIndex], "시민"); //FIXME - 초기 설정이 시민이라 필요한지 생각해보기
-          }
+          try {
+            //FIXME - 테스트용 코드, 배포시 삭제
+            for (let playerIndex = 0; playerIndex < playersMaxCount; playerIndex++) {
+              await setPlayerRole(playersUserId[playerIndex], "시민");
+            }
 
-          //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
-          for (let playerIndex = 0; playerIndex < mafiaMaxCount; playerIndex++) {
-            await setPlayerRole(playersUserId[playerIndex], "마피아");
-          }
+            //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
+            for (let playerIndex = 0; playerIndex < mafiaMaxCount; playerIndex++) {
+              await setPlayerRole(playersUserId[playerIndex], "마피아");
+            }
 
-          if (doctorMaxCount !== 0) {
-            console.log("의사 역할 배정");
-            await setPlayerRole(playersUserId[mafiaMaxCount], "의사");
-          }
+            if (doctorMaxCount !== 0) {
+              console.log("의사 역할 배정");
+              await setPlayerRole(playersUserId[mafiaMaxCount], "의사");
+            }
 
-          if (policeMaxCount !== 0) {
-            console.log("경찰 역할 배정");
-            await setPlayerRole(playersUserId[mafiaMaxCount + 1], "경찰");
-          }
+            if (policeMaxCount !== 0) {
+              console.log("경찰 역할 배정");
+              await setPlayerRole(playersUserId[mafiaMaxCount + 1], "경찰");
+            }
 
-          allPlayers = await getPlayersInRoom(roomId);
-          mafiaPlayers = allPlayers.filter((player) => player.role == "마피아").map((player) => player.user_id);
+            allPlayers = await getPlayersInRoom(roomId);
+            mafiaPlayers = allPlayers.filter((player) => player.role == "마피아").map((player) => player.user_id);
+          } catch (error) {
+            return await gameError(roundName, error);
+          }
 
           if (doctorMaxCount > 0) {
             doctorPlayer = allPlayers.find((player) => player.role == "의사").map((player) => player.user_id);
@@ -315,7 +363,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("showAllPlayerRole", role, time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r0-3";
+          roundName = "r0-3!";
         } else if (roundName === "r0-3") {
           console.log(`${roundName} 시작`);
           time = 5; //FIXME - 5초
@@ -375,7 +423,7 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-0";
+          roundName = "end";
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
           time = 3; //FIXME - 3초
@@ -883,6 +931,7 @@ const canGameStart = async (roomId) => {
 
     if (canStart) {
       const chief = await getChief(roomId);
+      console.log(`[chiefStart] ${chief}`);
       mafiaIo.to(chief).emit("chiefStart");
     } else {
       console.log("게임 준비X");

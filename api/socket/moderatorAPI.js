@@ -117,3 +117,10 @@ export const getRoleMaxCount = (totalCount) => {
       return [3, 1, 1];
   }
 };
+
+export const gameError = async (roundName, error) => {
+  await initGame(roomId);
+  console.log(`[playError] ${roundName}, ${error.message}`); //FIXME - 테스트용 코드
+  mafiaIo.to(roomId).emit("playError", roundName, error.message);
+  clearInterval(start);
+};
