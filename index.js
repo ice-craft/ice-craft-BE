@@ -2,6 +2,7 @@
 //FIXME - try/catch를 통한 예외처리 다시 확인
 //FIXME - deleteRoom에서 따지는 조건이 exitRoom에서 이미 확인함
 //FIXME - userInfo로 방에 들어있는 모든 유저 정보 송신
+//FIXME - 907번 째 줄 의사 없을 때 고려할 것
 
 import express from "express";
 import { createServer } from "http";
@@ -902,9 +903,13 @@ mafiaIo.on("connection", (socket) => {
             .filter((player) => player.role === "마피아")
             .map((player) => player.user_id);
 
-          const doctorPlayer = allPlayers
-            .filter((player) => player.is_lived == true)
-            .find((player) => player.role === "의사").user_id;
+          let doctorPlayer = null; //FIXME - 테스트 임시 코드
+
+          if (doctorPlayer) {
+            doctorPlayer = allPlayers
+              .filter((player) => player.is_lived == true)
+              .find((player) => player.role === "의사").user_id;
+          } //FIXME - 테스트 임시 코드
 
           if (mostVotedPlayer.voted_count !== 0) {
             playerToKill = mostVotedPlayer.user_id;
