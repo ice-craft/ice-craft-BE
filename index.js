@@ -274,7 +274,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r0-2";
         } else if (roundName === "r0-2") {
           console.log(`${roundName} 시작`);
-          time = 1; //FIXME - 10초
+          time = 6; //FIXME - 테스트용, 10초로 바꾸기
 
           let playersUserId = allPlayers.map((player) => player.user_id);
           [mafiaMaxCount, doctorMaxCount, policeMaxCount] =
