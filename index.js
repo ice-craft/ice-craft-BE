@@ -3,6 +3,9 @@
 //FIXME - deleteRoom에서 따지는 조건이 exitRoom에서 이미 확인함
 //FIXME - userInfo로 방에 들어있는 모든 유저 정보 송신
 //FIXME - 907번 째 줄 의사 없을 때 고려할 것
+//FIXME - voteToMafiaError
+//FIXME - 타이머 시간 노가다
+//FIXME - undefined 뜨는거 (아무것도 안했을 때)
 
 import express from "express";
 import { createServer } from "http";
@@ -174,6 +177,15 @@ mafiaIo.on("connection", (socket) => {
     } catch (error) {
       console.log(`[setReadyError] ${error.message}`);
       socket.emit("setReadyError", error.message);
+    }
+  });
+
+  socket.on("usersInfo", async (roomId) => {
+    try {
+      await getUsersInfoInRoom(roomId);
+    } catch (error) {
+      console.log(`[usersInfoError] ${error.message}`);
+      socket.emit("usersInfoError", error.message);
     }
   });
 
@@ -903,13 +915,12 @@ mafiaIo.on("connection", (socket) => {
             .filter((player) => player.role === "마피아")
             .map((player) => player.user_id);
 
-          let doctorPlayer = null; //FIXME - 테스트 임시 코드
+          doctorPlayer = allPlayers
+            .filter((player) => player.is_lived == true)
+            .find((player) => player.role === "의사");
 
           if (doctorPlayer) {
-            doctorPlayer = allPlayers
-              .filter((player) => player.is_lived == true)
-              .find((player) => player.role === "의사").user_id;
-          } //FIXME - 테스트 임시 코드
+          }
 
           if (mostVotedPlayer.voted_count !== 0) {
             playerToKill = mostVotedPlayer.user_id;
