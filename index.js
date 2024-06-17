@@ -1,10 +1,9 @@
 //NOTE - 네임스페이스, 룸 구현
 //FIXME - try/catch를 통한 예외처리 다시 확인
-//FIXME - 907번 째 줄 의사 없을 때 고려할 것
 //FIXME - voteToMafiaError
 //FIXME - 타이머 시간 노가다
 //FIXME - undefined 뜨는거 (아무것도 안했을 때)
-//FIXME - 게임 시작 조건이 안맞아지면 게임시작 비활성화
+//FIXME - 게임 시작 조건이 안맞아지면 게임시작 비활성화 (후반부에 작업, 게임 룸 작업을 서버에서 할지 클라이언트에서 할지 결정)
 
 import express from "express";
 import { createServer } from "http";
@@ -1073,17 +1072,20 @@ const canGameStart = async (roomId) => {
 
     canStart = isAllPlayerEnoughCount && isAllPlayersReady;
     console.log(
-      "인원 충분 :",
+      "인원 충분 : ",
       isAllPlayerEnoughCount,
-      " 전부 레디 :" + isAllPlayersReady
+      "전부 레디 : ",
+      isAllPlayersReady
     );
 
+    const chief = await getChief(roomId);
+
     if (canStart) {
-      const chief = await getChief(roomId);
-      console.log(`[chiefStart] ${chief}`);
-      mafiaIo.to(chief).emit("chiefStart");
+      console.log(`[chiefStart] ${chief} ${true}`);
+      mafiaIo.to(chief).emit("chiefStart", true);
     } else {
-      console.log("게임 준비X");
+      console.log(`[chiefStart] ${chief} ${false}`);
+      mafiaIo.to(chief).emit("chiefStart", false);
     }
   } catch (error) {
     console.log(`[canGameStartError] ${error.message}`);
