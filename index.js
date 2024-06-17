@@ -1,6 +1,7 @@
 //NOTE - 네임스페이스, 룸 구현
 //FIXME - try/catch를 통한 예외처리 다시 확인
 //FIXME - deleteRoom에서 따지는 조건이 exitRoom에서 이미 확인함
+//FIXME - userInfo로 방에 들어있는 모든 유저 정보 송신
 
 import express from "express";
 import { createServer } from "http";
@@ -196,7 +197,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r0-2"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = "r0-0"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -368,13 +369,13 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("showAllPlayerRole", role, time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r0-3!";
+          roundName = "r0-3";
         } else if (roundName === "r0-3") {
           console.log(`${roundName} 시작`);
-          time = 1; //FIXME - 5초
+          time = 1; //FIXME - 3초
 
           console.log(
-            `[${roundName}] showModal : 마피아들은 고개를 들어 서로를 확인해주세요. / 5초`
+            `[${roundName}] showModal : 마피아들은 고개를 들어 서로를 확인해주세요. / 3초`
           );
           mafiaIo
             .to(roomId)
@@ -444,7 +445,7 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "end";
+          roundName = "r1-0";
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
           time = 1; //FIXME - 3초
