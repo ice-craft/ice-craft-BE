@@ -6,8 +6,8 @@
 //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 //FIXME - try/catch를 통한 예외처리 다시 확인
 //FIXME - voteToMafiaError
-//FIXME - 타이머 시간 노가다
 //FIXME - undefined 뜨는거 (아무것도 안했을 때)
+//FIXME - 방 목록 갱신
 
 import express from "express";
 import { createServer } from "http";
@@ -998,7 +998,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-0";
         }
       }
-    }, 3000);
+    }, 1000);
   });
 
   socket.on("voteTo", async (votedPlayer) => {
