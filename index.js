@@ -1,11 +1,13 @@
-//NOTE - 네임스페이스, 룸 구현
+//FIXME - 승리 조건 넣기 (중도 이탈 시)
+//FIXME - 플레이어 사망 처리 넣기
+//FIXME - showModal 메서드로 만들기
+//FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
+//FIXME - 라운드명 상수화
+//FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 //FIXME - try/catch를 통한 예외처리 다시 확인
-//FIXME - deleteRoom에서 따지는 조건이 exitRoom에서 이미 확인함
-//FIXME - userInfo로 방에 들어있는 모든 유저 정보 송신
-//FIXME - 907번 째 줄 의사 없을 때 고려할 것
 //FIXME - voteToMafiaError
-//FIXME - 타이머 시간 노가다
 //FIXME - undefined 뜨는거 (아무것도 안했을 때)
+//FIXME - 방 목록 갱신
 
 import express from "express";
 import { createServer } from "http";
@@ -165,7 +167,8 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("usersInfo", async (roomId) => {
     try {
-      await getUsersInfoInRoom(roomId);
+      const usersInfo = await getUsersInfoInRoom(roomId);
+      socket.emit("usersInfo", usersInfo);
     } catch (error) {
       console.log(`[usersInfoError] ${error.message}`);
       socket.emit("usersInfoError", error.message);
@@ -193,7 +196,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r0-0"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -220,16 +223,10 @@ mafiaIo.on("connection", (socket) => {
           clearInterval(start);
         }
 
-        //FIXME - 승리 조건 넣기 (중도 이탈 시)
-        //FIXME - 플레이어 사망 처리 넣기
-        //FIXME - showModal 메서드로 만들기
-        //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
-        //FIXME - 라운드명 상수화
-        //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
-
         if (roundName == "init") {
           try {
             await initGame(roomId);
+            roundName = "r0-0";
           } catch (error) {
             console.log(`[playError] ${roundName}, ${error.message}`);
             mafiaIo.to(roomId).emit("playError", roundName, error.message);
@@ -263,7 +260,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r0-2";
         } else if (roundName === "r0-2") {
           console.log(`${roundName} 시작`);
-          time = 6; //FIXME - 테스트용, 10초로 바꾸기
+          time = 10; //FIXME - 테스트용, 10초로 바꾸기
 
           let playersUserId = allPlayers.map((player) => player.user_id);
           [mafiaMaxCount, doctorMaxCount, policeMaxCount] = getRoleMaxCount(playersMaxCount);
@@ -343,7 +340,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r0-3";
         } else if (roundName === "r0-3") {
           console.log(`${roundName} 시작`);
-          time = 1; //FIXME - 3초
+          time = 3; //FIXME - 3초
 
           console.log(`[${roundName}] showModal : 마피아들은 고개를 들어 서로를 확인해주세요. / 3초`);
           mafiaIo.to(roomId).emit("showModal", "마피아들은 고개를 들어 서로를 확인해주세요.", time);
@@ -575,7 +572,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-13";
         } else if (roundName == "r1-13") {
           console.log(`${roundName} 시작`);
-          time = 5; //FIXME - 3초
+          time = 3; //FIXME - 3초
 
           if (yesOrNoVoteResult.result) {
             console.log("투표 결과 유효함");
@@ -663,7 +660,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-17";
         } else if (roundName === "r1-17") {
           console.log(`${roundName} 시작`);
-          time = 5; //FIXME - 10초
+          time = 10; //FIXME - 10초
 
           console.log(`[${roundName}] inSelect : mafia /  10초`);
           mafiaIo.to(roomId).emit("inSelect", "mafia", time);
@@ -672,7 +669,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-18";
         } else if (roundName === "r1-18") {
           console.log(`${roundName} 시작`);
-          time = 1; //FIXME - 10초
+          time = 10; //FIXME - 10초
 
           let media = {};
           const mafiaPlayers = allPlayers
@@ -707,7 +704,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-20";
         } else if (roundName == "r1-20") {
           console.log(`${roundName} 시작`);
-          time = 5; //FIXME - 10초
+          time = 10; //FIXME - 10초
 
           console.log(`[${roundName}] inSelect : doctor / 10초`);
           mafiaIo.to(roomId).emit("inSelect", "doctor", time);
@@ -779,11 +776,12 @@ mafiaIo.on("connection", (socket) => {
             .filter((player) => player.role === "마피아")
             .map((player) => player.user_id);
 
-          doctorPlayer = allPlayers
+          let doctorPlayer = allPlayers
             .filter((player) => player.is_lived == true)
             .find((player) => player.role === "의사");
 
           if (doctorPlayer) {
+            doctorPlayer = doctorPlayer.userId;
           }
 
           if (mostVotedPlayer.voted_count !== 0) {
@@ -844,7 +842,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-0";
         }
       }
-    }, 3000);
+    }, 1000);
   });
 
   socket.on("voteTo", async (votedPlayer) => {
@@ -907,14 +905,16 @@ const canGameStart = async (roomId) => {
     const isAllPlayersReady = await checkAllPlayersReady(roomId, totalUserCount); //NOTE - 플레이어들이 전부 레디했는지
 
     canStart = isAllPlayerEnoughCount && isAllPlayersReady;
-    console.log("인원 충분 :", isAllPlayerEnoughCount, " 전부 레디 :" + isAllPlayersReady);
+    console.log("인원 충분 : ", isAllPlayerEnoughCount, "전부 레디 : ", isAllPlayersReady);
+
+    const chief = await getChief(roomId);
 
     if (canStart) {
-      const chief = await getChief(roomId);
-      console.log(`[chiefStart] ${chief}`);
-      mafiaIo.to(chief).emit("chiefStart");
+      console.log(`[chiefStart] ${chief} ${canStart}`);
+      mafiaIo.to(chief).emit("chiefStart", canStart);
     } else {
-      console.log("게임 준비X");
+      console.log(`[chiefStart] ${chief} ${canStart}`);
+      mafiaIo.to(chief).emit("chiefStart", canStart);
     }
   } catch (error) {
     console.log(`[canGameStartError] ${error.message}`);
