@@ -912,15 +912,13 @@ mafiaIo.on("connection", (socket) => {
             .filter((player) => player.role === "마피아")
             .map((player) => player.user_id);
 
-          // doctorPlayer = allPlayers
-          //   .filter((player) => player.is_lived == true)
-          //   .find((player) => player.role === "의사");
+          let doctorPlayer = allPlayers
+            .filter((player) => player.is_lived == true)
+            .find((player) => player.role === "의사");
 
-          // if (doctorPlayer) {
-          //   doctorPlayer = doctorPlayer.userId;
-          // }
-
-          doctorPlayer = null; //FIXME - 테스트 코드
+          if (doctorPlayer) {
+            doctorPlayer = doctorPlayer.userId;
+          }
 
           if (mostVotedPlayer.voted_count !== 0) {
             playerToKill = mostVotedPlayer.user_id;
