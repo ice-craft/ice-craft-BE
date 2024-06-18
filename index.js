@@ -11,6 +11,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import {
+  gameError,
   getMostVotedPlayer,
   getRoleMaxCount,
   getYesOrNoVoteResult,
@@ -18,7 +19,6 @@ import {
   whoWins,
 } from "./api/socket/moderatorAPI.js";
 import {
-  checkAllPlayersReady,
   checkPlayerCountEnough,
   getPlayersInRoom,
   getSelectedPlayer,
@@ -42,43 +42,6 @@ import {
   getUsersInfoInRoom,
   joinRoom,
 } from "./api/supabase/roomAPI.js";
-import {
-  checkAllPlayersReady,
-  checkChosenPlayer,
-  checkPlayerCountEnough,
-  checkPlayerLived,
-  checkPlayerMafia,
-  choosePlayer,
-  getPlayerByRole,
-  getPlayerNickname,
-  getPlayersInRoom,
-  getRound,
-  getSelectedPlayer,
-  getStatus,
-  getVoteToResult,
-  initGame,
-  killPlayer,
-  resetVote,
-  savePlayer,
-  selectPlayer,
-  setPlayerRole,
-  setReady,
-  setStatus,
-  updateRound,
-  voteTo,
-  voteYesOrNo,
-} from "./api/supabase/gamePlayAPI.js";
-import {
-  gameError,
-  getMostVotedPlayer,
-  getRoleMaxCount,
-  getYesOrNoVoteResult,
-  showVoteToResult,
-  showVoteYesOrNoResult,
-  showWhoWins,
-  shufflePlayers,
-  whoWins,
-} from "./api/socket/moderatorAPI.js";
 
 const app = express();
 const httpServer = createServer(app);
