@@ -98,12 +98,12 @@ export const voteTo = async (user_id, time) => {
 export const resetVote = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
-    .update({ vote_to: null, voted_count: 0, vote_time: null })
+    .update({ vote_yes_or_no: null, voted_count: 0, vote_time: null })
     .eq("room_id", room_id)
     .select();
 
   if (error) {
-    throw new Error();
+    throw new Error("투표 초기화 실패");
   }
 
   return data;
