@@ -78,7 +78,7 @@ export const voteTo = async (user_id, time) => {
     .single();
 
   if (selectError) {
-    throw new Error();
+    throw new Error("플레이어의 받은 투표 수 조회 실패");
   }
 
   const votedCount = data.voted_count;
@@ -89,7 +89,7 @@ export const voteTo = async (user_id, time) => {
     .eq("user_id", user_id);
 
   if (updateError) {
-    throw new Error();
+    throw new Error("플레이어의 받은 투표 수 갱신 실패");
   }
 
   return userId;

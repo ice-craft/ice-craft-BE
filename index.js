@@ -213,7 +213,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r1-0"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = "r1-6"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -545,7 +545,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("inSelect", "vote", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-6!";
+          roundName = "r1-6";
         } else if (roundName == "r1-6") {
           console.log(`${roundName} 시작`);
           time = 5;
@@ -559,7 +559,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("showVoteResult", voteBoard, time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-7";
+          roundName = "r1-7!";
         } else if (roundName == "r1-7") {
           console.log(`${roundName} 시작`);
           time = 3;
