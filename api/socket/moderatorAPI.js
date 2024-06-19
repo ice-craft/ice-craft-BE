@@ -84,26 +84,23 @@ export const whoWins = async (allPlayers) => {
     .filter((player) => player.role === "마피아");
   const citizenPlayers = allPlayers
     .filter((player) => player.is_lived === true)
-    .filter((player) => player.role === "시민");
+    .filter((player) => player.role !== "마피아");
   let mafiaCount;
   let citizenCount;
 
-  if (mafiaPlayers) {
-    mafiaCount = mafiaPlayers.length;
-  } else {
-    mafiaCount = 0;
-  }
+  mafiaPlayers.length > 0
+    ? (mafiaCount = mafiaPlayers.length)
+    : (mafiaCount = 0);
 
-  if (citizenPlayers) {
-    citizenCount = citizenPlayers.length;
-  } else {
-    mafiaCount = 0;
-  }
+  citizenPlayers.length > 0
+    ? (citizenCount = citizenPlayers.length)
+    : (citizenCount = 0);
 
   if (mafiaCount === 0) {
     return { isValid: true, result: "시민" };
   }
-  if (mafiaCount > citizenCount || mafiaCount === citizenCount) {
+
+  if (mafiaCount >= citizenCount) {
     return { isValid: true, result: "마피아" };
   }
 

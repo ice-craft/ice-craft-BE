@@ -8,6 +8,7 @@
 //FIXME - voteToMafiaError
 //FIXME - undefined 뜨는거 (아무것도 안했을 때)
 //FIXME - 방 목록 갱신
+//FIXME - 중간에 나갈 경우, 해골 or 캠을 없앨지
 
 import express from "express";
 import { createServer } from "http";
@@ -224,6 +225,8 @@ mafiaIo.on("connection", (socket) => {
     let voteBoard = null;
     let mostVoteResult = null;
     let yesOrNoVoteResult = null;
+
+    let winResult = null;
 
     let time = 1;
 
@@ -704,7 +707,7 @@ mafiaIo.on("connection", (socket) => {
               );
               mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
             }
-            const winResult = whoWins(allPlayers);
+            winResult = whoWins(allPlayers);
             if (winResult.isValid) {
               if (winResult.result === "시민") {
                 console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
