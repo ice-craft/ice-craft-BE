@@ -582,14 +582,18 @@ mafiaIo.on("connection", (socket) => {
             roundName = "r1-8!";
           } else {
             console.log(
-              `[${roundName}] showModal : 동률로 인해 아무도 죽지 않았습니다. / 3초`
+              `[${roundName}] showModal : 동률로 인해 임의의 플레이어가 사망합니다., ${mostVoteResult.result.user_nickname} / 3초`
             );
             mafiaIo
               .to(roomId)
-              .emit("showModal", "동률로 인해 아무도 죽지 않았습니다.", time);
+              .emit(
+                "showModal",
+                "동률로 인해 임의의 플레이어가 사망합니다.",
+                time
+              );
 
             console.log(`${roundName} 종료`);
-            roundName = "r1-14!";
+            roundName = "r1-13!";
           }
         } else if (roundName == "r1-8") {
           console.log(`${roundName} 시작`);
