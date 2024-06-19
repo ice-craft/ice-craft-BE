@@ -118,7 +118,7 @@ export const getVoteToResult = async (room_id) => {
     .order("vote_time", { ascending: true });
 
   if (error) {
-    throw new Error();
+    throw new Error("방 전체 플레이어 투표 결과 조회 실패");
   }
 
   return data;
