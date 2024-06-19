@@ -213,7 +213,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = "r1-0"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -545,7 +545,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("inSelect", "vote", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-6";
+          roundName = "r1-6!";
         } else if (roundName == "r1-6") {
           console.log(`${roundName} 시작`);
           time = 5;
@@ -1002,17 +1002,14 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("voteTo", async (votedPlayer) => {
-    console.log("voteTo 시작");
+    console.log(`[voteTo] 투표 대상 : ${votedPlayer}`);
 
     try {
       await voteTo(votedPlayer, new Date());
-      console.log(`${userId}는 ${votedPlayer}에게 투표`);
     } catch (error) {
-      console.log("[voteToMafiaError]");
-      socket.emit("voteToMafiaError");
-      return;
+      console.log(`[voteToError] ${error.message}`);
+      socket.emit("voteToError", error.message);
     }
-    console.log("voteToMafia 종료");
   });
 
   socket.on("VoteYesOrNo", async (yesOrNo) => {
