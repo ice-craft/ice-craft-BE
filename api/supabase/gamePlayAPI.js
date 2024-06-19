@@ -145,12 +145,10 @@ export const getVoteYesOrNoResult = async (room_id) => {
     .eq("room_id", room_id);
 
   if (error) {
-    throw new Error();
+    throw new Error("찬성 반대 투표 결과 조회 실패");
   }
 
-  const result = data.map((item) => item.vote_yes_or_no);
-
-  return result;
+  return data.map((item) => item.vote_yes_or_no);
 };
 
 export const killPlayer = async (user_id) => {
