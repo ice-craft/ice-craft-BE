@@ -132,7 +132,7 @@ export const voteYesOrNo = async (user_id, yesOrNo) => {
     .select();
 
   if (error) {
-    throw new Error();
+    throw new Error("찬성/반대 투표 수정 실패");
   }
 
   return data;

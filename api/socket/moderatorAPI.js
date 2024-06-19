@@ -49,12 +49,11 @@ export const showVoteToResult = (mafiaIo, roomId, eventName, voteBoard) => {
 
 //NOTE - 찬성 반대 투표 결과
 export const getYesOrNoVoteResult = async (roomId) => {
-  const votes = await getVoteYesOrNoResult(roomId);
+  const voteResult = await getVoteYesOrNoResult(roomId);
   let yesCount = 0;
   let noCount = 0;
-  let isValid;
 
-  votes.forEach((vote) => {
+  voteResult.forEach((vote) => {
     if (vote === true) {
       yesCount++;
     } else if (vote === false) {
