@@ -931,13 +931,17 @@ mafiaIo.on("connection", (socket) => {
             .filter((player) => player.role === "마피아")
             .map((player) => player.user_id);
 
-          let doctorPlayer = allPlayers
-            .filter((player) => player.is_lived == true)
-            .find((player) => player.role === "의사")?.user_id;
+          let doctorPlayer = null;
+          if (doctorMaxCount > 0) {
+            doctorPlayer = allPlayers
+              .filter((player) => player.is_lived == true)
+              .find((player) => player.role === "의사")?.user_id;
+          }
 
           playerToKill = mostVotedPlayer.user_id;
 
           playerToSave = await getSelectedPlayer(roomId);
+          console.log("죽일 플레이어", playerToKill, "살릴 사람", playerToSave); //FIXME - 테스트 코드
 
           if (playerToKill !== playerToSave) {
             if (mafiaPlayers) {
