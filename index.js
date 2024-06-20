@@ -827,14 +827,17 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`${roundName} 종료`);
+          doctorMaxCount = 0; //FIXME - 테스트 코드
+          policeMaxCount = 0; //FIXME - 테스트 코드
+          console.log("의사", doctorMaxCount, "경찰", policeMaxCount); //FIXME - 테스트 코드
           if (doctorMaxCount === 0 && policeMaxCount === 0) {
-            roundName = "r2-0"; //FIXME - 의사, 경찰 역할 수행 스킵
+            roundName = "r2-0";
           } else if (doctorMaxCount == 0 && policeMaxCount > 0) {
-            roundName = "r1-21"; //FIXME - 의사 역할 수행 스킵
+            roundName = "r1-21";
           } else {
             roundName = "r1-19";
           }
-        } else if (roundName == "r1-19!") {
+        } else if (roundName == "r1-19") {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -872,7 +875,7 @@ mafiaIo.on("connection", (socket) => {
             .emit("showModal", "경찰은 마피아 의심자를 결정해주세요.", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-22"; //FIXME - 경찰 역할 수행 스킵
+          roundName = "r1-22";
         } else if (roundName == "r1-22") {
           console.log(`${roundName} 시작`);
           time = 10;

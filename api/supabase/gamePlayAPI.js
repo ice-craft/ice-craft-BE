@@ -489,10 +489,10 @@ export const getPlayersInRoom = async (room_id) => {
 export const selectPlayer = async (user_id) => {
   const { error } = await supabase
     .from("room_user_match_table")
-    .update({ selected_by: "의사" })
+    .update({ selected_by: true })
     .eq("user_id", user_id);
   if (error) {
-    throw new Error();
+    throw new Error("플레이어 선택 실패");
   }
 };
 
