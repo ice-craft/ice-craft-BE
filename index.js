@@ -1043,15 +1043,15 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("selectPlayer", async (selectedPlayer) => {
-    console.log("selectPlayer 시작");
+    console.log(
+      `[selectedPlayer] 의사에 의해 선택받은 플레이어 : ${selectedPlayer}`
+    );
 
     try {
       await selectPlayer(selectedPlayer);
-      console.log(`${votedPlayer}가 의사의 선택을 받음`);
     } catch (error) {
-      console.log("[selectPlayerError]");
-      socket.emit("selectPlayerError");
-      return;
+      console.log(`[selectPlayerError] ${error.message}`);
+      socket.emit("selectPlayerError", error.message);
     }
     console.log("selectPlayer 종료");
   });
