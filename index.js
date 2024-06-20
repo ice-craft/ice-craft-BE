@@ -216,7 +216,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r1-6"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = "r1-14"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -834,7 +834,7 @@ mafiaIo.on("connection", (socket) => {
           } else {
             roundName = "r1-19";
           }
-        } else if (roundName == "r1-19") {
+        } else if (roundName == "r1-19!") {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -858,7 +858,7 @@ mafiaIo.on("connection", (socket) => {
           if (policeMaxCount > 0) {
             roundName = "r1-21";
           } else {
-            roundName = "r1-21"; //FIXME - 경찰 역할 수행 스킵
+            roundName = "r2-0";
           }
         } else if (roundName == "r1-21") {
           console.log(`${roundName} 시작`);
