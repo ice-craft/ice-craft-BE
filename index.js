@@ -10,7 +10,7 @@
 //FIXME - 방 목록 갱신
 //FIXME - 중간에 나갈 경우, 해골 or 캠을 없앨지
 //FIXME - 게임 중 난입 금지
-//FIXME - 클라이언트로 보내는 joinRoom, fastJoinRoom에 roomId도 보내기
+//FIXME - 게임 종료 메서드로 만들기
 
 import express from "express";
 import { createServer } from "http";
@@ -688,6 +688,9 @@ mafiaIo.on("connection", (socket) => {
             const killedPlayer = await killPlayer(
               mostVoteResult.result.user_id
             ); //NOTE - 투표를 가장 많이 받은 플레이어 사망
+
+            allPlayers = await getPlayersInRoom(roomId);
+
             console.log(`[${roundName}] diedPlayer : ${killedPlayer}`);
             mafiaIo.to(roomId).emit("diedPlayer", killedPlayer);
 
@@ -709,6 +712,7 @@ mafiaIo.on("connection", (socket) => {
               );
               mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
             }
+
             winResult = whoWins(allPlayers);
             console.log(winResult);
             if (winResult.isValid) {

@@ -1,4 +1,7 @@
-import { getVoteYesOrNoResult } from "../supabase/gamePlayAPI.js";
+import {
+  getPlayersInRoom,
+  getVoteYesOrNoResult,
+} from "../supabase/gamePlayAPI.js";
 
 //NOTE - 클라이언트의 화면에 모달창을 띄움
 export const showModal = (
@@ -95,6 +98,8 @@ export const whoWins = (allPlayers) => {
   citizenPlayers.length > 0
     ? (citizenCount = citizenPlayers.length)
     : (citizenCount = 0);
+
+  console.log("마피아", mafiaCount, "시민", citizenCount);
 
   if (mafiaCount === 0) {
     return { isValid: true, result: "시민" };
