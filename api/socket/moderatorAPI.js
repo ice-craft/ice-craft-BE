@@ -78,7 +78,7 @@ export const showVoteYesOrNoResult = async (
 };
 
 //NOTE - 어느 팀이 이겼는지 결과 반환
-export const whoWins = async (allPlayers) => {
+export const whoWins = (allPlayers) => {
   const mafiaPlayers = allPlayers
     .filter((player) => player.is_lived === true)
     .filter((player) => player.role === "마피아");

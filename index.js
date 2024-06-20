@@ -710,6 +710,7 @@ mafiaIo.on("connection", (socket) => {
               mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
             }
             winResult = whoWins(allPlayers);
+            console.log(winResult);
             if (winResult.isValid) {
               if (winResult.result === "시민") {
                 console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
@@ -718,7 +719,8 @@ mafiaIo.on("connection", (socket) => {
                 console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
                 mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
               }
-              roundName = "r1-0";
+              //await initGame(roomId); //FIXME - 배포용 코드
+              clearInterval(start);
             }
           } else {
             //NOTE - 투표 실패, 동률이 나옴
