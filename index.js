@@ -216,7 +216,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r1-14"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = "r2-2"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -884,7 +884,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("inSelect", "police", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "end";
+          roundName = "2-0";
         } else if (roundName == "r2-0") {
           console.log(`${roundName} 시작`);
           time = 3;
@@ -893,7 +893,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("showModal", "아침이 되었습니다.", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r2-1"; //FIXME - 경찰 역할 수행 스킵
+          roundName = "r2-1";
         } else if (roundName == "r2-1") {
           console.log(`${roundName} 시작`);
           time = 1;
@@ -941,7 +941,7 @@ mafiaIo.on("connection", (socket) => {
           if (mostVotedPlayer.voted_count !== 0) {
             playerToKill = mostVotedPlayer.user_id;
           }
-          playerToSave = await getSelectedPlayer(roomId, "의사");
+          playerToSave = await getSelectedPlayer(roomId);
 
           if (playerToKill !== playerToSave) {
             if (mafiaPlayers) {
@@ -1053,7 +1053,6 @@ mafiaIo.on("connection", (socket) => {
       console.log(`[selectPlayerError] ${error.message}`);
       socket.emit("selectPlayerError", error.message);
     }
-    console.log("selectPlayer 종료");
   });
 });
 

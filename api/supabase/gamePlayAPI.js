@@ -496,12 +496,12 @@ export const selectPlayer = async (user_id) => {
   }
 };
 
-export const getSelectedPlayer = async (room_id, is_selected) => {
+export const getSelectedPlayer = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id")
     .eq("room_id", room_id)
-    .eq("is_selected", is_selected);
+    .eq("is_selected", true);
 
   if (error) {
     throw new Error("의사에 의해 선택된 플레이어 조회 실패");
