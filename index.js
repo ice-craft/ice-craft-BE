@@ -9,6 +9,8 @@
 //FIXME - undefined 뜨는거 (아무것도 안했을 때)
 //FIXME - 방 목록 갱신
 //FIXME - 중간에 나갈 경우, 해골 or 캠을 없앨지
+//FIXME - 게임 중 난입 금지
+//FIXME - 클라이언트로 보내는 joinRoom, fastJoinRoom에 roomId도 보내기
 
 import express from "express";
 import { createServer } from "http";
@@ -123,7 +125,7 @@ mafiaIo.on("connection", (socket) => {
       socket.data.userId = userId;
       socket.data.roomId = roomId;
 
-      mafiaIo.to(roomId).emit("joinRoom", usersInfo);
+      mafiaIo.to(roomId).emit("joinRoom", usersInfo, roomId);
     } catch (error) {
       console.log(`[joinRoomError] ${error.message}`);
       socket.emit("joinRoomError", error.message);
@@ -716,7 +718,7 @@ mafiaIo.on("connection", (socket) => {
                 console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
                 mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
               }
-              roundName = "r1-0"; //FIXME - 게임 초기화
+              roundName = "r1-0";
             }
           } else {
             //NOTE - 투표 실패, 동률이 나옴
