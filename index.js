@@ -144,7 +144,7 @@ mafiaIo.on("connection", (socket) => {
       socket.data.roomId = roomId;
       socket.data.userId = userId;
 
-      mafiaIo.to(roomId).emit("fastJoinRoom", usersInfo);
+      mafiaIo.to(roomId).emit("fastJoinRoom", usersInfo, roomId);
     } catch (error) {
       console.log(`[fastJoinRoomError] ${error.message}`);
       socket.emit("fastJoinRoomError", error.message);
