@@ -436,7 +436,7 @@ export const initGame = async (room_id) => {
       vote_yes_or_no: null,
       voted_count: 0,
       vote_time: null,
-      selected_by: null,
+      is_selected: false,
     })
     .eq("room_id", room_id);
 
@@ -489,22 +489,22 @@ export const getPlayersInRoom = async (room_id) => {
 export const selectPlayer = async (user_id) => {
   const { error } = await supabase
     .from("room_user_match_table")
-    .update({ selected_by: true })
+    .update({ is_selected: true })
     .eq("user_id", user_id);
   if (error) {
     throw new Error("플레이어 선택 실패");
   }
 };
 
-export const getSelectedPlayer = async (room_id, role) => {
+export const getSelectedPlayer = async (room_id, is_selected) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id")
     .eq("room_id", room_id)
-    .eq("selected_by", role);
+    .eq("is_selected", is_selected);
 
   if (error) {
-    throw new Error();
+    throw new Error("의사에 의해 선택된 플레이어 조회 실패");
   }
 
   if (data.length === 0) {
