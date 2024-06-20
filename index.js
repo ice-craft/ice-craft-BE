@@ -596,7 +596,7 @@ mafiaIo.on("connection", (socket) => {
                 "동률로 인해 임의의 플레이어가 사망합니다.",
                 time
               );
-
+            yesOrNoVoteResult = { result: true };
             console.log(`${roundName} 종료`);
             roundName = "r1-13";
           }
