@@ -935,9 +935,8 @@ mafiaIo.on("connection", (socket) => {
             .filter((player) => player.is_lived == true)
             .find((player) => player.role === "의사")?.user_id;
 
-          if (mostVotedPlayer.voted_count !== 0) {
-            playerToKill = mostVotedPlayer.user_id;
-          }
+          playerToKill = mostVotedPlayer.user_id;
+
           playerToSave = await getSelectedPlayer(roomId);
 
           if (playerToKill !== playerToSave) {
