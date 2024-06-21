@@ -859,7 +859,7 @@ mafiaIo.on("connection", (socket) => {
     console.log("voteToMafia 종료");
   });
 
-  socket.on("VoteYesOrNo", async (yesOrNo) => {
+  socket.on("voteYesOrNo", async (yesOrNo) => {
     console.log("voteYesOrNo 시작");
     const userId = socket.data.userId;
 
