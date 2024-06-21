@@ -1,4 +1,3 @@
-//FIXME - 플레이어 사망 처리 넣기
 //FIXME - showModal 메서드로 만들기
 //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
 //FIXME - 라운드명 상수화
@@ -7,7 +6,6 @@
 //FIXME - 방 목록 갱신
 //FIXME - 중간에 나갈 경우, 해골 or 캠을 없앨지
 //FIXME - 게임 중 난입 금지
-//FIXME - 게임 종료 메서드로 만들기
 
 import express from "express";
 import { createServer } from "http";
@@ -216,7 +214,7 @@ mafiaIo.on("connection", (socket) => {
     let time = 1;
 
     const start = setInterval(async () => {
-      time = 0; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
+      time--; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
 
       if (time <= 0) {
         try {
