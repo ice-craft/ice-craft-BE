@@ -6,6 +6,8 @@
 //FIXME - 방 목록 갱신
 //FIXME - 중간에 나갈 경우, 해골 or 캠을 없앨지
 //FIXME - 게임 중 난입 금지
+//FIXME - endGame으로 준비 화면으로 전환
+//FIXME - gameStart시 소켓으로 주기
 
 import express from "express";
 import { createServer } from "http";
@@ -776,7 +778,7 @@ mafiaIo.on("connection", (socket) => {
           roundName = "r1-18";
         } else if (roundName === "r1-18") {
           console.log(`${roundName} 시작`);
-          time = 10;
+          time = 1;
 
           let media = {};
           const mafiaPlayers = allPlayers
