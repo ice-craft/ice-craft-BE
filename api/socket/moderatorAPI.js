@@ -3,22 +3,6 @@ import {
   getVoteYesOrNoResult,
 } from "../supabase/gamePlayAPI.js";
 
-//NOTE - 클라이언트의 화면에 모달창을 띄움
-export const showModal = (
-  mafiaIo,
-  roomName,
-  eventName,
-  title,
-  message,
-  timer,
-  nickname,
-  yesOrNo
-) => {
-  mafiaIo
-    .to(roomName)
-    .emit(eventName, title, message, timer, nickname, yesOrNo);
-};
-
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
 export const shufflePlayers = (allPlayers) => {
   for (let i = allPlayers.length - 1; i >= 0; i--) {
@@ -26,11 +10,6 @@ export const shufflePlayers = (allPlayers) => {
     [allPlayers[i], allPlayers[j]] = [allPlayers[j], allPlayers[i]];
   }
   return allPlayers;
-};
-
-//NOTE - 플레이어에게 다른 플레이어의 역할 공개
-export const openPlayerRole = (mafiaIo, clientUserId, roleUserId, role) => {
-  mafiaIo.to(clientUserId).emit("openPlayerRole", roleUserId, role);
 };
 
 //NOTE - 표를 가장 많이 받은 플레이어 확인
@@ -43,11 +22,6 @@ export const getMostVotedPlayer = (voteBoard) => {
     const shuffledPlayers = shufflePlayers(voteBoard);
     return { isValid, result: shuffledPlayers[0] };
   }
-};
-
-//NOTE - 유저들에게 마피아 지목 투표 결과 보여줌
-export const showVoteToResult = (mafiaIo, roomId, eventName, voteBoard) => {
-  mafiaIo.to(roomId).emit(eventName, voteBoard);
 };
 
 //NOTE - 찬성 반대 투표 결과
@@ -68,16 +42,6 @@ export const getYesOrNoVoteResult = async (roomId) => {
     result: yesCount > noCount,
     detail: { yesCount, noCount },
   };
-};
-
-//NOTE - 유저들에게 찬성/반대 투표 결과 보여줌
-export const showVoteYesOrNoResult = async (
-  mafiaIo,
-  roomId,
-  eventName,
-  voteResult
-) => {
-  mafiaIo.to(roomId).emit(eventName, voteResult);
 };
 
 //NOTE - 어느 팀이 이겼는지 결과 반환
@@ -110,15 +74,6 @@ export const whoWins = (allPlayers) => {
   }
 
   return { isValid: false };
-};
-
-export const showWhoWins = async (gameOver) => {
-  console.log("showWhoWins 송신");
-
-  //NOTE - 게임 종료 만족하는 지
-  console.log(`${gameOver.result}팀이 이겼습니다.`);
-
-  mafiaIo.to(roomId).emit("gameOver", `${gameOver.result}팀이 이겼습니다.`);
 };
 
 export const getRoleMaxCount = (totalCount) => {

@@ -925,7 +925,7 @@ mafiaIo.on("connection", (socket) => {
           mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
           mostVotedPlayer = mostVoteResult.result;
           console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
-          await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
           playerToKill = mostVotedPlayer.user_id;
 
@@ -977,7 +977,7 @@ mafiaIo.on("connection", (socket) => {
             if (winResult.isValid) {
               if (winResult.result === "시민") {
                 console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
-                mafiaIo.to(roomId).emit("victoryPlayer", "citizen", 5);
+                mafiaIo.to(roomId).emit("victoryPlayer", "citizen", 3);
               } else if (winResult.result === "마피아") {
                 console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
                 mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
