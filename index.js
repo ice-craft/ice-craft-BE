@@ -183,14 +183,22 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("disconnect", async () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
-    // try {
-    //   const roomId = socket.data.roomId;
-    //   const userId = socket.data.userId;
+    console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
-    //   await exitRoom(roomId, userId); //NOTE - 테스트 중이라서 주석 처리
-    // } catch (error) {
-    //   console.log("방에서 나가기에 실패했습니다.");
-    // }
+    try {
+      await exitRoom(roomId, userId);
+      const usersInfo = await getUsersInfoInRoom(roomId);
+
+      socket.data.userId = null;
+      socket.data.roomId = null;
+      socket.leave(userId);
+      socket.leave(roomId);
+
+      mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+    } catch (error) {
+      console.log(`[exitRoomError] ${error.message}`);
+      socket.emit("exitRoomError", error.message);
+    }
   });
 
   socket.on("gameStart", async (roomId, playersMaxCount) => {
