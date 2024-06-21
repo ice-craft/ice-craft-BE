@@ -1,4 +1,4 @@
-import { getVoteYesOrNoResult } from "../supabase/gamePlayAPI.js";
+import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI.js";
 
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
 export const shufflePlayers = (allPlayers) => {
@@ -90,8 +90,11 @@ export const getRoleMaxCount = (totalCount) => {
   }
 };
 
-export const gameError = async (roundName, error) => {
-  await initGame(roomId);
+export const gameError = async (roundName, error, start) => {
+  if (roundName != "init") {
+    await initGame(roomId);
+  }
+
   console.log(`[playError] ${roundName}, ${error.message}`); //FIXME - 테스트용 코드
   mafiaIo.to(roomId).emit("playError", roundName, error.message);
   clearInterval(start);

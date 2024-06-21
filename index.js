@@ -5,8 +5,6 @@
 //FIXME - 라운드명 상수화
 //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 //FIXME - try/catch를 통한 예외처리 다시 확인
-//FIXME - voteToMafiaError
-//FIXME - undefined 뜨는거 (아무것도 안했을 때)
 //FIXME - 방 목록 갱신
 //FIXME - 중간에 나갈 경우, 해골 or 캠을 없앨지
 //FIXME - 게임 중 난입 금지
@@ -46,9 +44,6 @@ import {
   getMostVotedPlayer,
   getRoleMaxCount,
   getYesOrNoVoteResult,
-  showVoteToResult,
-  showVoteYesOrNoResult,
-  showWhoWins,
   shufflePlayers,
   whoWins,
 } from "./api/socket/moderatorAPI.js";
@@ -190,14 +185,23 @@ mafiaIo.on("connection", (socket) => {
     // try {
     //   const roomId = socket.data.roomId;
     //   const userId = socket.data.userId;
-    //   const gameOver = await whoWins(roomId);
 
     //   await exitRoom(roomId, userId); //NOTE - 테스트 중이라서 주석 처리
-    //   await updateUserInRoom(mafiaIo, roomId); //NOTE - 테스트 중이라서 주석 처리
+    const allPlayers = await getPlayersInRoom(roomId);
+    const winResult = whoWins(allPlayers);
+    console.log(winResult);
+    if (winResult.isValid) {
+      if (winResult.result === "시민") {
+        console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
+        mafiaIo.to(roomId).emit("victoryPlayer", "citizen", 3);
+      } else if (winResult.result === "마피아") {
+        console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
+        mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
+      }
+      //await initGame(roomId); //FIXME - 배포용 코드
+      clearInterval(start);
+    }
 
-    //   if (gameOver.isValid) {
-    //     showWhoWins(gameOver); //NOTE - 테스트 중이라서 주석 처리
-    //   }
     // } catch (error) {
     //   console.log("방에서 나가기에 실패했습니다.");
     // }
@@ -223,20 +227,13 @@ mafiaIo.on("connection", (socket) => {
     let time = 1;
 
     const start = setInterval(async () => {
-      time--; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
+      time = 0; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
 
       if (time <= 0) {
         try {
           allPlayers = await getPlayersInRoom(roomId);
         } catch (error) {
-          await initGame(roomId);
-          console.log(
-            `[playError] 모든 플레이어 정보 가져오기, ${error.message}`
-          );
-          mafiaIo
-            .to(roomId)
-            .emit("playError", "모든 플레이어 정보 가져오기", error.message);
-          clearInterval(start);
+          gameError(roundName, error, start);
         }
 
         if (roundName == "init") {
