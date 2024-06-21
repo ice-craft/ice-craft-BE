@@ -216,7 +216,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
 
-    let roundName = "r2-2"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     //NOTE - 플레이상 안쓰면 삭제
@@ -233,7 +233,7 @@ mafiaIo.on("connection", (socket) => {
     let time = 1;
 
     const start = setInterval(async () => {
-      time = 0; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
+      time--; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
 
       if (time <= 0) {
         try {
@@ -556,7 +556,7 @@ mafiaIo.on("connection", (socket) => {
           time = 5;
 
           voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-          //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
           console.log(
             `[${roundName}] showVoteResult : 마피아 의심 투표 결과 / 5초`
           );
@@ -675,7 +675,7 @@ mafiaIo.on("connection", (socket) => {
             .to(roomId)
             .emit("showVoteDeadOrLive", yesOrNoVoteResult, time);
 
-          // await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
+          await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
 
           console.log(`${roundName} 종료`);
           roundName = "r1-13";
@@ -925,7 +925,7 @@ mafiaIo.on("connection", (socket) => {
           mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
           mostVotedPlayer = mostVoteResult.result;
           console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
-          //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
           playerToKill = mostVotedPlayer.user_id;
 
