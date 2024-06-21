@@ -916,15 +916,18 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 3;
 
-          voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-          mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
-          const mostVotedPlayer = mostVoteResult.result;
-          console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
-          //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
-
+          let mostVotedPlayer = null;
           let playerToKill = null;
           let playerToSave = null;
           let killedPlayer = null;
+
+          voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+          mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+          mostVotedPlayer = mostVoteResult.result;
+          console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
+          //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+
+          playerToKill = mostVotedPlayer.user_id;
 
           const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
@@ -936,11 +939,10 @@ mafiaIo.on("connection", (socket) => {
             doctorPlayer = allPlayers
               .filter((player) => player.is_lived == true)
               .find((player) => player.role === "의사")?.user_id;
+
+            playerToSave = await getSelectedPlayer(roomId);
           }
 
-          playerToKill = mostVotedPlayer.user_id;
-
-          playerToSave = await getSelectedPlayer(roomId);
           console.log("죽일 플레이어", playerToKill, "살릴 사람", playerToSave); //FIXME - 테스트 코드
 
           if (playerToKill !== playerToSave) {
@@ -960,17 +962,18 @@ mafiaIo.on("connection", (socket) => {
 
           if (killedPlayer) {
             console.log(
-              `[${roundName}] : ${mostVotedPlayer.nickname}님이 죽었습니다. / 3초`
+              `[${roundName}] : ${mostVotedPlayer.user_nickname}님이 죽었습니다. / 3초`
             );
             mafiaIo
               .to(roomId)
               .emit(
                 "showModal",
-                `${mostVotedPlayer.nickname}님이 죽었습니다.`,
+                `${mostVotedPlayer.user_nickname}님이 죽었습니다.`,
                 time
               );
 
-            const winResult = whoWins(allPlayers);
+            winResult = whoWins(allPlayers);
+            console.log(winResult);
             if (winResult.isValid) {
               if (winResult.result === "시민") {
                 console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
@@ -979,18 +982,19 @@ mafiaIo.on("connection", (socket) => {
                 console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
                 mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
               }
-              roundName = "r1-0"; //FIXME - 게임 초기화
+              //await initGame(roomId); //FIXME - 배포용 코드
+              clearInterval(start);
             }
           } else {
             console.log(
-              `[${roundName}] : ${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아 유저에게)`
+              `[${roundName}] : ${mostVotedPlayer.user_nickname}님이 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아 유저에게)`
             );
             mafiaPlayers.forEach((player) => {
               mafiaIo
                 .to(player)
                 .emit(
                   "showModal",
-                  `${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
+                  `${mostVotedPlayer.user_nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
                   time
                 );
             });
@@ -1006,7 +1010,7 @@ mafiaIo.on("connection", (socket) => {
                   .to(player)
                   .emit(
                     "showModal",
-                    `${mostVotedPlayer.nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
+                    `${mostVotedPlayer.user_nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
                     time
                   );
               });
