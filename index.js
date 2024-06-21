@@ -207,6 +207,7 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
+    mafiaIo.to(roomId).emit("gameStart");
 
     let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
