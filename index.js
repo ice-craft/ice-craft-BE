@@ -977,7 +977,7 @@ mafiaIo.on("connection", (socket) => {
           }
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-0!";
+          roundName = "r1-0";
         }
       }
     }, 1000);
