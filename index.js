@@ -41,6 +41,7 @@ import {
 } from "./api/supabase/gamePlayAPI.js";
 import {
   gameError,
+  gameOver,
   getMostVotedPlayer,
   getRoleMaxCount,
   getYesOrNoVoteResult,
@@ -187,21 +188,6 @@ mafiaIo.on("connection", (socket) => {
     //   const userId = socket.data.userId;
 
     //   await exitRoom(roomId, userId); //NOTE - 테스트 중이라서 주석 처리
-    const allPlayers = await getPlayersInRoom(roomId);
-    const winResult = whoWins(allPlayers);
-    console.log(winResult);
-    if (winResult.isValid) {
-      if (winResult.result === "시민") {
-        console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
-        mafiaIo.to(roomId).emit("victoryPlayer", "citizen", 3);
-      } else if (winResult.result === "마피아") {
-        console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
-        mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
-      }
-      //await initGame(roomId); //FIXME - 배포용 코드
-      clearInterval(start);
-    }
-
     // } catch (error) {
     //   console.log("방에서 나가기에 실패했습니다.");
     // }
@@ -213,7 +199,6 @@ mafiaIo.on("connection", (socket) => {
     let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
-    //NOTE - 플레이상 안쓰면 삭제
     let mafiaMaxCount = null;
     let doctorMaxCount = null;
     let policeMaxCount = null;
@@ -221,8 +206,6 @@ mafiaIo.on("connection", (socket) => {
     let voteBoard = null;
     let mostVoteResult = null;
     let yesOrNoVoteResult = null;
-
-    let winResult = null;
 
     let time = 1;
 
@@ -235,6 +218,8 @@ mafiaIo.on("connection", (socket) => {
         } catch (error) {
           gameError(roundName, error, start);
         }
+
+        gameOver(mafiaIo, roomId, roundName, allPlayers, start); //NOTE - 라운드마다 게임 종료 조건 확인
 
         if (roundName == "init") {
           try {
@@ -447,7 +432,7 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-0";
+          roundName = "r1-0!";
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
           time = 3;
@@ -700,19 +685,7 @@ mafiaIo.on("connection", (socket) => {
               mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
             }
 
-            winResult = whoWins(allPlayers);
-            console.log(winResult);
-            if (winResult.isValid) {
-              if (winResult.result === "시민") {
-                console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
-                mafiaIo.to(roomId).emit("victoryPlayer", "citizen", 5);
-              } else if (winResult.result === "마피아") {
-                console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
-                mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
-              }
-              //await initGame(roomId); //FIXME - 배포용 코드
-              clearInterval(start);
-            }
+            gameOver(mafiaIo, roomId, roundName, allPlayers, start);
           } else {
             //NOTE - 투표 실패, 동률이 나옴
             console.log(

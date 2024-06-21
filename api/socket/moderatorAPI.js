@@ -60,7 +60,7 @@ export const whoWins = (allPlayers) => {
     ? (citizenCount = citizenPlayers.length)
     : (citizenCount = 0);
 
-  console.log("마피아", mafiaCount, "시민", citizenCount);
+  console.log("마피아", mafiaCount, "시민", citizenCount); //FIXME - 테스트용 코드
 
   if (mafiaCount === 0) {
     return { isValid: true, result: "시민" };
@@ -98,4 +98,31 @@ export const gameError = async (roundName, error, start) => {
   console.log(`[playError] ${roundName}, ${error.message}`); //FIXME - 테스트용 코드
   mafiaIo.to(roomId).emit("playError", roundName, error.message);
   clearInterval(start);
+};
+
+export const gameOver = (mafiaIo, roomId, roundName, allPlayers, start) => {
+  if (
+    roundName === "init" ||
+    roundName === "r0-0" ||
+    roundName === "r0-1" ||
+    roundName === "r0-2"
+  ) {
+    return;
+  }
+
+  const gameResult = whoWins(allPlayers);
+  const time = 5;
+
+  console.log(gameResult); //FIXME - 테스트용 코드
+  if (gameResult.isValid) {
+    if (gameResult.result === "시민") {
+      console.log(`[victoryPlayer] citizen / 5초`);
+      mafiaIo.to(roomId).emit("victoryPlayer", "citizen", time);
+    } else if (gameResult.result === "마피아") {
+      console.log(`[victoryPlayer] mafia / 5초`);
+      mafiaIo.to(roomId).emit("victoryPlayer", "mafia", time);
+    }
+
+    clearInterval(start);
+  }
 };
