@@ -27,17 +27,9 @@ import {
 } from "./api/supabase/roomAPI.js";
 import {
   checkAllPlayersReady,
-  checkChosenPlayer,
   checkPlayerCountEnough,
-  checkPlayerLived,
-  checkPlayerMafia,
-  choosePlayer,
-  getPlayerByRole,
-  getPlayerNickname,
   getPlayersInRoom,
-  getRound,
   getSelectedPlayer,
-  getStatus,
   getVoteToResult,
   initGame,
   killPlayer,
@@ -46,8 +38,6 @@ import {
   selectPlayer,
   setPlayerRole,
   setReady,
-  setStatus,
-  updateRound,
   voteTo,
   voteYesOrNo,
 } from "./api/supabase/gamePlayAPI.js";

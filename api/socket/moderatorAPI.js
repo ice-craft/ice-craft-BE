@@ -1,7 +1,4 @@
-import {
-  getPlayersInRoom,
-  getVoteYesOrNoResult,
-} from "../supabase/gamePlayAPI.js";
+import { getVoteYesOrNoResult } from "../supabase/gamePlayAPI.js";
 
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
 export const shufflePlayers = (allPlayers) => {
