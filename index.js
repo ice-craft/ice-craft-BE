@@ -46,7 +46,6 @@ import {
   getRoleMaxCount,
   getYesOrNoVoteResult,
   shufflePlayers,
-  whoWins,
 } from "./api/socket/moderatorAPI.js";
 
 const app = express();
@@ -939,20 +938,7 @@ mafiaIo.on("connection", (socket) => {
                 `${mostVotedPlayer.user_nickname}님이 죽었습니다.`,
                 time
               );
-
-            winResult = whoWins(allPlayers);
-            console.log(winResult);
-            if (winResult.isValid) {
-              if (winResult.result === "시민") {
-                console.log(`[${roundName}] victoryPlayer : citizen / 5초`);
-                mafiaIo.to(roomId).emit("victoryPlayer", "citizen", 3);
-              } else if (winResult.result === "마피아") {
-                console.log(`[${roundName}] victoryPlayer : mafia / 5초`);
-                mafiaIo.to(roomId).emit("victoryPlayer", "mafia", 5);
-              }
-              //await initGame(roomId); //FIXME - 배포용 코드
-              clearInterval(start);
-            }
+            gameOver(mafiaIo, roomId, roundName, allPlayers, start);
           } else {
             console.log(
               `[${roundName}] : ${mostVotedPlayer.user_nickname}님이 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아 유저에게)`
