@@ -177,6 +177,7 @@ mafiaIo.on("connection", (socket) => {
     }
   });
 
+  //FIXME - 메인 페이지에서 새로고침할 경우 대처
   socket.on("disconnect", async () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
 
@@ -441,7 +442,7 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-0!";
+          roundName = "r1-0";
         } else if (roundName == "r1-0") {
           console.log(`${roundName} 시작`);
           time = 3;
