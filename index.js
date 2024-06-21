@@ -179,11 +179,12 @@ mafiaIo.on("connection", (socket) => {
 
   socket.on("disconnect", async () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
-    console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
     try {
       const roomId = socket.data.roomId;
       const userId = socket.data.userId;
+
+      console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
       await exitRoom(roomId, userId);
 
