@@ -926,9 +926,6 @@ mafiaIo.on("connection", (socket) => {
           }
 
           allPlayers = await getPlayersInRoom(roomId);
-          killedPlayer = allPlayers.find(
-            (player) => player.user_id === killedPlayer
-          );
 
           if (killedPlayer) {
             console.log(
@@ -941,6 +938,7 @@ mafiaIo.on("connection", (socket) => {
                 `${mostVotedPlayer.user_nickname}님이 죽었습니다.`,
                 time
               );
+            console.log("죽은 사람", killedPlayer);
             console.log(`[${roundName}] diedPlayer : ${killedPlayer}`);
             mafiaIo.to(roomId).emit("diedPlayer", killedPlayer);
 
