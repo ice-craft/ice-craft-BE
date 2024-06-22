@@ -4,10 +4,11 @@
 //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 //FIXME - try/catch를 통한 예외처리 다시 확인
 //FIXME - 방 목록 갱신
-//FIXME - 중간에 나갈 경우, 해골 or 캠을 없앨지
 //FIXME - 게임 중 난입 금지
 //FIXME - endGame으로 준비 화면으로 전환
-//FIXME - gameStart시 소켓으로 주기
+//FIXME - ~가 죽었습니다. 아침이 되었습니다. 모달창 겹침
+//FIXME - 게임 끝나고 준비화면으로 가게 하기
+//FIXME - 밤 투표 랜덤 범위에서 마피아 제외
 
 import express from "express";
 import { createServer } from "http";
