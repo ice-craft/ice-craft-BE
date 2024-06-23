@@ -8,7 +8,6 @@
 //FIXME - endGame으로 준비 화면으로 전환
 //FIXME - ~가 죽었습니다. 아침이 되었습니다. 모달창 겹침
 //FIXME - 게임 끝나고 준비화면으로 가게 하기
-//FIXME - 밤 투표 랜덤 범위에서 마피아 제외
 
 import express from "express";
 import { createServer } from "http";
@@ -74,7 +73,7 @@ mafiaIo.on("connection", (socket) => {
     console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
 
     try {
-      const rooms = await getRooms(rowStart, rowEnd);
+      const rooms = await getRooms();
       socket.emit("enterMafia", rooms);
     } catch (error) {
       console.log(`[enterMafiaError] ${error.message}`);
@@ -543,7 +542,7 @@ mafiaIo.on("connection", (socket) => {
 
           voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
           voteBoard.forEach((vote) => delete vote.role);
-          await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
           console.log(
             `[${roundName}] showVoteResult : 마피아 의심 투표 결과 / 5초`
@@ -663,7 +662,7 @@ mafiaIo.on("connection", (socket) => {
             .to(roomId)
             .emit("showVoteDeadOrLive", yesOrNoVoteResult, time);
 
-          await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
+          //await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
 
           console.log(`${roundName} 종료`);
           roundName = "r1-13";

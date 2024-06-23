@@ -1,11 +1,10 @@
 import { supabase } from "./client.js";
 
 //NOTE - 해당 범위의 방들을 반환(데이터베이스의 인덱스는 0부터 시작, rowStart 인덱스와 rowEnd 인덱스를 포함해서 반환), 날짜 내림차순
-export const getRooms = async (rowStart, rowEnd) => {
+export const getRooms = async () => {
   const { data, error } = await supabase
     .from("room_table")
     .select("*, users:room_user_match_table(user_id)")
-    .range(rowStart, rowEnd)
     .order("created_at", { ascending: false });
 
   if (error) {
