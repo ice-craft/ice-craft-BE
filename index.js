@@ -6,7 +6,7 @@
 //FIXME - 방 목록 갱신
 //FIXME - 게임 중 난입 금지
 //FIXME - endGame으로 준비 화면으로 전환
-//FIXME - ~가 죽었습니다. 아침이 되었습니다. 모달창 겹침
+//FIXME - ~가 죽었습니다. 아침이 되었습니다. 모달창 겹침 r2-2 r1-0 사이
 //FIXME - 게임 끝나고 준비화면으로 가게 하기
 
 import express from "express";
@@ -88,7 +88,9 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const room = await createRoom(title, game_category, total_user_count);
+      const rooms = await getRooms();
       socket.emit("createRoom", room);
+      mafiaIo.emit("enterMafia", rooms);
     } catch (error) {
       console.log(`[createRoomError] ${error.message}`);
       socket.emit("createRoomError", error.message);
@@ -103,6 +105,7 @@ mafiaIo.on("connection", (socket) => {
     try {
       await joinRoom(roomId, userId, nickname);
       const usersInfo = await getUsersInfoInRoom(roomId);
+      const rooms = await getRooms();
 
       socket.join(roomId);
       socket.join(userId);
@@ -110,6 +113,7 @@ mafiaIo.on("connection", (socket) => {
       socket.data.roomId = roomId;
 
       mafiaIo.to(roomId).emit("joinRoom", usersInfo, roomId);
+      mafiaIo.emit("enterMafia", rooms);
     } catch (error) {
       console.log(`[joinRoomError] ${error.message}`);
       socket.emit("joinRoomError", error.message);
@@ -122,6 +126,7 @@ mafiaIo.on("connection", (socket) => {
     try {
       const roomId = await fastJoinRoom(userId, nickname);
       const usersInfo = await getUsersInfoInRoom(roomId);
+      const rooms = await getRooms();
 
       socket.join(roomId);
       socket.join(userId);
@@ -129,6 +134,7 @@ mafiaIo.on("connection", (socket) => {
       socket.data.userId = userId;
 
       mafiaIo.to(roomId).emit("fastJoinRoom", usersInfo, roomId);
+      mafiaIo.emit("enterMafia", rooms);
     } catch (error) {
       console.log(`[fastJoinRoomError] ${error.message}`);
       socket.emit("fastJoinRoomError", error.message);
@@ -141,6 +147,7 @@ mafiaIo.on("connection", (socket) => {
     try {
       await exitRoom(roomId, userId);
       const usersInfo = await getUsersInfoInRoom(roomId);
+      const rooms = await getRooms();
 
       socket.data.userId = null;
       socket.data.roomId = null;
@@ -148,6 +155,7 @@ mafiaIo.on("connection", (socket) => {
       socket.leave(roomId);
 
       mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+      mafiaIo.emit("enterMafia", rooms);
     } catch (error) {
       console.log(`[exitRoomError] ${error.message}`);
       socket.emit("exitRoomError", error.message);
@@ -186,6 +194,7 @@ mafiaIo.on("connection", (socket) => {
     // try {
     //   const roomId = socket.data.roomId;
     //   const userId = socket.data.userId;
+    //   const rooms = await getRooms();
 
     //   console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
@@ -199,6 +208,7 @@ mafiaIo.on("connection", (socket) => {
     //   socket.data.roomId = null;
 
     //   mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+    //   mafiaIo.emit("enterMafia", rooms);
     // } catch (error) {
     //   console.log(`[exitRoomError] ${error.message}`);
     //   socket.emit("exitRoomError", error.message);
