@@ -1,4 +1,5 @@
 import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI.js";
+import { setRoomIsPlaying } from "../supabase/roomAPI.js";
 
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
 export const shufflePlayers = (allPlayers) => {
@@ -133,6 +134,7 @@ export const gameOver = async (
     }
     try {
       await initGame(roomId);
+      await setRoomIsPlaying(roomId, false);
     } catch (error) {
       console.log(`[gameOverError] ${error.message}`);
       mafiaIo.to(roomId).emit("gameOverError", error.message);
