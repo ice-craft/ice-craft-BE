@@ -268,3 +268,19 @@ export const getRoomJoinable = async (room_id) => {
 
   return data.joinable;
 };
+
+//NOTE - 방에 입장 가능 여부 수정
+export const setRoomJoinable = async (room_id, joinable) => {
+  const { data, error } = await supabase
+    .from("room_table")
+    .update({ joinable })
+    .eq("room_id", room_id)
+    .select("room_id")
+    .single();
+
+  if (error) {
+    throw new Error("방 입장 가능 여부 수정 실패");
+  }
+
+  return data.room_id;
+};
