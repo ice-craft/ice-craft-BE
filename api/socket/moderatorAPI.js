@@ -10,12 +10,15 @@ export const shufflePlayers = (allPlayers) => {
 };
 
 //NOTE - 표를 가장 많이 받은 플레이어 확인
-export const getMostVotedPlayer = (voteBoard) => {
+export const getMostVotedPlayer = (voteBoard, exceptedMafia) => {
   const isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
 
   if (isValid) {
     return { isValid, result: voteBoard[0] };
   } else {
+    if (exceptedMafia) {
+      voteBoard.filter((vote) => vote.role !== "마피아");
+    }
     const shuffledPlayers = shufflePlayers(voteBoard);
     return { isValid, result: shuffledPlayers[0] };
   }

@@ -544,6 +544,7 @@ mafiaIo.on("connection", (socket) => {
           voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
           voteBoard.forEach((vote) => delete vote.role);
           await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+
           console.log(
             `[${roundName}] showVoteResult : 마피아 의심 투표 결과 / 5초`
           );
@@ -556,7 +557,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 3;
 
-          mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+          mostVoteResult = getMostVotedPlayer(voteBoard, false); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
 
           if (mostVoteResult.isValid) {
             console.log(
@@ -897,7 +898,7 @@ mafiaIo.on("connection", (socket) => {
           let killedPlayer = null;
 
           voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-          mostVoteResult = getMostVotedPlayer(voteBoard); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+          mostVoteResult = getMostVotedPlayer(voteBoard, true); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
           mostVotedPlayer = mostVoteResult.result;
           console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
           //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
