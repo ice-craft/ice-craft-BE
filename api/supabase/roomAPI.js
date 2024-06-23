@@ -50,10 +50,12 @@ export const joinRoom = async (room_id, user_id, user_nickname) => {
     room_id
   );
   const usersIdInRoom = await getUsersIdInRoom(room_id);
+  const isPlaying = await getRoomIsPlaying(room_id);
 
   if (
     total_user_count - current_user_count > 0 &&
-    usersIdInRoom.indexOf(user_id) === -1
+    usersIdInRoom.indexOf(user_id) === -1 &&
+    !isPlaying
   ) {
     await changeUserCountInRoom(room_id, 1);
 
