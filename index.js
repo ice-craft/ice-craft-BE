@@ -19,6 +19,7 @@ import {
   getUserCountInRoom,
   getUsersInfoInRoom,
   joinRoom,
+  setRoomIsPlaying,
 } from "./api/supabase/roomAPI.js";
 import {
   checkAllPlayersReady,
@@ -1060,6 +1061,7 @@ const canGameStart = async (roomId) => {
     const chief = await getChief(roomId);
 
     if (canStart) {
+      await setRoomIsPlaying(roomId, true);
       console.log(`[chiefStart] ${chief} ${canStart}`);
       mafiaIo.to(chief).emit("chiefStart", canStart);
     } else {
