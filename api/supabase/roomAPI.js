@@ -286,3 +286,18 @@ export const setRoomIsPlaying = async (room_id, is_playing) => {
 
   return data.room_id;
 };
+
+//NOTE - 방의 정보를 조회
+export const getRoomInfo = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_table")
+    .select("*")
+    .eq("room_id", room_id)
+    .single();
+
+  if (error) {
+    throw new Error("방의 정보 조회 실패");
+  }
+
+  return data;
+};

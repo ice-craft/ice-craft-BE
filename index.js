@@ -3,7 +3,6 @@
 //FIXME - 라운드명 상수화
 //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 //FIXME - try/catch를 통한 예외처리 다시 확인
-//FIXME - 게임 중 난입 금지
 //FIXME - ~가 죽었습니다. 아침이 되었습니다. 모달창 겹침 r2-2 r1-0 사이
 //FIXME - updateRoomInfo로 개별적인 방 정보 갱신
 
@@ -87,9 +86,7 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       const room = await createRoom(title, game_category, total_user_count);
-      //const rooms = await getRooms();
       socket.emit("createRoom", room);
-      // mafiaIo.emit("enterMafia", rooms);
     } catch (error) {
       console.log(`[createRoomError] ${error.message}`);
       socket.emit("createRoomError", error.message);
