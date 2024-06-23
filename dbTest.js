@@ -7,13 +7,13 @@ import {
 import {
   decideChief,
   getChief,
-  getRoomJoinable,
+  getRoomIsPlaying,
   getRooms,
-  setRoomJoinable,
+  setRoomIsPlaying,
 } from "./api/supabase/roomAPI.js";
 
 try {
-  const joinable = await setRoomJoinable(
+  const joinable = await setRoomIsPlaying(
     "0ed9a099-f1b4-46eb-a187-2da752eed29c",
     false
   );

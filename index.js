@@ -67,8 +67,8 @@ mafiaIo.on("connection", (socket) => {
   socket.data.roomId = "0ed9a099-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
   //NOTE - joinRoom하고 fastJoinRoom에서 처리하고 있음
 
-  socket.on("enterMafia", async (rowStart, rowEnd) => {
-    console.log(`[enterMafia] rowStart : ${rowStart}, rowEnd : ${rowEnd}`);
+  socket.on("enterMafia", async () => {
+    console.log("[enterMafia]");
 
     try {
       const rooms = await getRooms();
@@ -192,12 +192,11 @@ mafiaIo.on("connection", (socket) => {
     // try {
     //   const roomId = socket.data.roomId;
     //   const userId = socket.data.userId;
-    //   const rooms = await getRooms();
 
     //   console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
-
     //   await exitRoom(roomId, userId);
 
+    //   const rooms = await getRooms();
     //   const usersInfo = await getUsersInfoInRoom(roomId);
 
     //   socket.leave(userId);

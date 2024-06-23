@@ -254,32 +254,32 @@ export const decideChief = async (room_id) => {
   return data[0].user_id;
 };
 
-//NOTE - 방에 입장 가능 여부 조회
-export const getRoomJoinable = async (room_id) => {
+//NOTE - 방에서 게임이 진행중인지 여부 조회
+export const getRoomIsPlaying = async (room_id) => {
   const { data, error } = await supabase
     .from("room_table")
-    .select("joinable")
+    .select("is_playing")
     .eq("room_id", room_id)
     .single();
 
   if (error) {
-    throw new Error("방 입장 가능 여부 조회 실패");
+    throw new Error("방에서 게임이 진행중인지 여부 조회 실패");
   }
 
-  return data.joinable;
+  return data.is_playing;
 };
 
-//NOTE - 방에 입장 가능 여부 수정
-export const setRoomJoinable = async (room_id, joinable) => {
+//NOTE - 방에서 게임이 진행중인지 여부 수정
+export const setRoomIsPlaying = async (room_id, is_playing) => {
   const { data, error } = await supabase
     .from("room_table")
-    .update({ joinable })
+    .update({ is_playing })
     .eq("room_id", room_id)
     .select("room_id")
     .single();
 
   if (error) {
-    throw new Error("방 입장 가능 여부 수정 실패");
+    throw new Error("방에서 게임이 진행중인지 여부 수정 실패");
   }
 
   return data.room_id;
