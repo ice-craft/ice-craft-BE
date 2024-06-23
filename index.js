@@ -708,8 +708,6 @@ mafiaIo.on("connection", (socket) => {
               );
               mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
             }
-
-            gameOver(mafiaIo, roomId, roundName, allPlayers, start);
           } else {
             //NOTE - 투표 실패, 동률이 나옴
             console.log(
@@ -955,8 +953,6 @@ mafiaIo.on("connection", (socket) => {
             console.log("죽은 사람", killedPlayer);
             console.log(`[${roundName}] diedPlayer : ${killedPlayer}`);
             mafiaIo.to(roomId).emit("diedPlayer", killedPlayer);
-
-            gameOver(mafiaIo, roomId, roundName, allPlayers, start);
           } else {
             console.log(
               `[${roundName}] : ${mostVotedPlayer.user_nickname}님이 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아 유저에게)`
