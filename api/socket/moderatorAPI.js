@@ -103,7 +103,13 @@ export const gameError = async (roundName, error, start) => {
   clearInterval(start);
 };
 
-export const gameOver = (mafiaIo, roomId, roundName, allPlayers, start) => {
+export const gameOver = async (
+  mafiaIo,
+  roomId,
+  roundName,
+  allPlayers,
+  start
+) => {
   if (
     roundName === "init" ||
     roundName === "r0-0" ||
@@ -124,6 +130,12 @@ export const gameOver = (mafiaIo, roomId, roundName, allPlayers, start) => {
     } else if (gameResult.result === "마피아") {
       console.log(`[victoryPlayer] mafia / 5초`);
       mafiaIo.to(roomId).emit("victoryPlayer", "mafia", time);
+    }
+    try {
+      await initGame(roomId);
+    } catch (error) {
+      console.log(`[gameOverError] ${error.message}`);
+      mafiaIo.to(roomId).emit("gameOverError", error.message);
     }
 
     clearInterval(start);
