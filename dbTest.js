@@ -4,12 +4,18 @@ import {
   getVoteYesOrNoResult,
   setReady,
 } from "./api/supabase/gamePlayAPI.js";
-import { decideChief, getChief, getRooms } from "./api/supabase/roomAPI.js";
+import {
+  decideChief,
+  getChief,
+  getRoomJoinable,
+  getRooms,
+} from "./api/supabase/roomAPI.js";
 
 try {
-  const data = await getVoteToResult("0ed9a099-f1b4-46eb-a187-2da752eed29c");
-  const result = getMostVotedPlayer(data, true);
-  console.log(result);
+  const joinable = await getRoomJoinable(
+    "0ed9a099-f1b4-46eb-a187-2da752eed29c"
+  );
+  console.log(joinable);
 } catch (error) {
   console.log(error.message);
 }

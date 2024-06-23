@@ -253,3 +253,18 @@ export const decideChief = async (room_id) => {
 
   return data[0].user_id;
 };
+
+//NOTE - 방에 입장 가능 여부 조회
+export const getRoomJoinable = async (room_id) => {
+  const { data, error } = await supabase
+    .from("room_table")
+    .select("joinable")
+    .eq("room_id", room_id)
+    .single();
+
+  if (error) {
+    throw new Error("방 입장 가능 여부 조회 실패");
+  }
+
+  return data.joinable;
+};
