@@ -184,33 +184,33 @@ mafiaIo.on("connection", (socket) => {
   socket.on("disconnect", async () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
 
-    try {
-      const roomId = socket.data.roomId;
-      const userId = socket.data.userId;
+    // try {
+    //   const roomId = socket.data.roomId;
+    //   const userId = socket.data.userId;
 
-      console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
+    //   console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
-      await exitRoom(roomId, userId);
+    //   await exitRoom(roomId, userId);
 
-      const usersInfo = await getUsersInfoInRoom(roomId);
+    //   const usersInfo = await getUsersInfoInRoom(roomId);
 
-      socket.leave(userId);
-      socket.leave(roomId);
-      socket.data.userId = null;
-      socket.data.roomId = null;
+    //   socket.leave(userId);
+    //   socket.leave(roomId);
+    //   socket.data.userId = null;
+    //   socket.data.roomId = null;
 
-      mafiaIo.to(roomId).emit("exitRoom", usersInfo);
-    } catch (error) {
-      console.log(`[exitRoomError] ${error.message}`);
-      socket.emit("exitRoomError", error.message);
-    }
+    //   mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+    // } catch (error) {
+    //   console.log(`[exitRoomError] ${error.message}`);
+    //   socket.emit("exitRoomError", error.message);
+    // }
   });
 
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
     mafiaIo.to(roomId).emit("gameStart");
 
-    let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = "r1-6"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     let mafiaMaxCount = null;
@@ -542,6 +542,7 @@ mafiaIo.on("connection", (socket) => {
           time = 5;
 
           voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+          voteBoard.forEach((vote) => delete vote.role);
           await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
           console.log(
             `[${roundName}] showVoteResult : 마피아 의심 투표 결과 / 5초`
@@ -550,7 +551,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("showVoteResult", voteBoard, time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-7";
+          roundName = "r1-7!";
         } else if (roundName == "r1-7") {
           console.log(`${roundName} 시작`);
           time = 3;
