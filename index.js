@@ -558,7 +558,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("showVoteResult", voteBoard, time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-7!";
+          roundName = "r1-7";
         } else if (roundName == "r1-7") {
           console.log(`${roundName} 시작`);
           time = 3;
