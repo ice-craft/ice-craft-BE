@@ -214,6 +214,8 @@ mafiaIo.on("connection", (socket) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
     mafiaIo.to(roomId).emit("gameStart");
 
+    await setRoomIsPlaying(roomId, true);
+
     let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
@@ -1058,7 +1060,6 @@ const canGameStart = async (roomId) => {
     const chief = await getChief(roomId);
 
     if (canStart) {
-      await setRoomIsPlaying(roomId, true);
       console.log(`[chiefStart] ${chief} ${canStart}`);
       mafiaIo.to(chief).emit("chiefStart", canStart);
     } else {
