@@ -4,7 +4,6 @@
 //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 //FIXME - try/catch를 통한 예외처리 다시 확인
 //FIXME - ~가 죽었습니다. 아침이 되었습니다. 모달창 겹침 r2-2 r1-0 사이
-//FIXME - updateRoomInfo로 개별적인 방 정보 갱신
 
 import express from "express";
 import { createServer } from "http";
@@ -188,27 +187,27 @@ mafiaIo.on("connection", (socket) => {
   socket.on("disconnect", async () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
 
-    // try {
-    //   const roomId = socket.data.roomId;
-    //   const userId = socket.data.userId;
+    try {
+      const roomId = socket.data.roomId;
+      const userId = socket.data.userId;
 
-    //   console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
-    //   await exitRoom(roomId, userId);
+      console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
+      await exitRoom(roomId, userId);
 
-    //   const rooms = await getRooms();
-    //   const usersInfo = await getUsersInfoInRoom(roomId);
+      const roomInfo = await getRoomInfo();
+      const usersInfo = await getUsersInfoInRoom(roomId);
 
-    //   socket.leave(userId);
-    //   socket.leave(roomId);
-    //   socket.data.userId = null;
-    //   socket.data.roomId = null;
+      socket.leave(userId);
+      socket.leave(roomId);
+      socket.data.userId = null;
+      socket.data.roomId = null;
 
-    //   mafiaIo.to(roomId).emit("exitRoom", usersInfo);
-    //   mafiaIo.emit("enterMafia", rooms);
-    // } catch (error) {
-    //   console.log(`[exitRoomError] ${error.message}`);
-    //   socket.emit("exitRoomError", error.message);
-    // }
+      mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+      mafiaIo.emit("updateRoomInfo", roomInfo);
+    } catch (error) {
+      console.log(`[exitRoomError] ${error.message}`);
+      socket.emit("exitRoomError", error.message);
+    }
   });
 
   socket.on("gameStart", async (roomId, playersMaxCount) => {
@@ -548,7 +547,7 @@ mafiaIo.on("connection", (socket) => {
 
           voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
           voteBoard.forEach((vote) => delete vote.role);
-          //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
           console.log(
             `[${roundName}] showVoteResult : 마피아 의심 투표 결과 / 5초`
@@ -668,7 +667,7 @@ mafiaIo.on("connection", (socket) => {
             .to(roomId)
             .emit("showVoteDeadOrLive", yesOrNoVoteResult, time);
 
-          //await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
+          await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
 
           console.log(`${roundName} 종료`);
           roundName = "r1-13";
@@ -904,7 +903,7 @@ mafiaIo.on("connection", (socket) => {
           mostVoteResult = getMostVotedPlayer(voteBoard, true); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
           mostVotedPlayer = mostVoteResult.result;
           console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
-          //await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
 
           playerToKill = mostVotedPlayer.user_id;
 
