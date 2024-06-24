@@ -140,6 +140,8 @@ export const gameOver = async (
       mafiaIo.to(roomId).emit("gameOverError", error.message);
     }
 
+    roundName = "end!";
+
     clearInterval(start);
   }
 };

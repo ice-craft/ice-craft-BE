@@ -215,6 +215,7 @@ mafiaIo.on("connection", (socket) => {
     mafiaIo.to(roomId).emit("gameStart");
 
     await setRoomIsPlaying(roomId, true);
+    //FIXME - updateRoomInfo 추가하기
 
     let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
