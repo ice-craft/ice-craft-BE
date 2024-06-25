@@ -187,26 +187,27 @@ mafiaIo.on("connection", (socket) => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
 
     // try {
-    //   const roomId = socket.data.roomId;
-    //   const userId = socket.data.userId;
-
-    //   console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
-    //   await exitRoom(roomId, userId);
-
-    //   const roomInfo = await getRoomInfo(roomId);
-    //   const usersInfo = await getUsersInfoInRoom(roomId);
-
-    //   socket.leave(userId);
-    //   socket.leave(roomId);
-    //   socket.data.userId = null;
-    //   socket.data.roomId = null;
-
-    //   mafiaIo.to(roomId).emit("exitRoom", usersInfo);
-    //   mafiaIo.emit("updateRoomInfo", roomInfo);
     // } catch (error) {
     //   console.log(`[exitRoomError] ${error.message}`);
     //   socket.emit("exitRoomError", error.message);
     // }
+
+    const roomId = socket.data.roomId;
+    const userId = socket.data.userId;
+
+    console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
+    await exitRoom(roomId, userId);
+
+    const roomInfo = await getRoomInfo(roomId);
+    const usersInfo = await getUsersInfoInRoom(roomId);
+
+    socket.leave(userId);
+    socket.leave(roomId);
+    socket.data.userId = null;
+    socket.data.roomId = null;
+
+    mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+    mafiaIo.emit("updateRoomInfo", roomInfo);
   });
 
   socket.on("gameStart", async (roomId, playersMaxCount) => {
@@ -235,7 +236,7 @@ mafiaIo.on("connection", (socket) => {
     let time = 1;
 
     const start = setInterval(async () => {
-      time = 0; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
+      time--; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
 
       if (time <= 0) {
         try {
