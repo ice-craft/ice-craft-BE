@@ -5,7 +5,7 @@
 //FIXME - try/catch를 통한 예외처리 다시 확인
 //FIXME - ~가 죽었습니다. 아침이 되었습니다. 모달창 겹침 r2-2 r1-0 사이
 //FIXME - 게임 오버 뒤 라운드 1개 더 진행되는 현상 수정
-//FIXME -  2라운드 수정
+//FIXME - 2라운드 수정
 //FIXME - 찬/반 =>반대 : 동률X 멘트 수정
 //FIXME - voteTo 한번에 여러개 투표: 1개 씹힘(for문으로 실험함)
 
@@ -871,33 +871,6 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 종료`);
           roundName = "2-0";
         } else if (roundName == "r2-0") {
-          console.log(`${roundName} 시작`);
-          time = 3;
-
-          console.log(`[${roundName}] showModal : 아침이 되었습니다. / 3초`);
-          mafiaIo.to(roomId).emit("showModal", "아침이 되었습니다.", time);
-
-          console.log(`${roundName} 종료`);
-          roundName = "r2-1";
-        } else if (roundName == "r2-1") {
-          console.log(`${roundName} 시작`);
-          time = 1;
-
-          let media = {};
-          allPlayers
-            .filter((player) => player.is_lived == true)
-            .forEach((player) => {
-              media[player.user_id] = { camera: true, mike: true };
-            });
-
-          console.log(
-            `[${roundName}] playerMediaStatus : 모든 유저 카메라 마이크 켬`
-          );
-          mafiaIo.to(roomId).emit("playerMediaStatus", media);
-
-          console.log(`${roundName} 종료`);
-          roundName = "r2-2";
-        } else if (roundName == "r2-2") {
           console.log(`${roundName} 시작`);
           time = 3;
 
