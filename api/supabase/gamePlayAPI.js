@@ -203,6 +203,16 @@ export const selectPlayer = async (user_id) => {
   }
 };
 
+export const resetSelectedPlayer = async (room_id) => {
+  const { error } = await supabase
+    .from("room_user_match_table")
+    .update({ is_selected: false })
+    .eq("room_id", room_id);
+  if (error) {
+    throw new Error("플레이어 선택 초기화 실패");
+  }
+};
+
 export const getSelectedPlayer = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
