@@ -43,6 +43,7 @@ import {
   getMostVotedPlayer,
   getRoleMaxCount,
   getYesOrNoVoteResult,
+  playError,
   shufflePlayers,
 } from "./api/socket/moderatorAPI.js";
 
@@ -214,8 +215,12 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
     mafiaIo.to(roomId).emit("gameStart");
+    try {
+      await setRoomIsPlaying(roomId, true);
+    } catch (error) {
+      return await playError(roundName, error, start);
+    }
 
-    await setRoomIsPlaying(roomId, true);
     //FIXME - updateRoomInfo 추가하기
 
     let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
@@ -239,7 +244,7 @@ mafiaIo.on("connection", (socket) => {
           allPlayers = await getPlayersInRoom(roomId);
           gameOver(mafiaIo, roomId, roundName, allPlayers, start); //NOTE - 라운드마다 게임 종료 조건 확인
         } catch (error) {
-          playError(roundName, error, start);
+          return await playError(roundName, error, start);
         }
 
         if (roundName == "init") {
