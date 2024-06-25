@@ -879,7 +879,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("inSelect", "police", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "2-0";
+          roundName = "r2-0";
         } else if (roundName == "r2-0") {
           console.log(`${roundName} 시작`);
           time = 3;
