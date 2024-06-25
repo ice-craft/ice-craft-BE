@@ -822,8 +822,8 @@ mafiaIo.on("connection", (socket) => {
           });
 
           console.log(`${roundName} 종료`);
-          doctorMaxCount = 0; //FIXME - 테스트 코드
-          policeMaxCount = 0; //FIXME - 테스트 코드
+          // doctorMaxCount = 0; //FIXME - 테스트 코드
+          // policeMaxCount = 0; //FIXME - 테스트 코드
           console.log("의사", doctorMaxCount, "경찰", policeMaxCount); //FIXME - 테스트 코드
           if (doctorMaxCount === 0 && policeMaxCount === 0) {
             roundName = "r2-0";
