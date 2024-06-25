@@ -552,10 +552,13 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName == "r1-6") {
           console.log(`${roundName} 시작`);
           time = 5;
-
-          voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-          voteBoard.forEach((vote) => delete vote.role);
-          await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          try {
+            voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+            voteBoard.forEach((vote) => delete vote.role);
+            await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          } catch (error) {
+            return await playError(roundName, error, start);
+          }
 
           console.log(
             `[${roundName}] showVoteResult : 마피아 의심 투표 결과 / 5초`
