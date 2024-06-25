@@ -237,11 +237,10 @@ mafiaIo.on("connection", (socket) => {
       if (time <= 0) {
         try {
           allPlayers = await getPlayersInRoom(roomId);
+          gameOver(mafiaIo, roomId, roundName, allPlayers, start); //NOTE - 라운드마다 게임 종료 조건 확인
         } catch (error) {
           playError(roundName, error, start);
         }
-
-        gameOver(mafiaIo, roomId, roundName, allPlayers, start); //NOTE - 라운드마다 게임 종료 조건 확인
 
         if (roundName == "init") {
           try {

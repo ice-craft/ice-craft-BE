@@ -132,15 +132,8 @@ export const gameOver = async (
       console.log(`[victoryPlayer] mafia / 5초`);
       mafiaIo.to(roomId).emit("victoryPlayer", "mafia", time);
     }
-    try {
-      await initGame(roomId);
-      await setRoomIsPlaying(roomId, false);
-    } catch (error) {
-      console.log(`[gameOverError] ${error.message}`);
-      mafiaIo.to(roomId).emit("gameOverError", error.message);
-    }
-
-    roundName = "end!";
+    await initGame(roomId);
+    await setRoomIsPlaying(roomId, false);
 
     clearInterval(start);
   }
