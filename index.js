@@ -670,15 +670,19 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName == "r1-12") {
           console.log(`${roundName} 시작`);
           time = 5;
-          yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
+
+          try {
+            yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
+            await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
+          } catch (error) {
+            return await playError(roundName, error, start);
+          }
 
           console.log(`[${roundName}] showVoteDeadOrLive / 5초`);
           console.log(yesOrNoVoteResult);
           mafiaIo
             .to(roomId)
             .emit("showVoteDeadOrLive", yesOrNoVoteResult, time);
-
-          await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
 
           console.log(`${roundName} 종료`);
           roundName = "r1-13";
