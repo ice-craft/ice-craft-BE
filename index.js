@@ -934,8 +934,8 @@ mafiaIo.on("connection", (socket) => {
               }
             }
 
-            allPlayers = await getPlayersInRoom(roomId);
             await resetSelectedPlayer(roomId);
+            allPlayers = await getPlayersInRoom(roomId);
           } catch (error) {
             return await playError(roundName, roomId, mafiaIo, error, start);
           }
@@ -958,15 +958,19 @@ mafiaIo.on("connection", (socket) => {
             console.log(
               `[${roundName}] : ${mostVotedPlayer.user_nickname}님이 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아 유저에게)`
             );
-            mafiaPlayers.forEach((player) => {
-              mafiaIo
-                .to(player)
-                .emit(
-                  "showModal",
-                  `${mostVotedPlayer.user_nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
-                  time
-                );
-            });
+
+            allPlayers
+              .filter((player) => player.role === "마피아")
+              .map((player) => player.user_id)
+              .forEach((player) => {
+                mafiaIo
+                  .to(player)
+                  .emit(
+                    "showModal",
+                    `${mostVotedPlayer.user_nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
+                    time
+                  );
+              });
 
             console.log(
               `[${roundName}] : 의사의 활약으로 아무도 죽지 않았습니다. / 3초 (마피아가 아닌 유저에게)`
@@ -979,7 +983,7 @@ mafiaIo.on("connection", (socket) => {
                   .to(player)
                   .emit(
                     "showModal",
-                    `${mostVotedPlayer.user_nickname}님이 의사의 활약으로 아무도 죽지 않았습니다.`,
+                    "의사의 활약으로 아무도 죽지 않았습니다.",
                     time
                   );
               });
