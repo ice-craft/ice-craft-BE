@@ -4,6 +4,10 @@
 //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 //FIXME - try/catch를 통한 예외처리 다시 확인
 //FIXME - ~가 죽었습니다. 아침이 되었습니다. 모달창 겹침 r2-2 r1-0 사이
+//FIXME - 게임 오버 뒤 라운드 1개 더 진행되는 현상 수정
+//FIXME -  2라운드 수정
+//FIXME - 찬/반 =>반대 : 동률X 멘트 수정
+//FIXME - voteTo 한번에 여러개 투표: 1개 씹힘(for문으로 실험함)
 
 import express from "express";
 import { createServer } from "http";
@@ -710,11 +714,11 @@ mafiaIo.on("connection", (socket) => {
           } else {
             //NOTE - 투표 실패, 동률이 나옴
             console.log(
-              `[${roundName}] showModal : 동률로 인해 아무도 죽지 않았습니다. / 3초`
+              `[${roundName}] showModal : 아무도 죽지 않았습니다. / 3초`
             );
             mafiaIo
               .to(roomId)
-              .emit("showModal", "동률로 인해 아무도 죽지 않았습니다.", time);
+              .emit("showModal", "아무도 죽지 않았습니다.", time);
           }
 
           console.log(`${roundName} 종료`);
