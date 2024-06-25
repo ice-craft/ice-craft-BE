@@ -2,10 +2,7 @@
 //FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
 //FIXME - 라운드명 상수화
 //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
-//FIXME - try/catch를 통한 예외처리 다시 확인
 //FIXME - 게임 오버 뒤 라운드 1개 더 진행되는 현상 수정
-//FIXME - 찬/반 =>반대 : 동률X 멘트 수정
-//FIXME - voteTo 한번에 여러개 투표: 1개 씹힘(for문으로 실험함)
 
 import express from "express";
 import { createServer } from "http";
@@ -215,13 +212,14 @@ mafiaIo.on("connection", (socket) => {
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
     mafiaIo.to(roomId).emit("gameStart");
+
     try {
       await setRoomIsPlaying(roomId, true);
+      const roomInfo = await getRoomInfo();
+      mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
       return await playError(roundName, error, start);
     }
-
-    //FIXME - updateRoomInfo 추가하기
 
     let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
