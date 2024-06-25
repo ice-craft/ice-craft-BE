@@ -3,9 +3,7 @@
 //FIXME - 라운드명 상수화
 //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 //FIXME - try/catch를 통한 예외처리 다시 확인
-//FIXME - ~가 죽었습니다. 아침이 되었습니다. 모달창 겹침 r2-2 r1-0 사이
 //FIXME - 게임 오버 뒤 라운드 1개 더 진행되는 현상 수정
-//FIXME - 2라운드 수정
 //FIXME - 찬/반 =>반대 : 동률X 멘트 수정
 //FIXME - voteTo 한번에 여러개 투표: 1개 씹힘(for문으로 실험함)
 
@@ -41,7 +39,6 @@ import {
   voteYesOrNo,
 } from "./api/supabase/gamePlayAPI.js";
 import {
-  gameError,
   gameOver,
   getMostVotedPlayer,
   getRoleMaxCount,
@@ -241,7 +238,7 @@ mafiaIo.on("connection", (socket) => {
         try {
           allPlayers = await getPlayersInRoom(roomId);
         } catch (error) {
-          gameError(roundName, error, start);
+          playError(roundName, error, start);
         }
 
         gameOver(mafiaIo, roomId, roundName, allPlayers, start); //NOTE - 라운드마다 게임 종료 조건 확인
@@ -337,7 +334,7 @@ mafiaIo.on("connection", (socket) => {
               .filter((player) => player.role == "마피아")
               .map((player) => player.user_id);
           } catch (error) {
-            return await gameError(roundName, error);
+            return await playError(roundName, error);
           }
 
           if (doctorMaxCount > 0) {

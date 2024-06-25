@@ -94,7 +94,7 @@ export const getRoleMaxCount = (totalCount) => {
   }
 };
 
-export const gameError = async (roundName, error, start) => {
+export const playError = async (roundName, error, start) => {
   if (roundName != "init") {
     await initGame(roomId);
   }
