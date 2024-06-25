@@ -287,7 +287,7 @@ mafiaIo.on("connection", (socket) => {
           time = 10;
 
           let playersUserId = allPlayers.map((player) => player.user_id);
-          [mafiaMaxCount, doctorMaxCount, policeMaxCount] =
+          [mafiaMaxCount, policeMaxCount, doctorMaxCount] =
             getRoleMaxCount(playersMaxCount);
 
           let mafiaPlayers = null;
