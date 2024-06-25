@@ -27,6 +27,7 @@ import {
   getVoteToResult,
   initGame,
   killPlayer,
+  resetSelectedPlayer,
   resetVote,
   savePlayer,
   selectPlayer,
@@ -934,6 +935,7 @@ mafiaIo.on("connection", (socket) => {
             }
 
             allPlayers = await getPlayersInRoom(roomId);
+            await resetSelectedPlayer(roomId);
           } catch (error) {
             return await playError(roundName, roomId, mafiaIo, error, start);
           }
