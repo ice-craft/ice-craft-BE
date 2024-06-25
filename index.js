@@ -341,13 +341,13 @@ mafiaIo.on("connection", (socket) => {
 
           if (doctorMaxCount > 0) {
             doctorPlayer = allPlayers
-              .find((player) => player.role == "의사")
+              .filter((player) => player.role == "의사")
               .map((player) => player.user_id);
           }
 
           if (policeMaxCount) {
             policePlayer = allPlayers
-              .find((player) => player.role == "경찰")
+              .filter((player) => player.role == "경찰")
               .map((player) => player.user_id);
           }
 
