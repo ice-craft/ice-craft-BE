@@ -690,13 +690,17 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 3;
 
+          const killedPlayer = null;
+
           if (yesOrNoVoteResult.result) {
             console.log("투표 결과 유효함");
-            const killedPlayer = await killPlayer(
-              mostVoteResult.result.user_id
-            ); //NOTE - 투표를 가장 많이 받은 플레이어 사망
+            try {
+              killedPlayer = await killPlayer(mostVoteResult.result.user_id); //NOTE - 투표를 가장 많이 받은 플레이어 사망
 
-            allPlayers = await getPlayersInRoom(roomId);
+              allPlayers = await getPlayersInRoom(roomId);
+            } catch (error) {
+              return await playError(roundName, error, start);
+            }
 
             console.log(`[${roundName}] diedPlayer : ${killedPlayer}`);
             mafiaIo.to(roomId).emit("diedPlayer", killedPlayer);
