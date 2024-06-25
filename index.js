@@ -186,27 +186,27 @@ mafiaIo.on("connection", (socket) => {
   socket.on("disconnect", async () => {
     console.log("클라이언트와의 연결이 끊겼습니다.");
 
-    try {
-      const roomId = socket.data.roomId;
-      const userId = socket.data.userId;
+    // try {
+    //   const roomId = socket.data.roomId;
+    //   const userId = socket.data.userId;
 
-      console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
-      await exitRoom(roomId, userId);
+    //   console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
+    //   await exitRoom(roomId, userId);
 
-      const roomInfo = await getRoomInfo();
-      const usersInfo = await getUsersInfoInRoom(roomId);
+    //   const roomInfo = await getRoomInfo(roomId);
+    //   const usersInfo = await getUsersInfoInRoom(roomId);
 
-      socket.leave(userId);
-      socket.leave(roomId);
-      socket.data.userId = null;
-      socket.data.roomId = null;
+    //   socket.leave(userId);
+    //   socket.leave(roomId);
+    //   socket.data.userId = null;
+    //   socket.data.roomId = null;
 
-      mafiaIo.to(roomId).emit("exitRoom", usersInfo);
-      mafiaIo.emit("updateRoomInfo", roomInfo);
-    } catch (error) {
-      console.log(`[exitRoomError] ${error.message}`);
-      socket.emit("exitRoomError", error.message);
-    }
+    //   mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+    //   mafiaIo.emit("updateRoomInfo", roomInfo);
+    // } catch (error) {
+    //   console.log(`[exitRoomError] ${error.message}`);
+    //   socket.emit("exitRoomError", error.message);
+    // }
   });
 
   socket.on("gameStart", async (roomId, playersMaxCount) => {
@@ -215,10 +215,10 @@ mafiaIo.on("connection", (socket) => {
 
     try {
       await setRoomIsPlaying(roomId, true);
-      const roomInfo = await getRoomInfo();
+      const roomInfo = await getRoomInfo(roomId);
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
-      return await playError(roundName, error, start);
+      return await playError("start", roomId, mafiaIo, error, null);
     }
 
     let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
@@ -235,14 +235,14 @@ mafiaIo.on("connection", (socket) => {
     let time = 1;
 
     const start = setInterval(async () => {
-      time--; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
+      time = 0; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
 
       if (time <= 0) {
         try {
           allPlayers = await getPlayersInRoom(roomId);
           gameOver(mafiaIo, roomId, roundName, allPlayers, start); //NOTE - 라운드마다 게임 종료 조건 확인
         } catch (error) {
-          return await playError(roundName, error, start);
+          return await playError(roundName, roomId, mafiaIo, error, start);
         }
 
         if (roundName == "init") {
@@ -336,7 +336,7 @@ mafiaIo.on("connection", (socket) => {
               .filter((player) => player.role == "마피아")
               .map((player) => player.user_id);
           } catch (error) {
-            return await playError(roundName, error);
+            return await playError(roundName, roomId, mafiaIo, error, start);
           }
 
           if (doctorMaxCount > 0) {
@@ -555,7 +555,7 @@ mafiaIo.on("connection", (socket) => {
             voteBoard.forEach((vote) => delete vote.role);
             await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
           } catch (error) {
-            return await playError(roundName, error, start);
+            return await playError(roundName, roomId, mafiaIo, error, start);
           }
 
           console.log(
@@ -673,7 +673,7 @@ mafiaIo.on("connection", (socket) => {
             yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
             await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
           } catch (error) {
-            return await playError(roundName, error, start);
+            return await playError(roundName, roomId, mafiaIo, error, start);
           }
 
           console.log(`[${roundName}] showVoteDeadOrLive / 5초`);
@@ -688,7 +688,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 3;
 
-          const killedPlayer = null;
+          let killedPlayer = null;
 
           if (yesOrNoVoteResult.result) {
             console.log("투표 결과 유효함");
@@ -697,7 +697,7 @@ mafiaIo.on("connection", (socket) => {
 
               allPlayers = await getPlayersInRoom(roomId);
             } catch (error) {
-              return await playError(roundName, error, start);
+              return await playError(roundName, roomId, mafiaIo, error, start);
             }
 
             console.log(`[${roundName}] diedPlayer : ${killedPlayer}`);
@@ -896,7 +896,7 @@ mafiaIo.on("connection", (socket) => {
             console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
             await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
           } catch (error) {
-            return await playError(roundName, error, start);
+            return await playError(roundName, roomId, mafiaIo, error, start);
           }
 
           playerToKill = mostVotedPlayer.user_id;
@@ -935,7 +935,7 @@ mafiaIo.on("connection", (socket) => {
 
             allPlayers = await getPlayersInRoom(roomId);
           } catch (error) {
-            return await playError(roundName, error, start);
+            return await playError(roundName, roomId, mafiaIo, error, start);
           }
 
           if (killedPlayer) {
