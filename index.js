@@ -891,11 +891,15 @@ mafiaIo.on("connection", (socket) => {
           let playerToSave = null;
           let killedPlayer = null;
 
-          voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-          mostVoteResult = getMostVotedPlayer(voteBoard, true); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
-          mostVotedPlayer = mostVoteResult.result;
-          console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
-          await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          try {
+            voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
+            mostVoteResult = getMostVotedPlayer(voteBoard, true); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+            mostVotedPlayer = mostVoteResult.result;
+            console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
+            await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+          } catch (error) {
+            return await playError(roundName, error, start);
+          }
 
           playerToKill = mostVotedPlayer.user_id;
 
@@ -905,27 +909,36 @@ mafiaIo.on("connection", (socket) => {
             .map((player) => player.user_id);
 
           let doctorPlayer = null;
-          if (doctorMaxCount > 0) {
-            doctorPlayer = allPlayers
-              .filter((player) => player.is_lived == true)
-              .find((player) => player.role === "의사")?.user_id;
+          try {
+            if (doctorMaxCount > 0) {
+              doctorPlayer = allPlayers
+                .filter((player) => player.is_lived == true)
+                .find((player) => player.role === "의사")?.user_id;
 
-            playerToSave = await getSelectedPlayer(roomId);
-          }
-
-          console.log("죽일 플레이어", playerToKill, "살릴 사람", playerToSave); //FIXME - 테스트 코드
-
-          if (playerToKill !== playerToSave) {
-            if (mafiaPlayers) {
-              killedPlayer = await killPlayer(playerToKill);
+              playerToSave = await getSelectedPlayer(roomId);
             }
 
-            if (doctorPlayer) {
-              await savePlayer(playerToSave);
-            }
-          }
+            console.log(
+              "죽일 플레이어",
+              playerToKill,
+              "살릴 사람",
+              playerToSave
+            ); //FIXME - 테스트 코드
 
-          allPlayers = await getPlayersInRoom(roomId);
+            if (playerToKill !== playerToSave) {
+              if (mafiaPlayers) {
+                killedPlayer = await killPlayer(playerToKill);
+              }
+
+              if (doctorPlayer) {
+                await savePlayer(playerToSave);
+              }
+            }
+
+            allPlayers = await getPlayersInRoom(roomId);
+          } catch (error) {
+            return await playError(roundName, error, start);
+          }
 
           if (killedPlayer) {
             console.log(
