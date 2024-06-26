@@ -78,7 +78,7 @@ export const resetVote = async (room_id) => {
 export const getVoteToResult = async (room_id) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
-    .select("user_id, user_nickname, voted_count, role")
+    .select("user_id, user_nickname, voted_count, role, is_lived")
     .eq("room_id", room_id)
     .order("voted_count", { ascending: false })
     .order("vote_time", { ascending: true });

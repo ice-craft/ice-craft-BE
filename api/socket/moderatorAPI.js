@@ -17,10 +17,14 @@ export const getMostVotedPlayer = (voteBoard, exceptedMafia) => {
   if (isValid) {
     return { isValid, result: voteBoard[0] };
   } else {
+    voteBoard = voteBoard.filter((vote) => vote.is_lived === true);
+
     if (exceptedMafia) {
-      voteBoard.filter((vote) => vote.role !== "마피아");
+      voteBoard = voteBoard.filter((vote) => vote.role !== "마피아");
     }
+
     const shuffledPlayers = shufflePlayers(voteBoard);
+
     return { isValid, result: shuffledPlayers[0] };
   }
 };
