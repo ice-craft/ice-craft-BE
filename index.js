@@ -3,9 +3,7 @@
 //FIXME - 라운드명 상수화
 //FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
 //FIXME - 게임 오버 뒤 라운드 1개 더 진행되는 현상 수정
-//FIXME - 밤에 마피아들이 시민 선택 안해서 랜덤으로 죽일 때, 마피아도 포함됨
 //FIXME - 관전자는  게임 흐름따라가도록 수정 (캠, 마이크)
-//FIXME - 낮과 밤에 랜덤으로 플레이어 선택시 죽은 사람 제외시키기
 //FIXME - r2-0에서 playError에서 error 메세지 안뜸
 //FIXME - 타입스크립트 변환
 
@@ -558,7 +556,10 @@ mafiaIo.on("connection", (socket) => {
           time = 5;
           try {
             voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-            voteBoard.forEach((vote) => delete vote.role);
+            voteBoard.forEach((vote) => {
+              delete vote.role;
+              delete vote.is_lived;
+            });
             await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
           } catch (error) {
             return await playError(roundName, roomId, mafiaIo, error, start);
