@@ -137,8 +137,8 @@ export const gameOver = async (
     } else if (gameResult.result === "마피아") {
       console.log(`[victoryPlayer] mafia / 5초`);
       mafiaIo.to(roomId).emit("victoryPlayer", "mafia", time);
-      mafiaIo.to(roomId).emit("gameEnd");
     }
+    mafiaIo.to(roomId).emit("gameEnd");
     await initGame(roomId);
     await setRoomIsPlaying(roomId, false);
 
