@@ -24,7 +24,7 @@ export const getMostVotedPlayer = (voteBoard, exceptedMafia) => {
     }
 
     const shuffledPlayers = shufflePlayers(voteBoard);
-    console.log("isValid", isValid, "result", result);
+    console.log("isValid", isValid, "result", shuffledPlayers[0]);
 
     return { isValid, result: shuffledPlayers[0] };
   }
