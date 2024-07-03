@@ -13,6 +13,7 @@ export const shufflePlayers = (allPlayers) => {
 //NOTE - 표를 가장 많이 받은 플레이어 확인
 export const getMostVotedPlayer = (voteBoard, exceptedMafia) => {
   const isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
+  console.log("투표 결과", voteBoard);
 
   if (isValid) {
     return { isValid, result: voteBoard[0] };
@@ -24,7 +25,7 @@ export const getMostVotedPlayer = (voteBoard, exceptedMafia) => {
     }
 
     const shuffledPlayers = shufflePlayers(voteBoard);
-    console.log("isValid", isValid, "result", shuffledPlayers[0]);
+    console.log("isValid", isValid, "voteBoard", voteBoard);
 
     return { isValid, result: shuffledPlayers[0] };
   }
@@ -105,6 +106,7 @@ export const playError = async (roundName, roomId, mafiaIo, error, start) => {
   }
 
   console.log(`[playError] ${roundName}, ${error.message}`); //FIXME - 테스트용 코드
+  console.log(error); //FIXME - 지우기
   mafiaIo.to(roomId).emit("playError", roundName, error.message);
   if (start) {
     clearInterval(start);

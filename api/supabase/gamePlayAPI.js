@@ -32,7 +32,7 @@ export const setPlayerRole = async (user_id, role) => {
     .eq("user_id", user_id);
 
   if (error) {
-    throw new Error();
+    throw new Error("플레이어 역할 정하기 실패");
   }
 };
 
