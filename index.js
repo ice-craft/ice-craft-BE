@@ -143,22 +143,22 @@ mafiaIo.on("connection", (socket) => {
   socket.on("exitRoom", async (roomId, userId) => {
     console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
-    // try {
-    //   await exitRoom(roomId, userId);
-    //   const usersInfo = await getUsersInfoInRoom(roomId);
-    //   const roomInfo = await getRoomInfo(roomId);
+    try {
+      await exitRoom(roomId, userId);
+      const usersInfo = await getUsersInfoInRoom(roomId);
+      const roomInfo = await getRoomInfo(roomId);
 
-    //   socket.data.userId = null;
-    //   socket.data.roomId = null;
-    //   socket.leave(userId);
-    //   socket.leave(roomId);
+      socket.data.userId = null;
+      socket.data.roomId = null;
+      socket.leave(userId);
+      socket.leave(roomId);
 
-    //   mafiaIo.to(roomId).emit("exitRoom", usersInfo);
-    //   mafiaIo.emit("updateRoomInfo", roomInfo);
-    // } catch (error) {
-    //   console.log(`[exitRoomError] ${error.message}`);
-    //   socket.emit("exitRoomError", error.message);
-    // }
+      mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+      mafiaIo.emit("updateRoomInfo", roomInfo);
+    } catch (error) {
+      console.log(`[exitRoomError] ${error.message}`);
+      socket.emit("exitRoomError", error.message);
+    }
   });
 
   socket.on("setReady", async (userId, ready) => {

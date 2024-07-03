@@ -141,6 +141,7 @@ export const gameOver = async (
       console.log(`[victoryPlayer] mafia / 5초`);
       mafiaIo.to(roomId).emit("victoryPlayer", "mafia", time);
     }
+    roundName = "gameEnd";
     mafiaIo.to(roomId).emit("gameEnd");
     await initGame(roomId);
     await setRoomIsPlaying(roomId, false);
