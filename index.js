@@ -556,10 +556,6 @@ mafiaIo.on("connection", (socket) => {
           time = 5;
           try {
             voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-            voteBoard.forEach((vote) => {
-              delete vote.role;
-              delete vote.is_lived;
-            });
             await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
           } catch (error) {
             return await playError(roundName, roomId, mafiaIo, error, start);
