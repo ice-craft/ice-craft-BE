@@ -126,7 +126,7 @@ export const gameOver = async (
     roundName === "r0-1" ||
     roundName === "r0-2"
   ) {
-    return;
+    return roundName;
   }
 
   const gameResult = whoWins(allPlayers);
@@ -148,4 +148,5 @@ export const gameOver = async (
 
     clearInterval(start);
   }
+  return roundName;
 };
