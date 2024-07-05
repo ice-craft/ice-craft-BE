@@ -203,11 +203,11 @@ mafiaIo.on("connection", (socket) => {
         return;
       }
 
-      console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
-      await exitRoom(roomId, userId);
-
       const roomInfo = await getRoomInfo(roomId);
       // const usersInfo = await getUsersInfoInRoom(roomId);
+
+      console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
+      await exitRoom(roomId, userId);
 
       socket.leave(userId);
       socket.leave(roomId);
