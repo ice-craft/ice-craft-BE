@@ -173,6 +173,7 @@ export const initGame = async (room_id) => {
       voted_count: 0,
       vote_time: null,
       is_selected: false,
+      is_playing: false,
     })
     .eq("room_id", room_id);
 
