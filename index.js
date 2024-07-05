@@ -207,14 +207,15 @@ mafiaIo.on("connection", (socket) => {
       await exitRoom(roomId, userId);
 
       const roomInfo = await getRoomInfo(roomId);
-      const usersInfo = await getUsersInfoInRoom(roomId);
+      // const usersInfo = await getUsersInfoInRoom(roomId);
 
       socket.leave(userId);
       socket.leave(roomId);
       socket.data.userId = null;
       socket.data.roomId = null;
 
-      mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+      // mafiaIo.to(roomId).emit("exitRoom", usersInfo);
+      mafiaIo.to(roomId).emit("exitRoom");
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
       console.log(`[exitRoomError] ${error.message}`);
