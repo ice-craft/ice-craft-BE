@@ -181,6 +181,8 @@ mafiaIo.on("connection", (socket) => {
   });
 
   socket.on("usersInfo", async (roomId) => {
+    console.log(`[usersInfo] roomId : ${roomId}`);
+
     try {
       const usersInfo = await getUsersInfoInRoom(roomId);
       socket.to(roomId).emit("usersInfo", usersInfo);
