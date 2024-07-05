@@ -147,9 +147,9 @@ mafiaIo.on("connection", (socket) => {
     console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
     try {
+      const roomInfo = await getRoomInfo(roomId);
       await exitRoom(roomId, userId);
       // const usersInfo = await getUsersInfoInRoom(roomId);
-      const roomInfo = await getRoomInfo(roomId);
 
       socket.data.userId = null;
       socket.data.roomId = null;
