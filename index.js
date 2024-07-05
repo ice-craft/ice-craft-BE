@@ -198,6 +198,11 @@ mafiaIo.on("connection", (socket) => {
       const roomId = socket.data.roomId;
       const userId = socket.data.userId;
 
+      if (!roomId) {
+        console.log("[exitRoom] 방에서 나가는 경우가 아닙니다.");
+        return;
+      }
+
       console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
       await exitRoom(roomId, userId);
 
