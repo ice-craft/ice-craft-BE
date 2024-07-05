@@ -105,6 +105,7 @@ export const playError = async (roundName, roomId, mafiaIo, error, start) => {
     await initGame(roomId);
   }
 
+  await setRoomIsPlaying(roomId, false);
   console.log(`[playError] ${roundName}, ${error.message}`); //FIXME - 테스트용 코드
   console.log(error); //FIXME - 지우기
   mafiaIo.to(roomId).emit("playError", roundName, error.message);
