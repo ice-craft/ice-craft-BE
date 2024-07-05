@@ -180,7 +180,7 @@ mafiaIo.on("connection", (socket) => {
   socket.on("usersInfo", async (roomId) => {
     try {
       const usersInfo = await getUsersInfoInRoom(roomId);
-      socket.emit("usersInfo", usersInfo);
+      socket.to(roomId).emit("usersInfo", usersInfo);
     } catch (error) {
       console.log(`[usersInfoError] ${error.message}`);
       socket.emit("usersInfoError", error.message);
