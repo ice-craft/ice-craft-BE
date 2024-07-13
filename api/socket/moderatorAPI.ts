@@ -1,3 +1,5 @@
+import { Namespace } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { allPlayersType, voteBoardType } from "../../types";
 import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI";
 import { setRoomIsPlaying } from "../supabase/roomAPI";
@@ -107,7 +109,7 @@ export const getRoleMaxCount = (totalCount: number) => {
 export const playError = async (
   roundName: string,
   roomId: string,
-  mafiaIo,
+  mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   error: Error,
   start: NodeJS.Timeout | null
 ) => {
@@ -125,7 +127,7 @@ export const playError = async (
 };
 
 export const gameOver = async (
-  mafiaIo,
+  mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   roomId: string,
   roundName: string,
   allPlayers: allPlayersType,
