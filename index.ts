@@ -263,7 +263,13 @@ mafiaIo.on("connection", (socket) => {
             start
           ); //NOTE - 라운드마다 게임 종료 조건 확인
         } catch (error) {
-          return await playError(roundName, roomId, mafiaIo, error, start);
+          return await playError(
+            roundName,
+            roomId,
+            mafiaIo,
+            error as Error,
+            start
+          );
         }
 
         if (roundName == "init") {
@@ -271,8 +277,12 @@ mafiaIo.on("connection", (socket) => {
             await initGame(roomId);
             roundName = "r0-0";
           } catch (error) {
-            console.log(`[playError] ${roundName}, ${error.message}`);
-            mafiaIo.to(roomId).emit("playError", roundName, error.message);
+            console.log(
+              `[playError] ${roundName}, ${(error as Error).message}`
+            );
+            mafiaIo
+              .to(roomId)
+              .emit("playError", roundName, (error as Error).message);
             clearInterval(start);
           }
         }
@@ -357,7 +367,13 @@ mafiaIo.on("connection", (socket) => {
               .filter((player) => player.role == "마피아")
               .map((player) => player.user_id);
           } catch (error) {
-            return await playError(roundName, roomId, mafiaIo, error, start);
+            return await playError(
+              roundName,
+              roomId,
+              mafiaIo,
+              error as Error,
+              start
+            );
           }
 
           if (doctorMaxCount > 0) {
@@ -596,7 +612,9 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 3;
 
-          mostVoteResult = getMostVotedPlayer(voteBoard, false); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+          if (voteBoard) {
+            mostVoteResult = getMostVotedPlayer(voteBoard, false); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+          }
 
           if (mostVoteResult.isValid) {
             console.log(

@@ -1,9 +1,9 @@
-import { voteBoardType } from "../../types";
+import { allPlayersType, voteBoardType } from "../../types";
 import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI";
 import { setRoomIsPlaying } from "../supabase/roomAPI";
 
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
-export const shufflePlayers = (allPlayers) => {
+export const shufflePlayers = (allPlayers: allPlayersType | voteBoardType) => {
   for (let i = allPlayers.length - 1; i >= 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [allPlayers[i], allPlayers[j]] = [allPlayers[j], allPlayers[i]];
@@ -56,7 +56,7 @@ export const getYesOrNoVoteResult = async (roomId: string) => {
 };
 
 //NOTE - 어느 팀이 이겼는지 결과 반환
-export const whoWins = (allPlayers) => {
+export const whoWins = (allPlayers: allPlayersType) => {
   const mafiaPlayers = allPlayers
     .filter((player) => player.is_lived === true)
     .filter((player) => player.role === "마피아");
@@ -87,7 +87,7 @@ export const whoWins = (allPlayers) => {
   return { isValid: false };
 };
 
-export const getRoleMaxCount = (totalCount) => {
+export const getRoleMaxCount = (totalCount: number) => {
   switch (totalCount) {
     case 5:
       return [1, 0, 0];
@@ -109,7 +109,7 @@ export const playError = async (
   roomId: string,
   mafiaIo,
   error: Error,
-  start
+  start: NodeJS.Timeout
 ) => {
   if (roundName != "init") {
     await initGame(roomId);
@@ -129,7 +129,7 @@ export const gameOver = async (
   roomId: string,
   roundName: string,
   allPlayers,
-  start
+  start: NodeJS.Timeout
 ) => {
   if (
     roundName === "init" ||
