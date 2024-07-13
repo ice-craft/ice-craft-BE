@@ -1,3 +1,4 @@
+import { voteBoardType } from "../../types";
 import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI";
 import { setRoomIsPlaying } from "../supabase/roomAPI";
 
@@ -11,7 +12,10 @@ export const shufflePlayers = (allPlayers) => {
 };
 
 //NOTE - 표를 가장 많이 받은 플레이어 확인
-export const getMostVotedPlayer = (voteBoard, exceptedMafia: boolean) => {
+export const getMostVotedPlayer = (
+  voteBoard: voteBoardType,
+  exceptedMafia: boolean
+) => {
   const isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
   console.log("투표 결과", voteBoard);
 
@@ -122,8 +126,8 @@ export const playError = async (
 
 export const gameOver = async (
   mafiaIo,
-  roomId,
-  roundName,
+  roomId: string,
+  roundName: string,
   allPlayers,
   start
 ) => {

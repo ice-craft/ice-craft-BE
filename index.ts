@@ -47,6 +47,7 @@ import {
   playError,
   shufflePlayers,
 } from "./api/socket/moderatorAPI.js";
+import { voteBoardType } from "./types/index.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -242,7 +243,7 @@ mafiaIo.on("connection", (socket) => {
     let doctorMaxCount: number | null = null;
     let policeMaxCount: number | null = null;
 
-    let voteBoard = null;
+    let voteBoard: voteBoardType | null = null;
     let mostVoteResult = null;
     let yesOrNoVoteResult = null;
 
