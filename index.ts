@@ -53,7 +53,6 @@ const httpServer = createServer(app);
 const port = 4000;
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
     origin: "*",
   },
 });
