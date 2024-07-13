@@ -78,8 +78,8 @@ mafiaIo.on("connection", (socket) => {
       const rooms = await getRooms();
       socket.emit("enterMafia", rooms);
     } catch (error) {
-      console.log(`[enterMafiaError] ${error.message}`);
-      socket.emit("enterMafiaError", error.message);
+      console.log(`[enterMafiaError] ${(error as Error).message}`);
+      socket.emit("enterMafiaError", (error as Error).message);
     }
   });
 
@@ -92,8 +92,8 @@ mafiaIo.on("connection", (socket) => {
       const room = await createRoom(title, game_category, total_user_count);
       socket.emit("createRoom", room);
     } catch (error) {
-      console.log(`[createRoomError] ${error.message}`);
-      socket.emit("createRoomError", error.message);
+      console.log(`[createRoomError] ${(error as Error).message}`);
+      socket.emit("createRoomError", (error as Error).message);
     }
   });
 
@@ -116,8 +116,8 @@ mafiaIo.on("connection", (socket) => {
       mafiaIo.to(roomId).emit("joinRoom", roomId);
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
-      console.log(`[joinRoomError] ${error.message}`);
-      socket.emit("joinRoomError", error.message);
+      console.log(`[joinRoomError] ${(error as Error).message}`);
+      socket.emit("joinRoomError", (error as Error).message);
     }
   });
 
@@ -138,8 +138,8 @@ mafiaIo.on("connection", (socket) => {
       mafiaIo.to(roomId).emit("fastJoinRoom", roomId);
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
-      console.log(`[fastJoinRoomError] ${error.message}`);
-      socket.emit("fastJoinRoomError", error.message);
+      console.log(`[fastJoinRoomError] ${(error as Error).message}`);
+      socket.emit("fastJoinRoomError", (error as Error).message);
     }
   });
 
@@ -160,8 +160,8 @@ mafiaIo.on("connection", (socket) => {
       mafiaIo.to(roomId).emit("exitRoom");
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
-      console.log(`[exitRoomError] ${error.message}`);
-      socket.emit("exitRoomError", error.message);
+      console.log(`[exitRoomError] ${(error as Error).message}`);
+      socket.emit("exitRoomError", (error as Error).message);
     }
   });
 
@@ -175,8 +175,8 @@ mafiaIo.on("connection", (socket) => {
       mafiaIo.to(roomId).emit("setReady", userId, ready);
       canGameStart(roomId);
     } catch (error) {
-      console.log(`[setReadyError] ${error.message}`);
-      socket.emit("setReadyError", error.message);
+      console.log(`[setReadyError] ${(error as Error).message}`);
+      socket.emit("setReadyError", (error as Error).message);
     }
   });
 
@@ -187,8 +187,8 @@ mafiaIo.on("connection", (socket) => {
       const usersInfo = await getUsersInfoInRoom(roomId);
       mafiaIo.to(roomId).emit("usersInfo", usersInfo);
     } catch (error) {
-      console.log(`[usersInfoError] ${error.message}`);
-      socket.emit("usersInfoError", error.message);
+      console.log(`[usersInfoError] ${(error as Error).message}`);
+      socket.emit("usersInfoError", (error as Error).message);
     }
   });
 
@@ -220,7 +220,7 @@ mafiaIo.on("connection", (socket) => {
       mafiaIo.to(roomId).emit("exitRoom");
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
-      console.log(`[exitRoomError] ${error.message}`);
+      console.log(`[exitRoomError] ${(error as Error).message}`);
     }
   });
 
@@ -233,15 +233,15 @@ mafiaIo.on("connection", (socket) => {
       const roomInfo = await getRoomInfo(roomId);
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
-      return await playError("start", roomId, mafiaIo, error, null);
+      return await playError("start", roomId, mafiaIo, error as Error, null);
     }
 
     let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     let mafiaMaxCount = null;
-    let doctorMaxCount = null;
-    let policeMaxCount = null;
+    let doctorMaxCount: number | null = null;
+    let policeMaxCount: number | null = null;
 
     let voteBoard = null;
     let mostVoteResult = null;

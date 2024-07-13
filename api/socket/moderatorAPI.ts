@@ -1,5 +1,5 @@
-import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI.js";
-import { setRoomIsPlaying } from "../supabase/roomAPI.js";
+import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI";
+import { setRoomIsPlaying } from "../supabase/roomAPI";
 
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
 export const shufflePlayers = (allPlayers) => {
@@ -11,7 +11,7 @@ export const shufflePlayers = (allPlayers) => {
 };
 
 //NOTE - 표를 가장 많이 받은 플레이어 확인
-export const getMostVotedPlayer = (voteBoard, exceptedMafia) => {
+export const getMostVotedPlayer = (voteBoard, exceptedMafia: boolean) => {
   const isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
   console.log("투표 결과", voteBoard);
 
@@ -32,7 +32,7 @@ export const getMostVotedPlayer = (voteBoard, exceptedMafia) => {
 };
 
 //NOTE - 찬성 반대 투표 결과
-export const getYesOrNoVoteResult = async (roomId) => {
+export const getYesOrNoVoteResult = async (roomId: string) => {
   const voteResult = await getVoteYesOrNoResult(roomId);
   let yesCount = 0;
   let noCount = 0;
@@ -100,7 +100,13 @@ export const getRoleMaxCount = (totalCount) => {
   }
 };
 
-export const playError = async (roundName, roomId, mafiaIo, error, start) => {
+export const playError = async (
+  roundName: string,
+  roomId: string,
+  mafiaIo,
+  error: Error,
+  start
+) => {
   if (roundName != "init") {
     await initGame(roomId);
   }
