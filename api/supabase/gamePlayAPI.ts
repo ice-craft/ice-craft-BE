@@ -1,6 +1,9 @@
 import { supabase } from "./client.js";
 
-export const checkPlayerCountEnough = async (room_id, total_user_count) => {
+export const checkPlayerCountEnough = async (
+  room_id: string,
+  total_user_count: number
+) => {
   const { count, error } = await supabase
     .from("room_user_match_table")
     .select("*", { count: "exact", head: true })
@@ -12,7 +15,10 @@ export const checkPlayerCountEnough = async (room_id, total_user_count) => {
   return total_user_count === count;
 };
 
-export const checkAllPlayersReady = async (room_id, total_user_count) => {
+export const checkAllPlayersReady = async (
+  room_id: string,
+  total_user_count: number
+) => {
   const { count, error } = await supabase
     .from("room_user_match_table")
     .select("*", { count: "exact", head: true })
@@ -25,7 +31,7 @@ export const checkAllPlayersReady = async (room_id, total_user_count) => {
   return total_user_count === count;
 };
 
-export const setPlayerRole = async (user_id, role) => {
+export const setPlayerRole = async (user_id: string, role: string) => {
   const { error } = await supabase
     .from("room_user_match_table")
     .update({ role })
@@ -36,8 +42,8 @@ export const setPlayerRole = async (user_id, role) => {
   }
 };
 
-export const voteTo = async (user_id, time) => {
-  const { data, selectError } = await supabase
+export const voteTo = async (user_id: string, time: Date) => {
+  const { data, error: selectError } = await supabase
     .from("room_user_match_table")
     .select("voted_count")
     .eq("user_id", user_id)
@@ -49,7 +55,7 @@ export const voteTo = async (user_id, time) => {
 
   const votedCount = data.voted_count;
 
-  const { userId, updateError } = await supabase
+  const { error: updateError } = await supabase
     .from("room_user_match_table")
     .update({ voted_count: votedCount + 1, vote_time: time })
     .eq("user_id", user_id);
@@ -57,12 +63,10 @@ export const voteTo = async (user_id, time) => {
   if (updateError) {
     throw new Error("플레이어의 받은 투표 수 갱신 실패");
   }
-
-  return userId;
 };
 
-export const resetVote = async (room_id) => {
-  const { data, error } = await supabase
+export const resetVote = async (room_id: string) => {
+  const { error } = await supabase
     .from("room_user_match_table")
     .update({ vote_yes_or_no: null, voted_count: 0, vote_time: null })
     .eq("room_id", room_id)
@@ -71,11 +75,9 @@ export const resetVote = async (room_id) => {
   if (error) {
     throw new Error("투표 초기화 실패");
   }
-
-  return data;
 };
 
-export const getVoteToResult = async (room_id) => {
+export const getVoteToResult = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id, user_nickname, voted_count, role, is_lived")
@@ -90,7 +92,7 @@ export const getVoteToResult = async (room_id) => {
   return data;
 };
 
-export const voteYesOrNo = async (user_id, yesOrNo) => {
+export const voteYesOrNo = async (user_id: string, yesOrNo: boolean) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .update({ vote_yes_or_no: yesOrNo })
@@ -104,7 +106,7 @@ export const voteYesOrNo = async (user_id, yesOrNo) => {
   return data;
 };
 
-export const getVoteYesOrNoResult = async (room_id) => {
+export const getVoteYesOrNoResult = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("vote_yes_or_no")
@@ -117,7 +119,7 @@ export const getVoteYesOrNoResult = async (room_id) => {
   return data.map((item) => item.vote_yes_or_no);
 };
 
-export const killPlayer = async (user_id) => {
+export const killPlayer = async (user_id: string) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .update({ is_lived: false })
@@ -132,7 +134,7 @@ export const killPlayer = async (user_id) => {
   return data.user_id;
 };
 
-export const savePlayer = async (user_id) => {
+export const savePlayer = async (user_id: string) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .update({ is_lived: true })
@@ -147,22 +149,7 @@ export const savePlayer = async (user_id) => {
   return data.user_id;
 };
 
-export const getRoleMaxCount = async (total_user_count, role) => {
-  const { data, error } = await supabase
-    .from("room_composition")
-    .select(role)
-    .eq("total_user_count", total_user_count)
-    .single();
-
-  if (error) {
-    console.log(error);
-    throw new Error();
-  }
-
-  return data[role];
-};
-
-export const initGame = async (room_id) => {
+export const initGame = async (room_id: string) => {
   const { error } = await supabase
     .from("room_user_match_table")
     .update({
@@ -181,7 +168,7 @@ export const initGame = async (room_id) => {
   }
 };
 
-export const getPlayersInRoom = async (room_id) => {
+export const getPlayersInRoom = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id, user_nickname, is_lived, role")
@@ -193,7 +180,7 @@ export const getPlayersInRoom = async (room_id) => {
   return data;
 };
 
-export const selectPlayer = async (user_id) => {
+export const selectPlayer = async (user_id: string) => {
   const { error } = await supabase
     .from("room_user_match_table")
     .update({ is_selected: true })
@@ -203,7 +190,7 @@ export const selectPlayer = async (user_id) => {
   }
 };
 
-export const resetSelectedPlayer = async (room_id) => {
+export const resetSelectedPlayer = async (room_id: string) => {
   const { error } = await supabase
     .from("room_user_match_table")
     .update({ is_selected: false })
@@ -213,7 +200,7 @@ export const resetSelectedPlayer = async (room_id) => {
   }
 };
 
-export const getSelectedPlayer = async (room_id) => {
+export const getSelectedPlayer = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id")
@@ -231,7 +218,7 @@ export const getSelectedPlayer = async (room_id) => {
   return data[0].user_id;
 };
 
-export const setReady = async (user_id, is_ready) => {
+export const setReady = async (user_id: string, is_ready: boolean) => {
   const { error } = await supabase
     .from("room_user_match_table")
     .update({ is_ready })
