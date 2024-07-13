@@ -109,7 +109,7 @@ export const playError = async (
   roomId: string,
   mafiaIo,
   error: Error,
-  start: NodeJS.Timeout
+  start: NodeJS.Timeout | null
 ) => {
   if (roundName != "init") {
     await initGame(roomId);
@@ -128,7 +128,7 @@ export const gameOver = async (
   mafiaIo,
   roomId: string,
   roundName: string,
-  allPlayers,
+  allPlayers: allPlayersType,
   start: NodeJS.Timeout
 ) => {
   if (
