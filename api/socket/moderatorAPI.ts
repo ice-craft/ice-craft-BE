@@ -19,7 +19,7 @@ export const shufflePlayers = (
 export const getMostVotedPlayer = (
   voteBoard: voteBoardType[],
   exceptedMafia: boolean
-) => {
+): { isValid: boolean; result: voteBoardType | allPlayerType } => {
   const isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
   console.log("투표 결과", voteBoard);
 
