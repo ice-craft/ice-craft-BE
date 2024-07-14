@@ -106,6 +106,7 @@ export const getRoleMaxCount = (totalCount: number) => {
     case 10:
       return [3, 1, 1];
   }
+  return [0, 0, 0];
 };
 
 export const playError = async (
