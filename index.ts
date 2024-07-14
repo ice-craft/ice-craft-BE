@@ -47,7 +47,7 @@ import {
   playError,
   shufflePlayers,
 } from "./api/socket/moderatorAPI.js";
-import { mediaType, voteBoardType } from "./types/index.js";
+import { allPlayerType, mediaType, voteBoardType } from "./types/index.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -244,7 +244,10 @@ mafiaIo.on("connection", (socket) => {
     let policeMaxCount: number | null = null;
 
     let voteBoard: voteBoardType[] | null = null;
-    let mostVoteResult = null;
+    let mostVoteResult: {
+      isValid: boolean;
+      result: voteBoardType | allPlayerType;
+    } | null = null;
     let yesOrNoVoteResult = null;
 
     let time = 1;
@@ -614,36 +617,36 @@ mafiaIo.on("connection", (socket) => {
 
           if (voteBoard) {
             mostVoteResult = getMostVotedPlayer(voteBoard, false); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
-          }
 
-          if (mostVoteResult.isValid) {
-            console.log(
-              `[${roundName}] showModal : ${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요. / 3초`
-            );
-            mafiaIo
-              .to(roomId)
-              .emit(
-                "showModal",
-                `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`,
-                time
+            if (mostVoteResult.isValid) {
+              console.log(
+                `[${roundName}] showModal : ${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요. / 3초`
               );
+              mafiaIo
+                .to(roomId)
+                .emit(
+                  "showModal",
+                  `${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요.`,
+                  time
+                );
 
-            console.log(`${roundName} 종료`);
-            roundName = "r1-8";
-          } else {
-            console.log(
-              `[${roundName}] showModal : 동률로 인해 임의의 플레이어가 사망합니다. ${mostVoteResult.result.user_nickname} / 3초`
-            );
-            mafiaIo
-              .to(roomId)
-              .emit(
-                "showModal",
-                "동률로 인해 임의의 플레이어가 사망합니다.",
-                time
+              console.log(`${roundName} 종료`);
+              roundName = "r1-8";
+            } else {
+              console.log(
+                `[${roundName}] showModal : 동률로 인해 임의의 플레이어가 사망합니다. ${mostVoteResult.result.user_nickname} / 3초`
               );
-            yesOrNoVoteResult = { result: true };
-            console.log(`${roundName} 종료`);
-            roundName = "r1-13";
+              mafiaIo
+                .to(roomId)
+                .emit(
+                  "showModal",
+                  "동률로 인해 임의의 플레이어가 사망합니다.",
+                  time
+                );
+              yesOrNoVoteResult = { result: true };
+              console.log(`${roundName} 종료`);
+              roundName = "r1-13";
+            }
           }
         } else if (roundName == "r1-8") {
           console.log(`${roundName} 시작`);
