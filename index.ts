@@ -38,7 +38,7 @@ import {
   setReady,
   voteTo,
   voteYesOrNo,
-} from "./api/supabase/gamePlayAPI.js";
+} from "./api/supabase/gamePlayAPI";
 import {
   gameOver,
   getMostVotedPlayer,
@@ -46,8 +46,13 @@ import {
   getYesOrNoVoteResult,
   playError,
   shufflePlayers,
-} from "./api/socket/moderatorAPI.js";
-import { allPlayerType, mediaType, voteBoardType } from "./types/index.js";
+} from "./api/socket/moderatorAPI";
+import {
+  allPlayerType,
+  mediaType,
+  voteBoardType,
+  yesOrNoVoteResultType,
+} from "./types/index";
 
 const app = express();
 const httpServer = createServer(app);
@@ -248,7 +253,7 @@ mafiaIo.on("connection", (socket) => {
       isValid: boolean;
       result: voteBoardType | allPlayerType;
     } | null = null;
-    let yesOrNoVoteResult = null;
+    let yesOrNoVoteResult: yesOrNoVoteResultType | null = null;
 
     let time = 1;
 
@@ -643,7 +648,10 @@ mafiaIo.on("connection", (socket) => {
                   "동률로 인해 임의의 플레이어가 사망합니다.",
                   time
                 );
-              yesOrNoVoteResult = { result: true };
+              yesOrNoVoteResult = {
+                result: true,
+                detail: { yesCount: 0, noCount: 0 },
+              };
               console.log(`${roundName} 종료`);
               roundName = "r1-13";
             }
@@ -744,16 +752,24 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 3;
 
-          let killedPlayer = null;
+          let killedPlayer: string | null = null;
 
-          if (yesOrNoVoteResult.result) {
+          if (yesOrNoVoteResult && yesOrNoVoteResult.result) {
             console.log("투표 결과 유효함");
             try {
-              killedPlayer = await killPlayer(mostVoteResult.result.user_id); //NOTE - 투표를 가장 많이 받은 플레이어 사망
+              if (mostVoteResult) {
+                killedPlayer = await killPlayer(mostVoteResult.result.user_id); //NOTE - 투표를 가장 많이 받은 플레이어 사망
+              }
 
               allPlayers = await getPlayersInRoom(roomId);
             } catch (error) {
-              return await playError(roundName, roomId, mafiaIo, error, start);
+              return await playError(
+                roundName,
+                roomId,
+                mafiaIo,
+                error as Error,
+                start
+              );
             }
 
             console.log(`[${roundName}] diedPlayer : ${killedPlayer}`);
