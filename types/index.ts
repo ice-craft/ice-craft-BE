@@ -13,12 +13,12 @@ export type allPlayerType = {
   role: string;
 };
 
-export type mostVotedPlayer = {
+export type mostVotedPlayerType = {
   isValid: boolean;
   result: voteBoardType | allPlayerType;
 };
 
-export type yesOrNoVoteResult = {
+export type yesOrNoVoteResultType = {
   result: boolean;
   detail: {
     yesCount: number;

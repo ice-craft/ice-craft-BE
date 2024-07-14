@@ -1,6 +1,11 @@
 import { Namespace } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { allPlayerType, mostVotedPlayer, voteBoardType } from "../../types";
+import {
+  allPlayerType,
+  mostVotedPlayerType,
+  voteBoardType,
+  yesOrNoVoteResultType,
+} from "../../types";
 import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI";
 import { setRoomIsPlaying } from "../supabase/roomAPI";
 
@@ -19,7 +24,7 @@ export const shufflePlayers = (
 export const getMostVotedPlayer = (
   voteBoard: voteBoardType[],
   exceptedMafia: boolean
-): mostVotedPlayer => {
+): mostVotedPlayerType => {
   const isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
   console.log("투표 결과", voteBoard);
 
@@ -40,7 +45,9 @@ export const getMostVotedPlayer = (
 };
 
 //NOTE - 찬성 반대 투표 결과
-export const getYesOrNoVoteResult = async (roomId: string) => {
+export const getYesOrNoVoteResult = async (
+  roomId: string
+): Promise<yesOrNoVoteResultType> => {
   const voteResult = await getVoteYesOrNoResult(roomId);
   let yesCount = 0;
   let noCount = 0;
