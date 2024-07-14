@@ -392,7 +392,7 @@ mafiaIo.on("connection", (socket) => {
             .filter((player) => player.role == "시민")
             .map((player) => player.user_id);
 
-          let role = {};
+          let role: { [key: string]: string[] | null } = {};
 
           role["mafia"] = mafiaPlayers;
 
