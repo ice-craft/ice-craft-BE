@@ -21,7 +21,7 @@ import {
   getUsersInfoInRoom,
   joinRoom,
   setRoomIsPlaying,
-} from "./api/supabase/roomAPI.js";
+} from "./api/supabase/roomAPI";
 import {
   checkAllPlayersReady,
   checkPlayerCountEnough,
