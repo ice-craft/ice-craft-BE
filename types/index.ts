@@ -4,11 +4,11 @@ export type voteBoardType = {
   voted_count: number;
   role: string;
   is_lived: boolean;
-}[];
+};
 
-export type allPlayersType = {
+export type allPlayerType = {
   user_id: string;
   user_nickname: string;
   is_lived: boolean;
   role: string;
-}[];
+};
