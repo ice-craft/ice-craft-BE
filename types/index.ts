@@ -12,3 +12,5 @@ export type allPlayerType = {
   is_lived: boolean;
   role: string;
 };
+
+export type mediaType = { [key: string]: { [key: string]: boolean } };
