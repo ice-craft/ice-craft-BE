@@ -651,21 +651,22 @@ mafiaIo.on("connection", (socket) => {
         } else if (roundName == "r1-8") {
           console.log(`${roundName} 시작`);
           time = 1;
+          if (mostVoteResult) {
+            let media: mediaType = {};
+            allPlayers
+              .filter(
+                (player) => player.user_id === mostVoteResult!.result.user_id
+              )
+              .forEach((player) => {
+                media[player.user_id] = { camera: true, mike: true };
+              });
 
-          let media: mediaType = {};
-          allPlayers
-            .filter(
-              (player) => player.user_id === mostVoteResult.result.user_id
-            )
-            .forEach((player) => {
-              media[player.user_id] = { camera: true, mike: true };
-            });
-
-          console.log(
-            `[${roundName}] playerMediaStatus : 최대 투표를 받은 유저 카메라 켬, 마이크 켬`
-          );
-          console.log(media);
-          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+            console.log(
+              `[${roundName}] playerMediaStatus : 최대 투표를 받은 유저 카메라 켬, 마이크 켬`
+            );
+            console.log(media);
+            mafiaIo.to(roomId).emit("playerMediaStatus", media);
+          }
 
           console.log(`${roundName} 종료`);
           roundName = "r1-9";
@@ -682,20 +683,22 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media: mediaType = {};
-          allPlayers
-            .filter(
-              (player) => player.user_id === mostVoteResult.result.user_id
-            )
-            .forEach((player) => {
-              media[player.user_id] = { camera: true, mike: false };
-            });
+          if (mostVoteResult) {
+            let media: mediaType = {};
+            allPlayers
+              .filter(
+                (player) => player.user_id === mostVoteResult!.result.user_id
+              )
+              .forEach((player) => {
+                media[player.user_id] = { camera: true, mike: false };
+              });
 
-          console.log(
-            `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 끔`
-          );
-          console.log(media);
-          mafiaIo.to(roomId).emit("playerMediaStatus", media);
+            console.log(
+              `[${roundName}] playerMediaStatus : 모든 유저 카메라 켬, 마이크 끔`
+            );
+            console.log(media);
+            mafiaIo.to(roomId).emit("playerMediaStatus", media);
+          }
 
           console.log(`${roundName} 종료`);
           roundName = "r1-11";
