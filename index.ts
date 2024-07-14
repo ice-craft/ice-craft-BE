@@ -47,7 +47,7 @@ import {
   playError,
   shufflePlayers,
 } from "./api/socket/moderatorAPI.js";
-import { voteBoardType } from "./types/index.js";
+import { mediaType, voteBoardType } from "./types/index.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -291,7 +291,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           allPlayers.forEach((player) => {
             media[player.user_id] = { camera: false, mike: false };
           });
@@ -439,7 +439,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
@@ -473,7 +473,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
@@ -515,7 +515,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           allPlayers
             .filter((player) => player.is_lived == true)
             .forEach((player) => {
@@ -543,7 +543,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           allPlayers
             .filter((player) => player.is_lived == true)
             .forEach((player) => {
@@ -649,7 +649,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           allPlayers
             .filter(
               (player) => player.user_id === mostVoteResult.result.user_id
@@ -679,7 +679,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           allPlayers
             .filter(
               (player) => player.user_id === mostVoteResult.result.user_id
@@ -717,7 +717,13 @@ mafiaIo.on("connection", (socket) => {
             yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
             await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
           } catch (error) {
-            return await playError(roundName, roomId, mafiaIo, error, start);
+            return await playError(
+              roundName,
+              roomId,
+              mafiaIo,
+              error as Error,
+              start
+            );
           }
 
           console.log(`[${roundName}] showVoteDeadOrLive / 5초`);
@@ -781,7 +787,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           allPlayers.forEach((player) => {
             media[player.user_id] = { camera: false, mike: false };
           });
@@ -814,7 +820,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived === true)
             .filter((player) => player.role === "마피아")
@@ -847,7 +853,7 @@ mafiaIo.on("connection", (socket) => {
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media = {};
+          let media: mediaType = {};
           const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
