@@ -899,7 +899,11 @@ mafiaIo.on("connection", (socket) => {
           console.log("의사", doctorMaxCount, "경찰", policeMaxCount); //FIXME - 테스트 코드
           if (doctorMaxCount === 0 && policeMaxCount === 0) {
             roundName = "r2-0";
-          } else if (doctorMaxCount == 0 && policeMaxCount > 0) {
+          } else if (
+            doctorMaxCount == 0 &&
+            policeMaxCount &&
+            policeMaxCount > 0
+          ) {
             roundName = "r1-21";
           } else {
             roundName = "r1-19";
@@ -925,7 +929,7 @@ mafiaIo.on("connection", (socket) => {
           mafiaIo.to(roomId).emit("inSelect", "doctor", time);
 
           console.log(`${roundName} 종료`);
-          if (policeMaxCount > 0) {
+          if (policeMaxCount && policeMaxCount > 0) {
             roundName = "r1-21";
           } else {
             roundName = "r2-0";
@@ -986,7 +990,7 @@ mafiaIo.on("connection", (socket) => {
 
           let doctorPlayer = null;
           try {
-            if (doctorMaxCount > 0) {
+            if (doctorMaxCount && doctorMaxCount > 0) {
               doctorPlayer = allPlayers
                 .filter((player) => player.is_lived == true)
                 .find((player) => player.role === "의사")?.user_id;
