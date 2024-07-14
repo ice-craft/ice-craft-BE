@@ -78,7 +78,9 @@ export const resetVote = async (room_id: string) => {
   }
 };
 
-export const getVoteToResult = async (room_id: string) => {
+export const getVoteToResult = async (
+  room_id: string
+): Promise<voteBoardType[]> => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id, user_nickname, voted_count, role, is_lived")

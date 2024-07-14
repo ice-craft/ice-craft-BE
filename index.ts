@@ -243,7 +243,7 @@ mafiaIo.on("connection", (socket) => {
     let doctorMaxCount: number | null = null;
     let policeMaxCount: number | null = null;
 
-    let voteBoard: voteBoardType | null = null;
+    let voteBoard: voteBoardType[] | null = null;
     let mostVoteResult = null;
     let yesOrNoVoteResult = null;
 
