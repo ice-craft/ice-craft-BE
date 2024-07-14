@@ -1,6 +1,6 @@
 import { Namespace } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { allPlayerType, MostVotedPlayer, voteBoardType } from "../../types";
+import { allPlayerType, mostVotedPlayer, voteBoardType } from "../../types";
 import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI";
 import { setRoomIsPlaying } from "../supabase/roomAPI";
 
@@ -19,7 +19,7 @@ export const shufflePlayers = (
 export const getMostVotedPlayer = (
   voteBoard: voteBoardType[],
   exceptedMafia: boolean
-): MostVotedPlayer => {
+): mostVotedPlayer => {
   const isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
   console.log("투표 결과", voteBoard);
 

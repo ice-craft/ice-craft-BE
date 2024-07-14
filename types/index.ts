@@ -13,9 +13,17 @@ export type allPlayerType = {
   role: string;
 };
 
-export type MostVotedPlayer = {
+export type mostVotedPlayer = {
   isValid: boolean;
   result: voteBoardType | allPlayerType;
+};
+
+export type yesOrNoVoteResult = {
+  result: boolean;
+  detail: {
+    yesCount: number;
+    noCount: number;
+  };
 };
 
 export type mediaType = { [key: string]: { [key: string]: boolean } };
