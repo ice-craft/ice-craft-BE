@@ -1,5 +1,5 @@
-import { voteBoardType } from "../../types/index.js";
-import { supabase } from "./client.js";
+import { voteBoardType } from "../../../types/index";
+import { supabase } from "./client";
 
 export const checkPlayerCountEnough = async (
   room_id: string,
