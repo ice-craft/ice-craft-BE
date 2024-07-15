@@ -52,7 +52,7 @@ import {
   mediaType,
   voteBoardType,
   yesOrNoVoteResultType,
-} from "./types/index";
+} from "../types/index";
 
 const app = express();
 const httpServer = createServer(app);
@@ -623,7 +623,7 @@ mafiaIo.on("connection", (socket) => {
           if (voteBoard) {
             mostVoteResult = getMostVotedPlayer(voteBoard, false); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
 
-            if (mostVoteResult.isValid) {
+            if (mostVoteResult && mostVoteResult.isValid) {
               console.log(
                 `[${roundName}] showModal : ${mostVoteResult.result.user_nickname}님은 최후의 변론을 시작하세요. / 3초`
               );
@@ -638,9 +638,12 @@ mafiaIo.on("connection", (socket) => {
               console.log(`${roundName} 종료`);
               roundName = "r1-8";
             } else {
-              console.log(
-                `[${roundName}] showModal : 동률로 인해 임의의 플레이어가 사망합니다. ${mostVoteResult.result.user_nickname} / 3초`
-              );
+              if (mostVoteResult) {
+                console.log(
+                  `[${roundName}] showModal : 동률로 인해 임의의 플레이어가 사망합니다. ${mostVoteResult.result.user_nickname} / 3초`
+                );
+              }
+
               mafiaIo
                 .to(roomId)
                 .emit(
@@ -968,7 +971,7 @@ mafiaIo.on("connection", (socket) => {
           try {
             voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
             mostVoteResult = getMostVotedPlayer(voteBoard, true); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
-            mostVotedPlayer = mostVoteResult.result;
+            mostVotedPlayer = mostVoteResult!.result;
             console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
             await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
           } catch (error) {
