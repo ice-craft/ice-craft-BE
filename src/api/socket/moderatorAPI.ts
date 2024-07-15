@@ -5,7 +5,7 @@ import {
   mostVotedPlayerType,
   voteBoardType,
   yesOrNoVoteResultType,
-} from "../../types";
+} from "../../../types/index";
 import { getVoteYesOrNoResult, initGame } from "../supabase/gamePlayAPI";
 import { setRoomIsPlaying } from "../supabase/roomAPI";
 
