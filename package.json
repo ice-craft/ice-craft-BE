@@ -1,26 +1,26 @@
 {
-  "name": "server",
+  "name": "chat-server",
   "version": "1.0.0",
-  "description": "채팅 서버",
-  "main": "index.js",
-  "type": "module",
+  "description": "ice-craft 서버",
+  "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/app.ts"
+    "start": "nodemon app",
+    "dev": "nodemon --watch \"*.ts\" --exec \"ts-node\" src/app.ts"
   },
   "author": "KMH",
   "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.42.0",
-    "better-sqlite3": "^9.5.0",
+    "@supabase/supabase-js": "^2.44.4",
+    "@types/express": "^4.17.21",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "supabase": "^1.183.5",
+    "typescript": "^5.5.3"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.14.10",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
+    "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2"
   }
 }
