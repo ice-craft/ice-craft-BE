@@ -1,11 +1,5 @@
 //FIXME - showModal 메서드로 만들기
-//FIXME - 각 역할의 플레이어 유저 아이디 반환 메서드 만들기
 //FIXME - 라운드명 상수화
-//FIXME - 5명보다 많은 인원 수도 테스트 (특히, r0-2)
-//FIXME - 게임 오버 뒤 라운드 1개 더 진행되는 현상 수정
-//FIXME - 관전자는 게임 흐름따라가도록 수정 (캠, 마이크)
-//FIXME - r2-0에서 playError에서 error 메세지 안뜸
-//FIXME - 타입스크립트 변환
 
 import express from "express";
 import { createServer } from "http";
