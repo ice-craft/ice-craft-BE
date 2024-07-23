@@ -159,10 +159,10 @@ export const gameOver = async (
   if (gameResult.isValid) {
     if (gameResult.result === "시민") {
       console.log(`[victoryPlayer] citizen / 5초`);
-      mafiaIo.to(roomId).emit("victoryPlayer", "citizen", time);
+      mafiaIo.to(roomId).emit("victoryPlayer", "Citizen", time);
     } else if (gameResult.result === "마피아") {
       console.log(`[victoryPlayer] mafia / 5초`);
-      mafiaIo.to(roomId).emit("victoryPlayer", "mafia", time);
+      mafiaIo.to(roomId).emit("victoryPlayer", "Mafia", time);
     }
     roundName = "gameEnd";
     mafiaIo.to(roomId).emit("gameEnd");
