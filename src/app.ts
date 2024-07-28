@@ -49,6 +49,7 @@ import {
 } from "../types/index";
 import { onEnterMafia } from "./services/onEnterMafia";
 import { onCreateRoom } from "./services/onCreateRoom";
+import { onJoinRoom } from "./services/onJoinRoom";
 
 const app = express();
 const httpServer = createServer(app);
@@ -102,29 +103,29 @@ mafiaIo.on("connection", (socket) => {
 
   onCreateRoom(socket);
 
-  socket.on("joinRoom", async (userId, roomId, nickname) => {
-    console.log(
-      `[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`
-    );
+  // socket.on("joinRoom", async (userId, roomId, nickname) => {
+  //   console.log(
+  //     `[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`
+  //   );
 
-    try {
-      await joinRoom(roomId, userId, nickname);
-      // const usersInfo = await getUsersInfoInRoom(roomId);
-      const roomInfo = await getRoomInfo(roomId);
+  //   try {
+  //     await joinRoom(roomId, userId, nickname);
+  //     const roomInfo = await getRoomInfo(roomId);
 
-      socket.join(roomId);
-      socket.join(userId);
-      socket.data.userId = userId;
-      socket.data.roomId = roomId;
+  //     socket.join(roomId);
+  //     socket.join(userId);
+  //     socket.data.userId = userId;
+  //     socket.data.roomId = roomId;
 
-      // mafiaIo.to(roomId).emit("joinRoom", usersInfo, roomId);
-      mafiaIo.to(roomId).emit("joinRoom", roomId);
-      mafiaIo.emit("updateRoomInfo", roomInfo);
-    } catch (error) {
-      console.log(`[joinRoomError] ${(error as Error).message}`);
-      socket.emit("joinRoomError", (error as Error).message);
-    }
-  });
+  //     mafiaIo.to(roomId).emit("joinRoom", roomId);
+  //     mafiaIo.emit("updateRoomInfo", roomInfo);
+  //   } catch (error) {
+  //     console.log(`[joinRoomError] ${(error as Error).message}`);
+  //     socket.emit("joinRoomError", (error as Error).message);
+  //   }
+  // });
+
+  onJoinRoom(socket, mafiaIo);
 
   socket.on("fastJoinRoom", async (userId, nickname) => {
     console.log(`[fastJoinRoom] userId : ${userId}, nickname : ${nickname}`);
