@@ -51,6 +51,7 @@ import { onEnterMafia } from "./services/onEnterMafia";
 import { onCreateRoom } from "./services/onCreateRoom";
 import { onJoinRoom } from "./services/onJoinRoom";
 import { onFastJoinRoom } from "./services/onFastJoinRoom";
+import { onExitRoom } from "./services/onExitRoom";
 
 const app = express();
 const httpServer = createServer(app);
@@ -150,25 +151,27 @@ mafiaIo.on("connection", (socket) => {
 
   onFastJoinRoom(socket, mafiaIo);
 
-  socket.on("exitRoom", async (roomId, userId) => {
-    console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
+  // socket.on("exitRoom", async (roomId, userId) => {
+  //   console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
-    try {
-      const roomInfo = await getRoomInfo(roomId);
-      await exitRoom(roomId, userId);
+  //   try {
+  //     const roomInfo = await getRoomInfo(roomId);
+  //     await exitRoom(roomId, userId);
 
-      socket.data.userId = null;
-      socket.data.roomId = null;
-      socket.leave(userId);
-      socket.leave(roomId);
+  //     socket.data.userId = null;
+  //     socket.data.roomId = null;
+  //     socket.leave(userId);
+  //     socket.leave(roomId);
 
-      mafiaIo.to(roomId).emit("exitRoom");
-      mafiaIo.emit("updateRoomInfo", roomInfo);
-    } catch (error) {
-      console.log(`[exitRoomError] ${(error as Error).message}`);
-      socket.emit("exitRoomError", (error as Error).message);
-    }
-  });
+  //     mafiaIo.to(roomId).emit("exitRoom");
+  //     mafiaIo.emit("updateRoomInfo", roomInfo);
+  //   } catch (error) {
+  //     console.log(`[exitRoomError] ${(error as Error).message}`);
+  //     socket.emit("exitRoomError", (error as Error).message);
+  //   }
+  // });
+
+  onExitRoom(socket, mafiaIo);
 
   socket.on("setReady", async (userId, ready) => {
     console.log(`[setReady] userId : ${userId}, ready : ${ready}`);
