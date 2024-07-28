@@ -54,6 +54,7 @@ import { onJoinRoom } from "./services/onJoinRoom";
 import { onFastJoinRoom } from "./services/onFastJoinRoom";
 import { onExitRoom } from "./services/onExitRoom";
 import { onSetReady } from "./services/onSetReady";
+import { onUserInfo } from "./services/onUserInfo";
 
 const app = express();
 const httpServer = createServer(app);
@@ -192,17 +193,19 @@ mafiaIo.on("connection", (socket) => {
 
   onSetReady(socket, mafiaIo);
 
-  socket.on("usersInfo", async (roomId) => {
-    console.log(`[usersInfo] roomId : ${roomId}`);
+  // socket.on("usersInfo", async (roomId) => {
+  //   console.log(`[usersInfo] roomId : ${roomId}`);
 
-    try {
-      const usersInfo = await getUsersInfoInRoom(roomId);
-      mafiaIo.to(roomId).emit("usersInfo", usersInfo);
-    } catch (error) {
-      console.log(`[usersInfoError] ${(error as Error).message}`);
-      socket.emit("usersInfoError", (error as Error).message);
-    }
-  });
+  //   try {
+  //     const usersInfo = await getUsersInfoInRoom(roomId);
+  //     mafiaIo.to(roomId).emit("usersInfo", usersInfo);
+  //   } catch (error) {
+  //     console.log(`[usersInfoError] ${(error as Error).message}`);
+  //     socket.emit("usersInfoError", (error as Error).message);
+  //   }
+  // });
+
+  onUserInfo(socket, mafiaIo);
 
   //FIXME - 메인 페이지에서 새로고침할 경우 대처
   socket.on("disconnect", async () => {
