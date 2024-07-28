@@ -48,6 +48,7 @@ import {
   yesOrNoVoteResultType,
 } from "../types/index";
 import { onEnterMafia } from "./services/onEnterMafia";
+import { onCreateRoom } from "./services/onCreateRoom";
 
 const app = express();
 const httpServer = createServer(app);
@@ -85,19 +86,21 @@ mafiaIo.on("connection", (socket) => {
 
   onEnterMafia(socket);
 
-  socket.on("createRoom", async (title, game_category, total_user_count) => {
-    console.log(
-      `[createRoom] title : ${title}, game_category : ${game_category}, total_user_count : ${total_user_count}`
-    );
+  // socket.on("createRoom", async (title, game_category, total_user_count) => {
+  //   console.log(
+  //     `[createRoom] title : ${title}, game_category : ${game_category}, total_user_count : ${total_user_count}`
+  //   );
 
-    try {
-      const room = await createRoom(title, game_category, total_user_count);
-      socket.emit("createRoom", room);
-    } catch (error) {
-      console.log(`[createRoomError] ${(error as Error).message}`);
-      socket.emit("createRoomError", (error as Error).message);
-    }
-  });
+  //   try {
+  //     const room = await createRoom(title, game_category, total_user_count);
+  //     socket.emit("createRoom", room);
+  //   } catch (error) {
+  //     console.log(`[createRoomError] ${(error as Error).message}`);
+  //     socket.emit("createRoomError", (error as Error).message);
+  //   }
+  // });
+
+  onCreateRoom(socket);
 
   socket.on("joinRoom", async (userId, roomId, nickname) => {
     console.log(
