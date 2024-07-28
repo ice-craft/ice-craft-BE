@@ -59,6 +59,7 @@ import { onDisconnect } from "./services/onDisconnect";
 import { onGameStart } from "./services/onGameStart";
 import { onVoteTo } from "./services/onVoteTo";
 import { onVoteYesOrNo } from "./services/onVoteYesOrNo";
+import { onSelectPlayer } from "./services/onSelectPlayer";
 
 const app = express();
 const httpServer = createServer(app);
@@ -1126,20 +1127,23 @@ mafiaIo.on("connection", (socket) => {
   //     socket.emit("[voteYesOrNoError]", (error as Error).message);
   //   }
   // });
+
   onVoteYesOrNo(socket);
 
-  socket.on("selectPlayer", async (selectedPlayer) => {
-    console.log(
-      `[selectedPlayer] 의사에 의해 선택받은 플레이어 : ${selectedPlayer}`
-    );
+  // socket.on("selectPlayer", async (selectedPlayer) => {
+  //   console.log(
+  //     `[selectedPlayer] 의사에 의해 선택받은 플레이어 : ${selectedPlayer}`
+  //   );
 
-    try {
-      await selectPlayer(selectedPlayer);
-    } catch (error) {
-      console.log(`[selectPlayerError] ${(error as Error).message}`);
-      socket.emit("selectPlayerError", (error as Error).message);
-    }
-  });
+  //   try {
+  //     await selectPlayer(selectedPlayer);
+  //   } catch (error) {
+  //     console.log(`[selectPlayerError] ${(error as Error).message}`);
+  //     socket.emit("selectPlayerError", (error as Error).message);
+  //   }
+  // });
+
+  onSelectPlayer(socket);
 });
 
 httpServer.listen(port, () => {
