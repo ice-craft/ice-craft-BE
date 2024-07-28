@@ -47,6 +47,7 @@ import {
   voteBoardType,
   yesOrNoVoteResultType,
 } from "../types/index";
+import { onEnterMafia } from "./services/onEnterMafia";
 
 const app = express();
 const httpServer = createServer(app);
@@ -70,17 +71,19 @@ mafiaIo.on("connection", (socket) => {
   // socket.data.roomId = "0ed9a099-f1b4-46eb-a187-2da752eed29c"; //NOTE - 테스트용 코드
   //NOTE - joinRoom하고 fastJoinRoom에서 처리하고 있음
 
-  socket.on("enterMafia", async () => {
-    console.log("[enterMafia]");
+  // socket.on("enterMafia", async () => {
+  //   console.log("[enterMafia]");
 
-    try {
-      const rooms = await getRooms();
-      socket.emit("enterMafia", rooms);
-    } catch (error) {
-      console.log(`[enterMafiaError] ${(error as Error).message}`);
-      socket.emit("enterMafiaError", (error as Error).message);
-    }
-  });
+  //   try {
+  //     const rooms = await getRooms();
+  //     socket.emit("enterMafia", rooms);
+  //   } catch (error) {
+  //     console.log(`[enterMafiaError] ${(error as Error).message}`);
+  //     socket.emit("enterMafiaError", (error as Error).message);
+  //   }
+  // });
+
+  onEnterMafia(socket);
 
   socket.on("createRoom", async (title, game_category, total_user_count) => {
     console.log(
