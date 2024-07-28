@@ -55,6 +55,7 @@ import { onFastJoinRoom } from "./services/onFastJoinRoom";
 import { onExitRoom } from "./services/onExitRoom";
 import { onSetReady } from "./services/onSetReady";
 import { onUserInfo } from "./services/onUserInfo";
+import { onDisconnect } from "./services/onDisconnect";
 
 const app = express();
 const httpServer = createServer(app);
@@ -208,34 +209,36 @@ mafiaIo.on("connection", (socket) => {
   onUserInfo(socket, mafiaIo);
 
   //FIXME - 메인 페이지에서 새로고침할 경우 대처
-  socket.on("disconnect", async () => {
-    console.log("클라이언트와의 연결이 끊겼습니다.");
+  // socket.on("disconnect", async () => {
+  //   console.log("클라이언트와의 연결이 끊겼습니다.");
 
-    try {
-      const roomId = socket.data.roomId;
-      const userId = socket.data.userId;
+  //   try {
+  //     const roomId = socket.data.roomId;
+  //     const userId = socket.data.userId;
 
-      if (!roomId) {
-        console.log("[exitRoom] 방에서 나가는 경우가 아닙니다.");
-        return;
-      }
+  //     if (!roomId) {
+  //       console.log("[exitRoom] 방에서 나가는 경우가 아닙니다.");
+  //       return;
+  //     }
 
-      const roomInfo = await getRoomInfo(roomId);
+  //     const roomInfo = await getRoomInfo(roomId);
 
-      console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
-      await exitRoom(roomId, userId);
+  //     console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
+  //     await exitRoom(roomId, userId);
 
-      socket.leave(userId);
-      socket.leave(roomId);
-      socket.data.userId = null;
-      socket.data.roomId = null;
+  //     socket.leave(userId);
+  //     socket.leave(roomId);
+  //     socket.data.userId = null;
+  //     socket.data.roomId = null;
 
-      mafiaIo.to(roomId).emit("exitRoom");
-      mafiaIo.emit("updateRoomInfo", roomInfo);
-    } catch (error) {
-      console.log(`[exitRoomError] ${(error as Error).message}`);
-    }
-  });
+  //     mafiaIo.to(roomId).emit("exitRoom");
+  //     mafiaIo.emit("updateRoomInfo", roomInfo);
+  //   } catch (error) {
+  //     console.log(`[exitRoomError] ${(error as Error).message}`);
+  //   }
+  // });
+
+  onDisconnect(socket, mafiaIo);
 
   socket.on("gameStart", async (roomId, playersMaxCount) => {
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);

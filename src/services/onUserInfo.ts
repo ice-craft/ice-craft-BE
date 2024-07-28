@@ -2,7 +2,7 @@ import { Namespace, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { getUsersInfoInRoom } from "../api/supabase/roomAPI";
 
-export const onUserInfo = (
+export const onUserInfo = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
