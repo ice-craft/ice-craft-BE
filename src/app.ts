@@ -57,6 +57,7 @@ import { onSetReady } from "./services/onSetReady";
 import { onUserInfo } from "./services/onUserInfo";
 import { onDisconnect } from "./services/onDisconnect";
 import { onGameStart } from "./services/onGameStart";
+import { onVoteTo } from "./services/onVoteTo";
 
 const app = express();
 const httpServer = createServer(app);
@@ -1100,16 +1101,18 @@ mafiaIo.on("connection", (socket) => {
 
   onGameStart(socket, mafiaIo);
 
-  socket.on("voteTo", async (votedPlayer) => {
-    console.log(`[voteTo] 투표 대상 : ${votedPlayer}`);
+  // socket.on("voteTo", async (votedPlayer) => {
+  //   console.log(`[voteTo] 투표 대상 : ${votedPlayer}`);
 
-    try {
-      await voteTo(votedPlayer, new Date());
-    } catch (error) {
-      console.log(`[voteToError] ${(error as Error).message}`);
-      socket.emit("voteToError", (error as Error).message);
-    }
-  });
+  //   try {
+  //     await voteTo(votedPlayer, new Date());
+  //   } catch (error) {
+  //     console.log(`[voteToError] ${(error as Error).message}`);
+  //     socket.emit("voteToError", (error as Error).message);
+  //   }
+  // });
+
+  onVoteTo(socket);
 
   socket.on("voteYesOrNo", async (yesOrNo) => {
     console.log(`[voteYesOrNo] 찬성/반대 : ${yesOrNo}`);
