@@ -60,6 +60,7 @@ import { onGameStart } from "./services/onGameStart";
 import { onVoteTo } from "./services/onVoteTo";
 import { onVoteYesOrNo } from "./services/onVoteYesOrNo";
 import { onSelectPlayer } from "./services/onSelectPlayer";
+import { onUpdateRoomInfo } from "./services/onUpdateRoomInfo";
 
 const app = express();
 const httpServer = createServer(app);
@@ -241,6 +242,7 @@ mafiaIo.on("connection", (socket) => {
   //     console.log(`[exitRoomError] ${(error as Error).message}`);
   //   }
   // });
+  onUpdateRoomInfo(socket);
 
   onDisconnect(socket, mafiaIo);
 
