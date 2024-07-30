@@ -257,7 +257,7 @@ export const onGameStart = async (
 
           console.log(`${roundName} 종료`);
           roundName = roundStatus.R0_3;
-        } else if (roundName === "roundStatus.R0_3") {
+        } else if (roundName === roundStatus.R0_3) {
           console.log(`${roundName} 시작`);
           time = 3;
 
