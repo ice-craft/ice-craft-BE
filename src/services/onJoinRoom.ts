@@ -1,6 +1,6 @@
 import { Namespace, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { getRoomInfo, joinRoom } from "../api/supabase/roomAPI";
+import { getRoomInfo, joinRoom } from "src/api/supabase/roomAPI";
 
 export const onJoinRoom = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,

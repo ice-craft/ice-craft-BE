@@ -1,4 +1,4 @@
-import { supabase } from "./client";
+import { supabase } from "src/api/supabase/client";
 
 //NOTE - 해당 범위의 방들을 반환(데이터베이스의 인덱스는 0부터 시작, rowStart 인덱스와 rowEnd 인덱스를 포함해서 반환), 날짜 내림차순
 export const getRooms = async () => {

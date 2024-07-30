@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { voteYesOrNo } from "../api/supabase/gamePlayAPI";
+import { voteYesOrNo } from "src/api/supabase/gamePlayAPI";
 
 export const onVoteYesOrNo = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>

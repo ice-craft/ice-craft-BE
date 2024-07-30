@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { selectPlayer } from "../api/supabase/gamePlayAPI";
+import { selectPlayer } from "src/api/supabase/gamePlayAPI";
 
 export const onSelectPlayer = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>

@@ -5,18 +5,18 @@ import {
   mostVotedPlayerType,
   voteBoardType,
   yesOrNoVoteResultType,
-} from "../../../types/index";
+} from "types/index";
 import {
   checkAllPlayersReady,
   checkPlayerCountEnough,
   getVoteYesOrNoResult,
   initGame,
-} from "../supabase/gamePlayAPI";
+} from "src/api/supabase/gamePlayAPI";
 import {
   getChief,
   getUserCountInRoom,
   setRoomIsPlaying,
-} from "../supabase/roomAPI";
+} from "src/api/supabase/roomAPI";
 
 export const canGameStart = async (
   roomId: string,

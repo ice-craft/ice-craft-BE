@@ -1,7 +1,7 @@
 import { Namespace, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { setReady } from "../api/supabase/gamePlayAPI";
-import { canGameStart } from "../api/socket/moderatorAPI";
+import { setReady } from "src/api/supabase/gamePlayAPI";
+import { canGameStart } from "src/api/socket/moderatorAPI";
 
 export const onSetReady = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,

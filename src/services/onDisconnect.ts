@@ -1,6 +1,6 @@
 import { Namespace, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { exitRoom, getRoomInfo } from "../api/supabase/roomAPI";
+import { exitRoom, getRoomInfo } from "src/api/supabase/roomAPI";
 
 export const onDisconnect = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,

@@ -1,6 +1,6 @@
 import { Namespace, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { getRoomInfo, setRoomIsPlaying } from "../api/supabase/roomAPI";
+import { getRoomInfo, setRoomIsPlaying } from "src/api/supabase/roomAPI";
 import {
   gameOver,
   getMostVotedPlayer,

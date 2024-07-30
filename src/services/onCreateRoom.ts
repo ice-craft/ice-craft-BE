@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { createRoom } from "../api/supabase/roomAPI";
+import { createRoom } from "src/api/supabase/roomAPI";
 
 export const onCreateRoom = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>

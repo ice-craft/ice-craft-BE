@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { getRooms } from "../api/supabase/roomAPI";
+import { getRooms } from "src/api/supabase/roomAPI";
 
 export const onEnterMafia = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
