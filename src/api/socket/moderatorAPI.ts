@@ -3,6 +3,7 @@ import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import {
   allPlayerType,
   mostVotedPlayerType,
+  roundStatusType,
   voteBoardType,
   yesOrNoVoteResultType,
 } from "types/index";
@@ -175,9 +176,10 @@ export const playError = async (
   roomId: string,
   mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   error: Error,
-  start: NodeJS.Timeout | null
+  start: NodeJS.Timeout | null,
+  roundStatus: roundStatusType
 ) => {
-  if (roundName != "init") {
+  if (roundName != roundStatus.INIT) {
     await initGame(roomId);
   }
 
@@ -195,13 +197,14 @@ export const gameOver = async (
   roomId: string,
   roundName: string,
   allPlayers: allPlayerType[],
-  start: NodeJS.Timeout
+  start: NodeJS.Timeout,
+  roundStatus: roundStatusType
 ) => {
   if (
-    roundName === "init" ||
-    roundName === "r0-0" ||
-    roundName === "r0-1" ||
-    roundName === "r0-2"
+    roundName === roundStatus.INIT ||
+    roundName === roundStatus.R0_0 ||
+    roundName === roundStatus.R0_1 ||
+    roundName === roundStatus.R0_2
   ) {
     return roundName;
   }
@@ -218,8 +221,8 @@ export const gameOver = async (
       console.log(`[victoryPlayer] mafia / 5초`);
       mafiaIo.to(roomId).emit("victoryPlayer", "Mafia", time);
     }
-    roundName = "gameEnd";
-    mafiaIo.to(roomId).emit("gameEnd");
+    roundName = roundStatus.GAME_END;
+    mafiaIo.to(roomId).emit(roundStatus.GAME_END);
     await initGame(roomId);
     await setRoomIsPlaying(roomId, false);
 

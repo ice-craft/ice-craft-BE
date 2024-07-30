@@ -8,13 +8,14 @@ import {
   getYesOrNoVoteResult,
   playError,
   shufflePlayers,
-} from "../api/socket/moderatorAPI";
+} from "src/api/socket/moderatorAPI";
 import {
   allPlayerType,
   mediaType,
+  roundStatusType,
   voteBoardType,
   yesOrNoVoteResultType,
-} from "../../types";
+} from "types";
 import {
   getPlayersInRoom,
   getSelectedPlayer,
@@ -25,7 +26,7 @@ import {
   resetVote,
   savePlayer,
   setPlayerRole,
-} from "../api/supabase/gamePlayAPI";
+} from "src/api/supabase/gamePlayAPI";
 
 export const onGameStart = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
@@ -35,15 +36,40 @@ export const onGameStart = async (
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
     mafiaIo.to(roomId).emit("gameStart");
 
+    const roundStatus: roundStatusType = { INIT: "init", GAME_END: "gameEnd" };
+
+    for (let i = 0; i < 7; i++) {
+      const key = `R0_${i}`;
+      const value = `r0-${i}`;
+
+      roundStatus[key] = value;
+    }
+
+    for (let i = 0; i < 23; i++) {
+      const key = `R1_${i}`;
+      const value = `r1-${i}`;
+
+      roundStatus[key] = value;
+    }
+
+    roundStatus["R2_0"] = "r2-0";
+
     try {
       await setRoomIsPlaying(roomId, true);
       const roomInfo = await getRoomInfo(roomId);
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
-      return await playError("start", roomId, mafiaIo, error as Error, null);
+      return await playError(
+        "start",
+        roomId,
+        mafiaIo,
+        error as Error,
+        null,
+        roundStatus
+      );
     }
 
-    let roundName = "init"; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = roundStatus.INIT; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
     let allPlayers = null;
 
     let mafiaMaxCount = null;
@@ -70,7 +96,8 @@ export const onGameStart = async (
             roomId,
             roundName,
             allPlayers,
-            start
+            start,
+            roundStatus
           ); //NOTE - 라운드마다 게임 종료 조건 확인
         } catch (error) {
           return await playError(
@@ -78,14 +105,15 @@ export const onGameStart = async (
             roomId,
             mafiaIo,
             error as Error,
-            start
+            start,
+            roundStatus
           );
         }
 
-        if (roundName == "init") {
+        if (roundName == roundStatus.INIT) {
           try {
             await initGame(roomId);
-            roundName = "r0-0";
+            roundName = roundStatus.R0_0;
           } catch (error) {
             console.log(
               `[playError] ${roundName}, ${(error as Error).message}`
@@ -97,7 +125,7 @@ export const onGameStart = async (
           }
         }
 
-        if (roundName === "r0-0") {
+        if (roundName === roundStatus.R0_0) {
           console.log(`${roundName} 시작`);
           time = 1;
 
@@ -113,8 +141,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
-          roundName = "r0-1";
-        } else if (roundName === "r0-1") {
+          roundName = roundStatus.R0_1;
+        } else if (roundName === roundStatus.R0_1) {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -122,8 +150,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("showModal", "밤이 되었습니다.", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r0-2";
-        } else if (roundName === "r0-2") {
+          roundName = roundStatus.R0_2;
+        } else if (roundName === roundStatus.R0_2) {
           console.log(`${roundName} 시작`);
           time = 10;
 
@@ -182,7 +210,8 @@ export const onGameStart = async (
               roomId,
               mafiaIo,
               error as Error,
-              start
+              start,
+              roundStatus
             );
           }
 
@@ -227,8 +256,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("showAllPlayerRole", role, time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r0-3";
-        } else if (roundName === "r0-3") {
+          roundName = roundStatus.R0_3;
+        } else if (roundName === "roundStatus.R0_3") {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -244,8 +273,8 @@ export const onGameStart = async (
             );
 
           console.log(`${roundName} 종료`);
-          roundName = "r0-4";
-        } else if (roundName === "r0-4") {
+          roundName = roundStatus.R0_4;
+        } else if (roundName === roundStatus.R0_4) {
           console.log(`${roundName} 시작`);
           time = 1;
 
@@ -269,8 +298,8 @@ export const onGameStart = async (
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "r0-5";
-        } else if (roundName == "r0-5") {
+          roundName = roundStatus.R0_5;
+        } else if (roundName == roundStatus.R0_5) {
           console.log(`${roundName} 시작`);
           time = 5;
 
@@ -278,8 +307,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("timerStatus", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r0-6";
-        } else if (roundName === "r0-6") {
+          roundName = roundStatus.R0_6;
+        } else if (roundName === roundStatus.R0_6) {
           console.log(`${roundName} 시작`);
           time = 1;
 
@@ -303,8 +332,8 @@ export const onGameStart = async (
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-0";
-        } else if (roundName == "r1-0") {
+          roundName = roundStatus.R1_0;
+        } else if (roundName == roundStatus.R1_0) {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -320,8 +349,8 @@ export const onGameStart = async (
             );
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-1";
-        } else if (roundName == "r1-1") {
+          roundName = roundStatus.R1_1;
+        } else if (roundName == roundStatus.R1_1) {
           console.log(`${roundName} 시작`);
           time = 1;
 
@@ -339,8 +368,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-2";
-        } else if (roundName == "r1-2") {
+          roundName = roundStatus.R1_2;
+        } else if (roundName == roundStatus.R1_2) {
           console.log(`${roundName} 시작`);
           time = 60;
 
@@ -348,8 +377,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("timerStatus", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-3";
-        } else if (roundName == "r1-3") {
+          roundName = roundStatus.R1_3;
+        } else if (roundName == roundStatus.R1_3) {
           console.log(`${roundName} 시작`);
           time = 1;
 
@@ -367,8 +396,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-4";
-        } else if (roundName == "r1-4") {
+          roundName = roundStatus.R1_4;
+        } else if (roundName == roundStatus.R1_4) {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -384,8 +413,8 @@ export const onGameStart = async (
             );
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-5";
-        } else if (roundName == "r1-5") {
+          roundName = roundStatus.R1_5;
+        } else if (roundName == roundStatus.R1_5) {
           console.log(`${roundName} 시작`);
           time = 10;
 
@@ -393,8 +422,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("inSelect", "vote", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-6";
-        } else if (roundName == "r1-6") {
+          roundName = roundStatus.R1_6;
+        } else if (roundName == roundStatus.R1_6) {
           console.log(`${roundName} 시작`);
           time = 5;
           try {
@@ -406,7 +435,8 @@ export const onGameStart = async (
               roomId,
               mafiaIo,
               error as Error,
-              start
+              start,
+              roundStatus
             );
           }
 
@@ -417,8 +447,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("showVoteResult", voteBoard, time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-7";
-        } else if (roundName == "r1-7") {
+          roundName = roundStatus.R1_7;
+        } else if (roundName == roundStatus.R1_7) {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -438,7 +468,7 @@ export const onGameStart = async (
                 );
 
               console.log(`${roundName} 종료`);
-              roundName = "r1-8";
+              roundName = roundStatus.R1_8;
             } else {
               if (mostVoteResult) {
                 console.log(
@@ -458,10 +488,10 @@ export const onGameStart = async (
                 detail: { yesCount: 0, noCount: 0 },
               };
               console.log(`${roundName} 종료`);
-              roundName = "r1-13";
+              roundName = roundStatus.R1_13;
             }
           }
-        } else if (roundName == "r1-8") {
+        } else if (roundName == roundStatus.R1_8) {
           console.log(`${roundName} 시작`);
           time = 1;
           if (mostVoteResult) {
@@ -482,8 +512,8 @@ export const onGameStart = async (
           }
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-9";
-        } else if (roundName == "r1-9") {
+          roundName = roundStatus.R1_9;
+        } else if (roundName == roundStatus.R1_9) {
           console.log(`${roundName} 시작`);
           time = 10;
 
@@ -491,8 +521,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("timerStatus", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-10";
-        } else if (roundName == "r1-10") {
+          roundName = roundStatus.R1_10;
+        } else if (roundName == roundStatus.R1_10) {
           console.log(`${roundName} 시작`);
           time = 1;
 
@@ -514,8 +544,8 @@ export const onGameStart = async (
           }
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-11";
-        } else if (roundName == "r1-11") {
+          roundName = roundStatus.R1_11;
+        } else if (roundName == roundStatus.R1_11) {
           console.log(`${roundName} 시작`);
           time = 10;
 
@@ -527,8 +557,8 @@ export const onGameStart = async (
             .emit("showModal", "찬성/반대 투표를 해주세요.", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-12";
-        } else if (roundName == "r1-12") {
+          roundName = roundStatus.R1_12;
+        } else if (roundName == roundStatus.R1_12) {
           console.log(`${roundName} 시작`);
           time = 5;
 
@@ -541,7 +571,8 @@ export const onGameStart = async (
               roomId,
               mafiaIo,
               error as Error,
-              start
+              start,
+              roundStatus
             );
           }
 
@@ -552,8 +583,8 @@ export const onGameStart = async (
             .emit("showVoteDeadOrLive", yesOrNoVoteResult, time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-13";
-        } else if (roundName == "r1-13") {
+          roundName = roundStatus.R1_13;
+        } else if (roundName == roundStatus.R1_13) {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -573,7 +604,8 @@ export const onGameStart = async (
                 roomId,
                 mafiaIo,
                 error as Error,
-                start
+                start,
+                roundStatus
               );
             }
 
@@ -609,8 +641,8 @@ export const onGameStart = async (
           }
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-14";
-        } else if (roundName == "r1-14") {
+          roundName = roundStatus.R1_14;
+        } else if (roundName == roundStatus.R1_14) {
           console.log(`${roundName} 시작`);
           time = 1;
 
@@ -625,8 +657,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("playerMediaStatus", media);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-15";
-        } else if (roundName === "r1-15") {
+          roundName = roundStatus.R1_15;
+        } else if (roundName === roundStatus.R1_15) {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -642,8 +674,8 @@ export const onGameStart = async (
             );
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-16";
-        } else if (roundName === "r1-16") {
+          roundName = roundStatus.R1_16;
+        } else if (roundName === roundStatus.R1_16) {
           console.log(`${roundName} 시작`);
           time = 1;
 
@@ -666,8 +698,8 @@ export const onGameStart = async (
           });
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-17";
-        } else if (roundName === "r1-17") {
+          roundName = roundStatus.R1_17;
+        } else if (roundName === roundStatus.R1_17) {
           console.log(`${roundName} 시작`);
           time = 10;
 
@@ -675,8 +707,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("inSelect", "mafia", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-18";
-        } else if (roundName === "r1-18") {
+          roundName = roundStatus.R1_18;
+        } else if (roundName === roundStatus.R1_18) {
           console.log(`${roundName} 시작`);
           time = 1;
 
@@ -703,17 +735,17 @@ export const onGameStart = async (
           // policeMaxCount = 0; //FIXME - 테스트 코드
           console.log("의사", doctorMaxCount, "경찰", policeMaxCount); //FIXME - 테스트 코드
           if (doctorMaxCount === 0 && policeMaxCount === 0) {
-            roundName = "r2-0";
+            roundName = roundStatus.R2_0;
           } else if (
             doctorMaxCount == 0 &&
             policeMaxCount &&
             policeMaxCount > 0
           ) {
-            roundName = "r1-21";
+            roundName = roundStatus.R1_21;
           } else {
-            roundName = "r1-19";
+            roundName = roundStatus.R1_19;
           }
-        } else if (roundName == "r1-19") {
+        } else if (roundName == roundStatus.R1_19) {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -725,8 +757,8 @@ export const onGameStart = async (
             .emit("showModal", "의사는 누구를 살릴 지 결정해주세요.", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-20";
-        } else if (roundName == "r1-20") {
+          roundName = roundStatus.R1_20;
+        } else if (roundName == roundStatus.R1_20) {
           console.log(`${roundName} 시작`);
           time = 10;
 
@@ -735,11 +767,11 @@ export const onGameStart = async (
 
           console.log(`${roundName} 종료`);
           if (policeMaxCount && policeMaxCount > 0) {
-            roundName = "r1-21";
+            roundName = roundStatus.R1_21;
           } else {
-            roundName = "r2-0";
+            roundName = roundStatus.R2_0;
           }
-        } else if (roundName == "r1-21") {
+        } else if (roundName == roundStatus.R1_21) {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -751,8 +783,8 @@ export const onGameStart = async (
             .emit("showModal", "경찰은 마피아 의심자를 결정해주세요.", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-22";
-        } else if (roundName == "r1-22") {
+          roundName = roundStatus.R1_22;
+        } else if (roundName == roundStatus.R1_22) {
           console.log(`${roundName} 시작`);
           time = 10;
 
@@ -760,8 +792,8 @@ export const onGameStart = async (
           mafiaIo.to(roomId).emit("inSelect", "police", time);
 
           console.log(`${roundName} 종료`);
-          roundName = "r2-0";
-        } else if (roundName == "r2-0") {
+          roundName = roundStatus.R2_0;
+        } else if (roundName == roundStatus.R2_0) {
           console.log(`${roundName} 시작`);
           time = 3;
 
@@ -782,7 +814,8 @@ export const onGameStart = async (
               roomId,
               mafiaIo,
               error as Error,
-              start
+              start,
+              roundStatus
             );
           }
 
@@ -828,7 +861,8 @@ export const onGameStart = async (
               roomId,
               mafiaIo,
               error as Error,
-              start
+              start,
+              roundStatus
             );
           }
 
@@ -882,7 +916,7 @@ export const onGameStart = async (
           }
 
           console.log(`${roundName} 종료`);
-          roundName = "r1-0";
+          roundName = roundStatus.R1_0;
         }
       }
     }, 1000);

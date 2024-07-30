@@ -27,3 +27,5 @@ export type yesOrNoVoteResultType = {
 };
 
 export type mediaType = { [key: string]: { [key: string]: boolean } };
+
+export type roundStatusType = { [key: string]: string };
