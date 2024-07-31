@@ -1,4 +1,4 @@
-import { voteBoardType } from "types/index";
+import { VoteBoard } from "types/index";
 import { supabase } from "src/api/supabase/client";
 
 export const checkPlayerCountEnough = async (
@@ -80,7 +80,7 @@ export const resetVote = async (room_id: string) => {
 
 export const getVoteToResult = async (
   room_id: string
-): Promise<voteBoardType[]> => {
+): Promise<VoteBoard[]> => {
   const { data, error } = await supabase
     .from("room_user_match_table")
     .select("user_id, user_nickname, voted_count, role, is_lived")

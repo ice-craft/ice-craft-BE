@@ -1,11 +1,11 @@
 import { Namespace } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import {
-  allPlayerType,
-  mostVotedPlayerType,
-  roundStatusType,
-  voteBoardType,
-  yesOrNoVoteResultType,
+  AllPlayer,
+  MostVotedPlayer,
+  RoundStatus,
+  VoteBoard,
+  YesOrNoVoteResult,
 } from "types/index";
 import {
   checkAllPlayersReady,
@@ -65,9 +65,7 @@ export const canGameStart = async (
 };
 
 //NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
-export const shufflePlayers = (
-  allPlayers: allPlayerType[] | voteBoardType[]
-) => {
+export const shufflePlayers = (allPlayers: AllPlayer[] | VoteBoard[]) => {
   for (let i = allPlayers.length - 1; i >= 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [allPlayers[i], allPlayers[j]] = [allPlayers[j], allPlayers[i]];
@@ -77,9 +75,9 @@ export const shufflePlayers = (
 
 //NOTE - 표를 가장 많이 받은 플레이어 확인
 export const getMostVotedPlayer = (
-  voteBoard: voteBoardType[],
+  voteBoard: VoteBoard[],
   exceptedMafia: boolean
-): mostVotedPlayerType => {
+): MostVotedPlayer => {
   const isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
   console.log("투표 결과", voteBoard);
 
@@ -102,7 +100,7 @@ export const getMostVotedPlayer = (
 //NOTE - 찬성 반대 투표 결과
 export const getYesOrNoVoteResult = async (
   roomId: string
-): Promise<yesOrNoVoteResultType> => {
+): Promise<YesOrNoVoteResult> => {
   const voteResult = await getVoteYesOrNoResult(roomId);
   let yesCount = 0;
   let noCount = 0;
@@ -122,7 +120,7 @@ export const getYesOrNoVoteResult = async (
 };
 
 //NOTE - 어느 팀이 이겼는지 결과 반환
-export const whoWins = (allPlayers: allPlayerType[]) => {
+export const whoWins = (allPlayers: AllPlayer[]) => {
   const mafiaPlayers = allPlayers
     .filter((player) => player.is_lived === true)
     .filter((player) => player.role === "마피아");
@@ -177,7 +175,7 @@ export const playError = async (
   mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   error: Error,
   start: NodeJS.Timeout | null,
-  roundStatus: roundStatusType
+  roundStatus: RoundStatus
 ) => {
   if (roundName != roundStatus.INIT) {
     await initGame(roomId);
@@ -196,9 +194,9 @@ export const gameOver = async (
   mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   roomId: string,
   roundName: string,
-  allPlayers: allPlayerType[],
+  allPlayers: AllPlayer[],
   start: NodeJS.Timeout,
-  roundStatus: roundStatusType
+  roundStatus: RoundStatus
 ) => {
   if (
     roundName === roundStatus.INIT ||

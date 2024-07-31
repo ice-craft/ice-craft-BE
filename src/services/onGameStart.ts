@@ -10,11 +10,11 @@ import {
   shufflePlayers,
 } from "src/api/socket/moderatorAPI";
 import {
-  allPlayerType,
-  mediaType,
-  roundStatusType,
-  voteBoardType,
-  yesOrNoVoteResultType,
+  AllPlayer,
+  Media,
+  RoundStatus,
+  VoteBoard,
+  YesOrNoVoteResult,
 } from "types";
 import {
   getPlayersInRoom,
@@ -36,7 +36,7 @@ export const onGameStart = async (
     console.log(`[gameStart] roomId : ${roomId}, 총 인원 : ${playersMaxCount}`);
     mafiaIo.to(roomId).emit("gameStart");
 
-    const roundStatus: roundStatusType = { INIT: "init", GAME_END: "gameEnd" };
+    const roundStatus: RoundStatus = { INIT: "init", GAME_END: "gameEnd" };
 
     for (let i = 0; i < 7; i++) {
       const key = `R0_${i}`;
@@ -76,12 +76,12 @@ export const onGameStart = async (
     let doctorMaxCount: number | null = null;
     let policeMaxCount: number | null = null;
 
-    let voteBoard: voteBoardType[] | null = null;
+    let voteBoard: VoteBoard[] | null = null;
     let mostVoteResult: {
       isValid: boolean;
-      result: voteBoardType | allPlayerType;
+      result: VoteBoard | AllPlayer;
     } | null = null;
-    let yesOrNoVoteResult: yesOrNoVoteResultType | null = null;
+    let yesOrNoVoteResult: YesOrNoVoteResult | null = null;
 
     let time = 1;
 
@@ -129,7 +129,7 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media: mediaType = {};
+          let media: Media = {};
           allPlayers.forEach((player) => {
             media[player.user_id] = { camera: false, mike: false };
           });
@@ -278,7 +278,7 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media: mediaType = {};
+          let media: Media = {};
           const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
@@ -312,7 +312,7 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media: mediaType = {};
+          let media: Media = {};
           const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
@@ -354,7 +354,7 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media: mediaType = {};
+          let media: Media = {};
           allPlayers
             .filter((player) => player.is_lived == true)
             .forEach((player) => {
@@ -382,7 +382,7 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media: mediaType = {};
+          let media: Media = {};
           allPlayers
             .filter((player) => player.is_lived == true)
             .forEach((player) => {
@@ -495,7 +495,7 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 1;
           if (mostVoteResult) {
-            let media: mediaType = {};
+            let media: Media = {};
             allPlayers
               .filter(
                 (player) => player.user_id === mostVoteResult!.result.user_id
@@ -527,7 +527,7 @@ export const onGameStart = async (
           time = 1;
 
           if (mostVoteResult) {
-            let media: mediaType = {};
+            let media: Media = {};
             allPlayers
               .filter(
                 (player) => player.user_id === mostVoteResult!.result.user_id
@@ -646,7 +646,7 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media: mediaType = {};
+          let media: Media = {};
           allPlayers.forEach((player) => {
             media[player.user_id] = { camera: false, mike: false };
           });
@@ -679,7 +679,7 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media: mediaType = {};
+          let media: Media = {};
           const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived === true)
             .filter((player) => player.role === "마피아")
@@ -712,7 +712,7 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 1;
 
-          let media: mediaType = {};
+          let media: Media = {};
           const mafiaPlayers = allPlayers
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
