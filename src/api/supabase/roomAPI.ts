@@ -14,21 +14,6 @@ export const getRooms = async () => {
   return data;
 };
 
-//NOTE - 제목에 키워드가 포함된 방 목록 반환 (날짜 내림차순)
-export const getRoomsWithKeyword = async (keyword: string) => {
-  const { data, error } = await supabase
-    .from("room_table")
-    .select("*, users:room_user_match_table(user_id)")
-    .like("title", `%${keyword}%`)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw new Error("키워드를 통해 방 목록 불러오기 실패");
-  }
-
-  return data;
-};
-
 //NOTE - 방 만들기 (방만 만듬, 방을 만들고 접속도 해야함)
 export const createRoom = async (
   title: string,
