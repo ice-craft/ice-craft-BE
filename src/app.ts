@@ -21,9 +21,12 @@ import { onUpdateRoomInfo } from "src/services/onUpdateRoomInfo";
 const app = express();
 const httpServer = createServer(app);
 const port = 4000;
+const defaultUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "http://localhost:3000";
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: defaultUrl,
   },
 });
 const mafiaIo = io.of("/mafia");
