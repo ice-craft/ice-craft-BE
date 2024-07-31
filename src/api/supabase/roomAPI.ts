@@ -1,6 +1,5 @@
 import { supabase } from "src/api/supabase/client";
 
-//NOTE - 해당 범위의 방들을 반환(데이터베이스의 인덱스는 0부터 시작, rowStart 인덱스와 rowEnd 인덱스를 포함해서 반환), 날짜 내림차순
 export const getRooms = async () => {
   const { data, error } = await supabase
     .from("room_table")
@@ -14,7 +13,6 @@ export const getRooms = async () => {
   return data;
 };
 
-//NOTE - 방 만들기 (방만 만듬, 방을 만들고 접속도 해야함)
 export const createRoom = async (
   title: string,
   game_category: string,
@@ -33,7 +31,6 @@ export const createRoom = async (
   return data;
 };
 
-//NOTE - 방에 들어가기 (방 자리에 여유가 있고, 자신이 방에 없으면 방에 들어갈 수 있음 )
 export const joinRoom = async (
   room_id: string,
   user_id: string,
@@ -71,7 +68,6 @@ export const joinRoom = async (
   throw new Error("방 입장 실패");
 };
 
-//NOTE - 방 나가기 (내가 방에 존재하고 나 이외에 유저가 있으면 방에서 나감, 다른 유저가 방에 없으면 방 삭제)
 export const exitRoom = async (room_id: string, user_id: string) => {
   const { current_user_count } = await getUserCountInRoom(room_id);
   const usersIdInRoom = await getUsersIdInRoom(room_id);
@@ -104,7 +100,6 @@ export const exitRoom = async (room_id: string, user_id: string) => {
   throw new Error("방 나가기 실패");
 };
 
-//NOTE - 방 삭제하기 (방에 있는 유저가 오직 자신일 경우에 방 삭제)
 export const deleteRoom = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_table")
@@ -118,7 +113,6 @@ export const deleteRoom = async (room_id: string) => {
   return data;
 };
 
-//NOTE - 빠른 방 입장 (전체 인원 오름차순으로 정렬 후, 현재 인원 내림차순 정렬 후, 남은 인원이 0명인 방을 제외한 후, 첫 번째 방 입장)
 export const fastJoinRoom = async (user_id: string, user_nickname: string) => {
   const { data, error } = await supabase
     .from("room_table")
@@ -139,7 +133,6 @@ export const fastJoinRoom = async (user_id: string, user_nickname: string) => {
   return result;
 };
 
-//NOTE - 방의 현재 인원 변경 (방의 인원을 change만큼 더함, change는 음수가 될 수 있어서, 인원을 감소할 수 있음)
 export const changeUserCountInRoom = async (
   room_id: string,
   change: number
@@ -159,7 +152,6 @@ export const changeUserCountInRoom = async (
   return data;
 };
 
-//NOTE - 방에 들어갈 수 있는 총인원과 현재 인원 반환
 export const getUserCountInRoom = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_table")
@@ -177,7 +169,6 @@ export const getUserCountInRoom = async (room_id: string) => {
   };
 };
 
-//NOTE - roomId의 방에 입장한 유저들 id 목록 반환
 export const getUsersIdInRoom = async (roomId: string) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
@@ -191,7 +182,6 @@ export const getUsersIdInRoom = async (roomId: string) => {
   return data.map((row) => row.user_id);
 };
 
-//NOTE - roomId의 방에 입장한 유저들 id와 닉네임 목록 반환
 export const getUsersInfoInRoom = async (roomId: string) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
@@ -207,7 +197,6 @@ export const getUsersInfoInRoom = async (roomId: string) => {
   return data;
 };
 
-//NOTE - 방의 방장을 설정
 export const setChief = async (room_id: string, user_id: string) => {
   const { data, error } = await supabase
     .from("room_table")
@@ -222,7 +211,6 @@ export const setChief = async (room_id: string, user_id: string) => {
   return data;
 };
 
-//NOTE - 방의 방장 유저아이디 반환
 export const getChief = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_table")
@@ -237,7 +225,6 @@ export const getChief = async (room_id: string) => {
   return data.chief;
 };
 
-//NOTE - 방의 방장 정하기
 export const decideChief = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_user_match_table")
@@ -252,7 +239,6 @@ export const decideChief = async (room_id: string) => {
   return data[0].user_id;
 };
 
-//NOTE - 방에서 게임이 진행중인지 여부 조회
 export const getRoomIsPlaying = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_table")
@@ -267,7 +253,6 @@ export const getRoomIsPlaying = async (room_id: string) => {
   return data.is_playing;
 };
 
-//NOTE - 방에서 게임이 진행중인지 여부 수정
 export const setRoomIsPlaying = async (
   room_id: string,
   is_playing: boolean
@@ -286,7 +271,6 @@ export const setRoomIsPlaying = async (
   return data.room_id;
 };
 
-//NOTE - 방의 정보를 조회
 export const getRoomInfo = async (room_id: string) => {
   const { data, error } = await supabase
     .from("room_table")
