@@ -69,7 +69,7 @@ export const onGameStart = async (
       );
     }
 
-    let roundName = roundStatus.INIT; //FIXME - 테스트용 코드, 실제 배포시에는 init으로 변경
+    let roundName = roundStatus.INIT;
     let allPlayers = null;
 
     let mafiaMaxCount = null;
@@ -86,7 +86,7 @@ export const onGameStart = async (
     let time = 1;
 
     const start = setInterval(async () => {
-      time--; //FIXME - 테스트 코드, 배포할 때는 --로 고치기
+      time--;
 
       if (time <= 0) {
         try {
@@ -98,7 +98,7 @@ export const onGameStart = async (
             allPlayers,
             start,
             roundStatus
-          ); //NOTE - 라운드마다 게임 종료 조건 확인
+          );
         } catch (error) {
           return await playError(
             roundName,
@@ -172,7 +172,6 @@ export const onGameStart = async (
           console.log("최대 경찰 인원 수", policeMaxCount);
 
           try {
-            //FIXME - 테스트용 코드, 배포시 삭제
             for (
               let playerIndex = 0;
               playerIndex < playersMaxCount;
@@ -181,7 +180,6 @@ export const onGameStart = async (
               await setPlayerRole(playersUserId[playerIndex], "시민");
             }
 
-            //NOTE - 마피아 인원 수만큼 플레이어들에게 마피아 역할 배정
             for (
               let playerIndex = 0;
               playerIndex < mafiaMaxCount;
@@ -427,8 +425,8 @@ export const onGameStart = async (
           console.log(`${roundName} 시작`);
           time = 5;
           try {
-            voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-            await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+            voteBoard = await getVoteToResult(roomId);
+            await resetVote(roomId);
           } catch (error) {
             return await playError(
               roundName,
@@ -453,7 +451,7 @@ export const onGameStart = async (
           time = 3;
 
           if (voteBoard) {
-            mostVoteResult = getMostVotedPlayer(voteBoard, false); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+            mostVoteResult = getMostVotedPlayer(voteBoard, false);
 
             if (mostVoteResult && mostVoteResult.isValid) {
               console.log(
@@ -563,8 +561,8 @@ export const onGameStart = async (
           time = 5;
 
           try {
-            yesOrNoVoteResult = await getYesOrNoVoteResult(roomId); //NOTE - 찬반 투표 결과 (확정X, 동률 나올 수 있음)
-            await resetVote(roomId); //NOTE - 투표 결과 리셋, 테스트 상 주석처리
+            yesOrNoVoteResult = await getYesOrNoVoteResult(roomId);
+            await resetVote(roomId);
           } catch (error) {
             return await playError(
               roundName,
@@ -594,7 +592,7 @@ export const onGameStart = async (
             console.log("투표 결과 유효함");
             try {
               if (mostVoteResult) {
-                killedPlayer = await killPlayer(mostVoteResult.result.user_id); //NOTE - 투표를 가장 많이 받은 플레이어 사망
+                killedPlayer = await killPlayer(mostVoteResult.result.user_id);
               }
 
               allPlayers = await getPlayersInRoom(roomId);
@@ -616,7 +614,6 @@ export const onGameStart = async (
               .filter((player) => player.role === "마피아")
               .some((player) => player.user_id === killedPlayer);
 
-            //NOTE - 죽은 플레이어가 마피아인지 시민인지 알림
             if (isPlayerMafia) {
               console.log(
                 `[${roundName}] showModal : 마피아가 죽었습니다. / 3초`
@@ -631,7 +628,6 @@ export const onGameStart = async (
               mafiaIo.to(roomId).emit("showModal", "시민이 죽었습니다.", time);
             }
           } else {
-            //NOTE - 투표 실패, 동률이 나옴
             console.log(
               `[${roundName}] showModal : 아무도 죽지 않았습니다. / 3초`
             );
@@ -731,9 +727,8 @@ export const onGameStart = async (
           });
 
           console.log(`${roundName} 종료`);
-          // doctorMaxCount = 0; //FIXME - 테스트 코드
-          // policeMaxCount = 0; //FIXME - 테스트 코드
-          console.log("의사", doctorMaxCount, "경찰", policeMaxCount); //FIXME - 테스트 코드
+
+          console.log("의사", doctorMaxCount, "경찰", policeMaxCount);
           if (doctorMaxCount === 0 && policeMaxCount === 0) {
             roundName = roundStatus.R2_0;
           } else if (
@@ -803,11 +798,11 @@ export const onGameStart = async (
           let killedPlayer = null;
 
           try {
-            voteBoard = await getVoteToResult(roomId); //NOTE - 투표 결과 확인 (누가 얼마나 투표를 받았는지)
-            mostVoteResult = getMostVotedPlayer(voteBoard, true); //NOTE - 투표를 가장 많이 받은 사람 결과 (확정X, 동률일 가능성 존재)
+            voteBoard = await getVoteToResult(roomId);
+            mostVoteResult = getMostVotedPlayer(voteBoard, true);
             mostVotedPlayer = mostVoteResult!.result;
-            console.log("투표 당선", mostVotedPlayer); //FIXME - 테스트 코드
-            await resetVote(roomId); //NOTE - 플레이어들이 한 투표 기록 리셋, 테스트용으로 잠시 주석처리
+            console.log("투표 당선", mostVotedPlayer);
+            await resetVote(roomId);
           } catch (error) {
             return await playError(
               roundName,
@@ -841,7 +836,7 @@ export const onGameStart = async (
               playerToKill,
               "살릴 사람",
               playerToSave
-            ); //FIXME - 테스트 코드
+            );
 
             if (playerToKill !== playerToSave) {
               if (mafiaPlayers) {
