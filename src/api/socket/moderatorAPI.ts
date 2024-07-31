@@ -23,48 +23,35 @@ export const canGameStart = async (
   roomId: string,
   mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
-  console.log("게임 진행 가능 확인");
   let canStart = false;
   try {
     const { total_user_count: totalUserCount } = await getUserCountInRoom(
       roomId
     );
-    console.log("총 인원 :", totalUserCount);
-    console.log("룸 아이디", roomId);
 
     const isAllPlayerEnoughCount = await checkPlayerCountEnough(
       roomId,
       totalUserCount
-    ); //NOTE - 플레이어들이 방 정원을 채웠는지
+    );
     const isAllPlayersReady = await checkAllPlayersReady(
       roomId,
       totalUserCount
-    ); //NOTE - 플레이어들이 전부 레디했는지
+    );
 
     canStart = isAllPlayerEnoughCount && isAllPlayersReady;
-    console.log(
-      "인원 충분 : ",
-      isAllPlayerEnoughCount,
-      "전부 레디 : ",
-      isAllPlayersReady
-    );
 
     const chief = await getChief(roomId);
 
     if (canStart) {
-      console.log(`[chiefStart] ${chief} ${canStart}`);
       mafiaIo.to(chief).emit("chiefStart", canStart);
     } else {
-      console.log(`[chiefStart] ${chief} ${canStart}`);
       mafiaIo.to(chief).emit("chiefStart", canStart);
     }
   } catch (error) {
-    console.log(`[canGameStartError] ${(error as Error).message}`);
     mafiaIo.to(roomId).emit("canGameStartError", (error as Error).message);
   }
 };
 
-//NOTE - 참가자들 랜덤으로 섞기(피셔-예이츠 셔플 알고리즘)
 export const shufflePlayers = (allPlayers: AllPlayer[] | VoteBoard[]) => {
   for (let i = allPlayers.length - 1; i >= 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -73,13 +60,11 @@ export const shufflePlayers = (allPlayers: AllPlayer[] | VoteBoard[]) => {
   return allPlayers;
 };
 
-//NOTE - 표를 가장 많이 받은 플레이어 확인
 export const getMostVotedPlayer = (
   voteBoard: VoteBoard[],
   exceptedMafia: boolean
 ): MostVotedPlayer => {
   const isValid = voteBoard[0].voted_count !== voteBoard[1].voted_count;
-  console.log("투표 결과", voteBoard);
 
   if (isValid) {
     return { isValid, result: voteBoard[0] };
@@ -91,13 +76,11 @@ export const getMostVotedPlayer = (
     }
 
     const shuffledPlayers = shufflePlayers(voteBoard);
-    console.log("isValid", isValid, "voteBoard", voteBoard);
 
     return { isValid, result: shuffledPlayers[0] };
   }
 };
 
-//NOTE - 찬성 반대 투표 결과
 export const getYesOrNoVoteResult = async (
   roomId: string
 ): Promise<YesOrNoVoteResult> => {
@@ -119,7 +102,6 @@ export const getYesOrNoVoteResult = async (
   };
 };
 
-//NOTE - 어느 팀이 이겼는지 결과 반환
 export const whoWins = (allPlayers: AllPlayer[]) => {
   const mafiaPlayers = allPlayers
     .filter((player) => player.is_lived === true)
@@ -137,8 +119,6 @@ export const whoWins = (allPlayers: AllPlayer[]) => {
   citizenPlayers.length > 0
     ? (citizenCount = citizenPlayers.length)
     : (citizenCount = 0);
-
-  console.log("마피아", mafiaCount, "시민", citizenCount); //FIXME - 테스트용 코드
 
   if (mafiaCount === 0) {
     return { isValid: true, result: "시민" };
@@ -182,8 +162,7 @@ export const playError = async (
   }
 
   await setRoomIsPlaying(roomId, false);
-  console.log(`[playError] ${roundName}, ${error.message}`); //FIXME - 테스트용 코드
-  console.log(error); //FIXME - 지우기
+
   mafiaIo.to(roomId).emit("playError", roundName, error.message);
   if (start) {
     clearInterval(start);
@@ -210,13 +189,10 @@ export const gameOver = async (
   const gameResult = whoWins(allPlayers);
   const time = 5;
 
-  console.log(gameResult); //FIXME - 테스트용 코드
   if (gameResult.isValid) {
     if (gameResult.result === "시민") {
-      console.log(`[victoryPlayer] citizen / 5초`);
       mafiaIo.to(roomId).emit("victoryPlayer", "Citizen", time);
     } else if (gameResult.result === "마피아") {
-      console.log(`[victoryPlayer] mafia / 5초`);
       mafiaIo.to(roomId).emit("victoryPlayer", "Mafia", time);
     }
     roundName = roundStatus.GAME_END;
