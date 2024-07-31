@@ -146,7 +146,7 @@ export const savePlayer = async (user_id: string) => {
     .single();
 
   if (error) {
-    throw new Error();
+    throw new Error("플레이어 살리기 실패");
   }
 
   return data.user_id;
