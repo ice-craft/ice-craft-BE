@@ -5,8 +5,7 @@
   "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app",
-    "dev": "nodemon --watch \"*.ts\" --exec \"ts-node\" src/app.ts"
+    "start": "nodemon --watch \"*.ts\" --exec \"ts-node\" src/app.ts"
   },
   "author": "KMH",
   "license": "MIT",
