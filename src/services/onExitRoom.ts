@@ -7,8 +7,6 @@ export const onExitRoom = async (
   mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
   socket.on("exitRoom", async (roomId, userId) => {
-    console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
-
     try {
       await exitRoom(roomId, userId);
       const roomInfo = await getRoomInfo(roomId);
@@ -21,7 +19,6 @@ export const onExitRoom = async (
       mafiaIo.to(roomId).emit("exitRoom");
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
-      console.log(`[exitRoomError] ${(error as Error).message}`);
       socket.emit("exitRoomError", (error as Error).message);
     }
   });

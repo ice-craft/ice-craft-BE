@@ -6,13 +6,10 @@ export const onUpdateRoomInfo = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
   socket.on("updateRoomInfo", async (roomId) => {
-    console.log(`[updateRoomInfo] roomId : ${roomId}`);
-
     try {
       const roomInfo = await getRoomInfo(roomId);
       socket.emit("updateRoomInfo", roomInfo);
     } catch (error) {
-      console.log(`[updateRoomInfoError] ${(error as Error).message}`);
       socket.emit("updateRoomInfoError", (error as Error).message);
     }
   });
