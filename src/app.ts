@@ -23,7 +23,7 @@ const defaultUrl = process.env.VERCEL_URL
   : "http://localhost:3000";
 const io = new Server(httpServer, {
   cors: {
-    origin: defaultUrl,
+    origin: "*",
   },
 });
 const mafiaIo = io.of("/mafia");
