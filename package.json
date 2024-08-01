@@ -1,11 +1,13 @@
 {
-  "name": "chat-server",
+  "name": "ice-craft",
   "version": "1.0.0",
   "description": "ice-craft 서버",
   "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --watch \"*.ts\" --exec \"ts-node\" src/app.ts"
+    "dev": "nodemon --watch \"*.ts\" --exec \"ts-node\" src/app.ts",
+    "start": "pm2 start",
+    "stop": "pm2 delete ice-craft"
   },
   "author": "KMH",
   "license": "MIT",
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.4",
+    "pm2": "^5.4.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0"
   }
