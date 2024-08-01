@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch \"*.ts\" --exec \"ts-node\" src/app.ts",
     "start": "pm2 start",
+    "monitor":"pm2 monit",
     "stop": "pm2 delete ice-craft"
   },
   "author": "KMH",
