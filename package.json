@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch \"*.ts\" --exec \"ts-node\" src/app.ts",
-    "start-cluster": "pm2 start",
-    "start-fork": "pm2 start src/app.ts",
+    "start-cluster": "pm2 start --only ice-craft-cluster",
+    "start-fork": "pm2 start --only ice-craft-fork",
     "monitor": "pm2 monit",
     "stop": "pm2 kill"
   },
