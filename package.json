@@ -6,10 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch \"*.ts\" --exec \"ts-node\" src/app.ts",
-    "start cluster": "pm2 start",
-    "start fork": "pm2 start src/app.ts",
+    "start-cluster": "pm2 start",
+    "start-fork": "pm2 start src/app.ts",
     "monitor": "pm2 monit",
-    "stop": "pm2 delete ice-craft"
+    "stop": "pm2 kill"
   },
   "author": "KMH",
   "license": "MIT",
