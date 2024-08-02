@@ -197,7 +197,6 @@ export const gameOver = async (
       mafiaIo.to(roomId).emit("victoryPlayer", "Mafia", time);
     }
     roundName = roundStatus.GAME_END;
-    mafiaIo.to(roomId).emit(roundStatus.GAME_END);
 
     await initGame(roomId);
     await setRoomIsPlaying(roomId, false);
