@@ -15,6 +15,7 @@ import {
 } from "src/api/supabase/gamePlayAPI";
 import {
   getChief,
+  getRoomInfo,
   getUserCountInRoom,
   setRoomIsPlaying,
 } from "src/api/supabase/roomAPI";
@@ -197,8 +198,12 @@ export const gameOver = async (
     }
     roundName = roundStatus.GAME_END;
     mafiaIo.to(roomId).emit(roundStatus.GAME_END);
+
     await initGame(roomId);
     await setRoomIsPlaying(roomId, false);
+
+    const roomInfo = await getRoomInfo(roomId);
+    mafiaIo.emit("updateRoomInfo", roomInfo);
 
     clearInterval(start);
   }
