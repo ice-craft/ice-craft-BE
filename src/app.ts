@@ -60,6 +60,8 @@ mafiaIo.on("connection", (socket) => {
   onSelectPlayer(socket);
 });
 
+httpServer.keepAliveTimeout = 200_000;
+
 httpServer.listen(port, () => {
   console.log(`port(${port})으로 실행 중`);
 });
