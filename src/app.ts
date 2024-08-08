@@ -17,7 +17,7 @@ import { onUpdateRoomInfo } from "src/services/onUpdateRoomInfo";
 
 const app = express();
 const httpServer = createServer(app);
-const port = 8080;
+const port = 443;
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
