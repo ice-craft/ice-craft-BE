@@ -16,12 +16,12 @@ import { onSelectPlayer } from "src/services/onSelectPlayer";
 import { onUpdateRoomInfo } from "src/services/onUpdateRoomInfo";
 
 const app = express();
-const httpServer = createServer(app);
+const httpsServer = createServer(app);
 const port = 443;
 const originURL = process.env.VERCEL_URL
   ? process.env.VERCEL_URL
   : process.env.DEV_URL;
-const io = new Server(httpServer, {
+const io = new Server(httpsServer, {
   cors: {
     origin: originURL,
   },
@@ -60,8 +60,8 @@ mafiaIo.on("connection", (socket) => {
   onSelectPlayer(socket);
 });
 
-httpServer.keepAliveTimeout = 200_000;
+httpsServer.keepAliveTimeout = 200_000;
 
-httpServer.listen(port, () => {
+httpsServer.listen(port, () => {
   console.log(`port(${port})으로 실행 중`);
 });
