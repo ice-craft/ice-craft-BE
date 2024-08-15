@@ -7,15 +7,19 @@ export const onDisconnect = async (
   mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
   socket.on("disconnect", async () => {
+    console.log("클라이언트와의 연결이 끊겼습니다.");
     try {
       const roomId = socket.data.roomId;
       const userId = socket.data.userId;
 
       if (!roomId) {
+        console.log("[exitRoom] 방에서 나가는 경우가 아닙니다.");
         return;
       }
 
       const roomInfo = await getRoomInfo(roomId);
+
+      console.log(`[exitRoom] roomId : ${roomId}, userId : ${userId}`);
 
       await exitRoom(roomId, userId);
 
@@ -26,6 +30,8 @@ export const onDisconnect = async (
 
       mafiaIo.to(roomId).emit("exitRoom");
       mafiaIo.emit("updateRoomInfo", roomInfo);
-    } catch (error) {}
+    } catch (error) {
+      console.log(`[exitRoomError] ${(error as Error).message}`);
+    }
   });
 };

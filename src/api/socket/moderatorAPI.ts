@@ -24,6 +24,7 @@ export const canGameStart = async (
   roomId: string,
   mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
+  console.log("게임 진행 가능 확인");
   let canStart = false;
   try {
     const { total_user_count: totalUserCount } = await getUserCountInRoom(
@@ -34,6 +35,10 @@ export const canGameStart = async (
       roomId,
       totalUserCount
     );
+
+    console.log("룸 아이디", roomId);
+    console.log("총 인원 :", totalUserCount);
+
     const isAllPlayersReady = await checkAllPlayersReady(
       roomId,
       totalUserCount
@@ -41,10 +46,20 @@ export const canGameStart = async (
 
     canStart = isAllPlayerEnoughCount && isAllPlayersReady;
 
+    console.log(
+      "인원 충분 : ",
+      isAllPlayerEnoughCount,
+      "전부 레디 : ",
+      isAllPlayersReady
+    );
+
     const chief = await getChief(roomId);
+
+    console.log(`[chiefStart] ${chief} ${canStart}`);
 
     mafiaIo.to(chief).emit("chiefStart", canStart);
   } catch (error) {
+    console.log(`[canGameStartError] ${(error as Error).message}`);
     mafiaIo.to(roomId).emit("canGameStartError", (error as Error).message);
   }
 };

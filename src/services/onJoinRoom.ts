@@ -7,6 +7,9 @@ export const onJoinRoom = async (
   mafiaIo: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
   socket.on("joinRoom", async (userId, roomId, nickname) => {
+    console.log(
+      `[joinRoom] userId : ${userId}, roomId : ${roomId}, nickname : ${nickname}`
+    );
     try {
       await joinRoom(roomId, userId, nickname);
       const roomInfo = await getRoomInfo(roomId);
@@ -19,6 +22,7 @@ export const onJoinRoom = async (
       mafiaIo.to(roomId).emit("joinRoom", roomId);
       mafiaIo.emit("updateRoomInfo", roomInfo);
     } catch (error) {
+      console.log(`[joinRoomError] ${(error as Error).message}`);
       socket.emit("joinRoomError", (error as Error).message);
     }
   });
