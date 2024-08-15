@@ -43,11 +43,7 @@ export const canGameStart = async (
 
     const chief = await getChief(roomId);
 
-    if (canStart) {
-      mafiaIo.to(chief).emit("chiefStart", canStart);
-    } else {
-      mafiaIo.to(chief).emit("chiefStart", canStart);
-    }
+    mafiaIo.to(chief).emit("chiefStart", canStart);
   } catch (error) {
     mafiaIo.to(roomId).emit("canGameStartError", (error as Error).message);
   }
