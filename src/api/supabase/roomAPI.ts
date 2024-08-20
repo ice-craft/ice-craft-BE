@@ -124,13 +124,17 @@ export const fastJoinRoom = async (user_id: string, user_nickname: string) => {
     throw new Error("빠른 방 입장 실패");
   }
 
-  const rows = data.filter(
-    (row) => row.current_user_count < row.total_user_count
-  );
-  const room_id = rows[0].room_id;
-  const result = await joinRoom(room_id, user_id, user_nickname);
+  if (data) {
+    const rows = data.filter(
+      (row) => row.current_user_count < row.total_user_count
+    );
+    const room_id = rows[0].room_id;
+    const result = await joinRoom(room_id, user_id, user_nickname);
 
-  return result;
+    return result;
+  }
+
+  throw new Error("빠른 방 입장 실패");
 };
 
 export const changeUserCountInRoom = async (
