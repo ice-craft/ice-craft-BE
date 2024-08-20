@@ -124,14 +124,9 @@ export const fastJoinRoom = async (user_id: string, user_nickname: string) => {
     throw new Error("빠른 방 입장 실패");
   }
 
-  console.log("data", data);
-
   const rows = data.filter(
     (row) => row.current_user_count < row.total_user_count
   );
-
-  console.log("rows", rows);
-  console.log("rows.length", rows.length);
 
   if (rows.length > 0) {
     const room_id = rows[0].room_id;
