@@ -655,15 +655,23 @@ export const onGameStart = async (
             .filter((player) => player.is_lived === true)
             .filter((player) => player.role === "마피아")
             .map((player) => player.user_id);
+          const diedPlayers = allPlayers
+            .filter((player) => player.is_lived == false)
+            .map((player) => player.user_id);
+
           mafiaPlayers.forEach(
             (userId) => (media[userId] = { camera: true, mike: false })
           );
 
           console.log(
-            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 켬, 마이크 끔`
+            `[${roundName}] playerMediaStatus : 마피아 유저들과 죽은 유저들 카메라 켬, 마이크 끔`
           );
 
           mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+          });
+
+          diedPlayers.forEach((userId) => {
             mafiaIo.to(userId).emit("playerMediaStatus", media);
           });
 
@@ -687,15 +695,23 @@ export const onGameStart = async (
             .filter((player) => player.is_lived == true)
             .filter((player) => player.role == "마피아")
             .map((player) => player.user_id);
+          const diedPlayers = allPlayers
+            .filter((player) => player.is_lived == false)
+            .map((player) => player.user_id);
+
           mafiaPlayers.forEach(
             (userId) => (media[userId] = { camera: false, mike: false })
           );
 
           console.log(
-            `[${roundName}] playerMediaStatus : 마피아 유저들 카메라 끔, 마이크 끔`
+            `[${roundName}] playerMediaStatus : 마피아 유저들과 죽은 유저들 카메라 끔, 마이크 끔`
           );
 
           mafiaPlayers.forEach((userId) => {
+            mafiaIo.to(userId).emit("playerMediaStatus", media);
+          });
+
+          diedPlayers.forEach((userId) => {
             mafiaIo.to(userId).emit("playerMediaStatus", media);
           });
 
